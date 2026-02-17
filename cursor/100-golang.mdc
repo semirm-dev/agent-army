@@ -9,7 +9,7 @@ globs: "**/*.go"
 - **Error Handling:** ALWAYS wrap errors with context: `fmt.Errorf("user storage: save: %w", err)`.
   - Use `errors.Is` and `errors.As` for checking error types.
 - **Interfaces:** "Accept interfaces, return concrete types." Keep interfaces small (2-3 methods max).
-- **Project structure:** Follow vertical-slices architectrue (feature + hexagonal/clean), package by feature. Follow Golang best practices. 
+- **Project structure:** Follow vertical-slices architecture (feature + hexagonal/clean), package by feature. Follow Golang best practices. 
 
 ## 🧪 Testing & Quality
 - **Table-Driven Tests:** Use table-driven patterns for all logic-heavy functions.

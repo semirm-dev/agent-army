@@ -8,7 +8,7 @@ Before any code execution for complex tasks, generate a plan artifact using this
 
 ## 1. 🎯 Summary
 - High-level architectural goal.
-- List of specialized sub-agents required for parallel execution.
+- List of specialized agents/cycles required for parallel execution.
 
 ## 2. 🗺️ Strategy
 - **File Diff Preview:** List every file to be created or modified.
