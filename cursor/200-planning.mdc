@@ -7,7 +7,7 @@ alwaysApply: true
 
 # Agentic Implementation Plan
 
-Before any code execution for complex tasks, generate a plan artifact using this structure:
+Before any code execution for complex tasks, generate a plan using this structure:
 
 ## 1. 🎯 Summary
 - High-level architectural goal.

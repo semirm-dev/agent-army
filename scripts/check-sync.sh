@@ -31,13 +31,19 @@ diff_sections() {
   local section_b="$5"
   local end_a="${6:-^$}"
   local end_b="${7:-^$}"
+  local normalize="${8:-}"  # optional sed expression to normalize platform-specific terms
 
   local tmp_a tmp_b
   tmp_a=$(mktemp)
   tmp_b=$(mktemp)
 
-  extract_section "$file_a" "$section_a" "$end_a" | grep -v '^[[:space:]]*$' > "$tmp_a"
-  extract_section "$file_b" "$section_b" "$end_b" | grep -v '^[[:space:]]*$' > "$tmp_b"
+  if [ -n "$normalize" ]; then
+    extract_section "$file_a" "$section_a" "$end_a" | grep -v '^[[:space:]]*$' | sed "$normalize" > "$tmp_a"
+    extract_section "$file_b" "$section_b" "$end_b" | grep -v '^[[:space:]]*$' | sed "$normalize" > "$tmp_b"
+  else
+    extract_section "$file_a" "$section_a" "$end_a" | grep -v '^[[:space:]]*$' > "$tmp_a"
+    extract_section "$file_b" "$section_b" "$end_b" | grep -v '^[[:space:]]*$' > "$tmp_b"
+  fi
 
   if ! diff -q "$tmp_a" "$tmp_b" > /dev/null 2>&1; then
     echo "DRIFT in [$label]"
@@ -85,11 +91,13 @@ diff_sections \
 # 5. Planning: CLAUDE.md vs 200-planning.mdc
 # Compare the full planning section. Use 💻 as the end marker for CLAUDE.md
 # (next section after planning) and a sentinel for 200-planning.mdc (runs to EOF).
+# Normalize known platform terms: "sub-agents" (Claude) vs "agents/cycles" (Cursor).
 diff_sections \
   "Planning" \
   "$CLAUDE" "Agentic Implementation Plan" \
   "$CURSOR_DIR/200-planning.mdc" "Agentic Implementation Plan" \
-  "💻 Coding Patterns" "ZZZZZ_SENTINEL_EOF"
+  "💻 Coding Patterns" "ZZZZZ_SENTINEL_EOF" \
+  "s/sub-agents/agents/g;s/agents\/cycles/agents/g"
 
 if [ "$DRIFT_FOUND" -eq 0 ]; then
   echo "All sections in sync."

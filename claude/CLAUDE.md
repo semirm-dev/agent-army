@@ -46,8 +46,6 @@ Before any code execution for complex tasks, generate a plan using this structur
 - Expected visual/log output for success.
 - Write new temporary tests to verify your changes (if possible).
 
----
-
 # 💻 Coding Patterns
 - **Simplicity (KISS):** Prefer smaller, focused functions over complex ones. If a function >30 lines, refactor into sub-utilities.
 - **Packages:** Avoid "stuttering." Use `auth.Service` instead of `auth.AuthService`.
