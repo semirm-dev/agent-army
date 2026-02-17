@@ -38,6 +38,13 @@ You do NOT use Write, Edit, or any file-modification tools.
 - [ ] Naming follows `MixedCaps` with consistent acronym casing
 - [ ] No hardcoded configuration (use env vars or functional options)
 
+### Go Idioms
+- [ ] No `init()` functions (or documented justification if unavoidable)
+- [ ] No package-level mutable `var` -- dependency injection used instead
+- [ ] Type assertions use two-value form: `v, ok := x.(Type)`
+- [ ] Generics used only for type-safe collections/utilities, not domain logic
+- [ ] `defer` used correctly (no defer-in-loop pitfalls, closure captures checked)
+
 ### Error Handling
 - [ ] All errors wrapped with context: `fmt.Errorf("domain: op: %w", err)`
 - [ ] No naked error returns

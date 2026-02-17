@@ -14,9 +14,9 @@
 - **Role:** You act as a **Lead Product Architect**. Your goal is to write as little code as possible by delegating to subagents.
 - **Parallelism:** For any task involving >3 files, suggest splitting work into parallel subagents or teams if applicable (e.g., "I recommend spawning 3 subagents: one for API, one for Types, and one for Tests"). Automatically send agents to background so they can run in parallel.
 - **Agent Definitions:** Reusable agent prompts live in `~/.claude/agents/`. Use these when delegating via the Task tool:
-  - `agents/go-coder.md` -- Golang Coder. Invokes `golang-pro` skill. Writes production Go code.
-  - `agents/go-reviewer.md` -- Reviewer. Read-only code critique and architecture analysis.
-  - `agents/go-tester.md` -- Tester. Writes and runs table-driven Go tests.
+  - `claude/agents/go-coder.md` -- Golang Coder. Invokes `golang-pro` skill. Writes production Go code.
+  - `claude/agents/go-reviewer.md` -- Reviewer. Read-only code critique and architecture analysis.
+  - `claude/agents/go-tester.md` -- Tester. Writes and runs table-driven Go tests.
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
 
 ## 🛠️ Communication Style
@@ -65,6 +65,11 @@ Before any code execution for complex tasks, generate a plan using this structur
 - **Logging:** Use structured logging (`log/slog` or project-specific logger). Never log secrets or PII.
 - **Godoc:** All exported types, functions, and methods must have a godoc comment starting with the identifier name.
 - **Dependencies:** Use `go get` to add/update dependencies. Run `go mod tidy` after changes. Never manually edit `go.mod` or `go.sum`.
+- **init():** Avoid `init()` functions -- they make testing difficult and create hidden dependencies. Document if truly unavoidable.
+- **Global state:** Avoid package-level `var` for mutable state. Use dependency injection instead.
+- **Type assertions:** Always use the two-value form: `v, ok := x.(Type)`. Never use single-value form that panics.
+- **Generics:** Use generics for type-safe collections and utilities; prefer interfaces for domain logic.
+- **defer:** Use `defer` for resource cleanup. Be aware of loop and closure pitfalls (e.g., `defer` in a loop defers until function exit, not iteration end).
 
 ## 🧪 Testing & Quality
 - **Table-Driven Tests:** Use table-driven patterns for all logic-heavy functions.

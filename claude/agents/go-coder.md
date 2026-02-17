@@ -51,6 +51,11 @@ Key rules:
 - **Logging**: Use structured logging (`log/slog` or project-specific logger). Never log secrets or PII.
 - **Godoc**: All exported types, functions, and methods must have a godoc comment starting with the identifier name.
 - **Dependencies**: Use `go get` to add/update dependencies. Run `go mod tidy` after changes. Never manually edit `go.mod` or `go.sum`.
+- **init()**: Avoid `init()` functions -- they make testing difficult and create hidden dependencies. Document if truly unavoidable.
+- **Global state**: Avoid package-level `var` for mutable state. Use dependency injection instead.
+- **Type assertions**: Always use the two-value form: `v, ok := x.(Type)`. Never use single-value form that panics.
+- **Generics**: Use generics for type-safe collections and utilities; prefer interfaces for domain logic.
+- **defer**: Use `defer` for resource cleanup. Be aware of loop and closure pitfalls (e.g., `defer` in a loop defers until function exit, not iteration end).
 
 ## Workflow
 
