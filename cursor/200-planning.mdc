@@ -1,6 +1,9 @@
 ---
 description: Requirements for high-level technical planning and risk assessment
+alwaysApply: true
 ---
+
+<!-- Sync: Must stay in sync with claude/CLAUDE.md (Planning section) -->
 
 # Agentic Implementation Plan
 

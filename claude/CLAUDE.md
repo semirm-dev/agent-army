@@ -1,10 +1,14 @@
+<!-- Sync: Safety/Communication sections must stay in sync with cursor/000-index.mdc -->
+<!-- Sync: Coding Patterns/Testing sections must stay in sync with cursor/100-golang.mdc -->
+<!-- Sync: Planning section must stay in sync with cursor/200-planning.mdc -->
+
 # Global Orchestrator & Safety DNA
 
 ## 🛡️ Deletion & Safety (Hard Constraints)
 - **Destructive Actions:** NEVER delete or overwrite >5 files in a single turn without explicit confirmation.
 - **Rm-Rf Prohibited:** NEVER use `rm -rf` on project files. Use the `trash` command for all deletions.
 - **Dead Code:** If code appears unused, do not delete. Mark it with `// TODO: AI_DELETION_REVIEW` and list it in a `GRAVEYARD.md` at the root.
-- Never commit to Git. It must always be done manually.
+- **Git:** Do NOT auto-commit. If the user explicitly requests a commit, use Conventional Commits: `feat:`, `fix:`, `docs:`, or `refactor:`. Keep descriptions under 50 characters.
 
 ## 🤖 Multi-Agent Management (The Manager Workflow)
 - **Role:** You act as a **Lead Product Architect**. Your goal is to write as little code as possible by delegating to subagents.
@@ -17,7 +21,6 @@
 
 ## 🛠️ Communication Style
 - **Bluntness:** Skip the conversational fluff. No "Certainly!" or "I'd be happy to help." Go straight to the action.
-- **Conventional Commits:** All git commits must follow `feat:`, `fix:`, `docs:`, or `refactor:`. Keep descriptions under 50 characters.
 
 ---
 
@@ -43,18 +46,28 @@ Before any code execution for complex tasks, generate a plan using this structur
 - Expected visual/log output for success.
 - Write new temporary tests to verify your changes (if possible).
 
+---
 
 # 💻 Coding Patterns
 - **Simplicity (KISS):** Prefer smaller, focused functions over complex ones. If a function >30 lines, refactor into sub-utilities.
 - **Packages:** Avoid "stuttering." Use `auth.Service` instead of `auth.AuthService`.
-- **Error Handling:** ALWAYS wrap errors with context: `fmt.Errorf("user storage: save: %w", err)`.
+- **Error Handling:** ALWAYS wrap errors with context: `fmt.Errorf("domain: operation: %w", err)`.
   - Use `errors.Is` and `errors.As` for checking error types.
 - **Interfaces:** "Accept interfaces, return concrete types." Keep interfaces small (2-3 methods max).
-- **Project structure:** Follow vertical-slices architectrue (feature + hexagonal/clean), package by feature. Follow Golang best practices. 
+- **Project structure:** Follow vertical-slices architecture (feature + hexagonal/clean), package by feature. Follow Golang best practices.
+- **Naming:** Use `MixedCaps` (Acronyms like `ID`, `HTTP`, `URL` should be consistent case).
+- **Formatting:** Always order by visibility -- public first, then private.
+- **Context:** Always pass `context.Context` as the first parameter to blocking/IO operations.
+- **Panics:** Never use `panic()` for normal error paths. Reserve for truly unrecoverable situations.
+- **Configuration:** No hardcoded config values. Use environment variables, config files, or functional options.
+- **Concurrency:** Goroutines must have clear lifecycle management. Always pass `context.Context` for cancellation, and ensure clean shutdown.
+- **Security:** No hardcoded secrets, tokens, or credentials. Validate external input. Guard against SQL injection, command injection, and path traversal.
+- **Logging:** Use structured logging (`log/slog` or project-specific logger). Never log secrets or PII.
+- **Godoc:** All exported types, functions, and methods must have a godoc comment starting with the identifier name.
+- **Dependencies:** Use `go get` to add/update dependencies. Run `go mod tidy` after changes. Never manually edit `go.mod` or `go.sum`.
 
 ## 🧪 Testing & Quality
 - **Table-Driven Tests:** Use table-driven patterns for all logic-heavy functions.
 - **Mocks:** Avoid heavy mocking libraries. Prefer "fake" implementations or thin interfaces for external I/O.
-- **Naming:** Use `MixedCaps` (Acronyms like `ID`, `HTTP`, `URL` should be consistent case).
-
----
+- **Test Organization:** Test files live next to the code they test: `service.go` -> `service_test.go`. Use `t.Helper()` for shared assertion functions and `t.Cleanup()` for resource teardown.
+- **Race Detection:** Always run tests with `-race` flag: `go test ./... -race`.

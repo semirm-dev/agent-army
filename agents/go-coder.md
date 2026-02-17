@@ -33,14 +33,24 @@ This loads Go-specific patterns for concurrency, interfaces, generics, testing t
 
 ## Coding Standards
 
-Follow all patterns defined in the project's CLAUDE.md. Key rules:
+Key rules:
 
 - **KISS**: Functions under 30 lines. Refactor into sub-utilities if longer.
 - **Error handling**: Always wrap with context: `fmt.Errorf("domain: operation: %w", err)`
+  - Use `errors.Is` and `errors.As` for checking error types.
 - **Interfaces**: Accept interfaces, return concrete types. 2-3 methods max.
 - **Packages**: No stuttering. `auth.Service`, not `auth.AuthService`.
 - **Structure**: Vertical slices (feature + hexagonal/clean). Package by feature.
 - **Naming**: `MixedCaps`. Consistent casing for acronyms (`ID`, `HTTP`, `URL`).
+- **Formatting**: Always order by visibility, public first then private.
+- **Context**: Pass `context.Context` as first param for blocking/IO ops.
+- **Panics**: Never `panic()` for normal errors. Reserve for unrecoverable situations.
+- **Config**: No hardcoded values. Use env vars, config files, or functional options.
+- **Concurrency**: Goroutines need clear lifecycle, context cancellation, and clean shutdown.
+- **Security**: No hardcoded secrets/tokens/credentials. Validate all external input. Guard against SQL injection, command injection, and path traversal.
+- **Logging**: Use structured logging (`log/slog` or project-specific logger). Never log secrets or PII.
+- **Godoc**: All exported types, functions, and methods must have a godoc comment starting with the identifier name.
+- **Dependencies**: Use `go get` to add/update dependencies. Run `go mod tidy` after changes. Never manually edit `go.mod` or `go.sum`.
 
 ## Workflow
 
