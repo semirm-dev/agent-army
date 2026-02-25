@@ -7,7 +7,7 @@ Portable AI development setup for **Claude Code** and **Cursor**. One repo, one 
 ```bash
 git clone <this-repo> ~/workspace/agent-rules
 cd ~/workspace/agent-rules
-./scripts/bootstrap.sh
+make bootstrap
 ```
 
 Bootstrap configures your machine for the agent-rules workflow — it installs skills, deploys settings (which enables plugins), and sets up shell aliases. Every step lists what will be installed and asks for confirmation.
@@ -66,28 +66,20 @@ cursor/*.mdc                    → ~/.cursor/rules/*.mdc
 
 Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugins/`, `projects/`, `todos/`.
 
-## Commands Reference
+## Commands
 
-### `./scripts/bootstrap.sh` — First-time setup
+| Command            | Purpose                          |
+|--------------------|----------------------------------|
+| `make`             | Show all available targets       |
+| `make bootstrap`   | First-time interactive setup     |
+| `make sync`        | Sync rules to Claude and Cursor  |
+| `make sync-claude` | Sync rules to Claude only        |
+| `make sync-cursor` | Sync rules to Cursor only        |
+| `make check`       | Verify nothing drifted           |
+| `make deploy`      | Sync + check (day-to-day loop)   |
+| `make test`        | Run test suite                   |
 
-See [Quick Start](#quick-start) for the full 6-step breakdown.
-
-### `sync-rules` — Deploy rules after editing
-
-```bash
-sync-rules claude    # Deploys claude/ → ~/.claude/ (CLAUDE.md + agents + statusline)
-sync-rules cursor    # Deploys cursor/ → ~/.cursor/rules/ (4 .mdc files)
-```
-
-Run this after editing any file in `claude/` or `cursor/`. Uses `rsync -av` for physical mirroring.
-
-### `check-sync` — Verify nothing drifted
-
-```bash
-check-sync
-```
-
-Extracts 7 shared sections from CLAUDE.md and the Cursor `.mdc` files, strips heading levels, normalizes platform-specific terms, and diffs them.
+`make check` exit codes:
 
 | Exit code | Meaning                             |
 | --------- | ----------------------------------- |
@@ -95,14 +87,6 @@ Extracts 7 shared sections from CLAUDE.md and the Cursor `.mdc` files, strips he
 | `1`       | Drift detected — shows unified diff |
 
 Sections checked: Go Coding Patterns, Go Testing, Safety, Communication, TypeScript Coding Patterns, TypeScript Testing, Planning.
-
-### `./scripts/test-check-sync.sh` — Run tests
-
-```bash
-./scripts/test-check-sync.sh
-```
-
-4 tests: identical sections (no drift), drifted sections (drift detected), heading level normalization, real repo integration test.
 
 ## Capabilities
 
@@ -142,17 +126,13 @@ Each agent type has a specific role:
 
 ```bash
 # 1. Edit rules in this repo (single source of truth)
-vim claude/CLAUDE.md
+nano claude/CLAUDE.md
 
-# 2. Deploy changes
-sync-rules claude
-sync-rules cursor
+# 2. Deploy + verify
+make deploy
 
-# 3. Verify nothing drifted
-check-sync
-
-# 4. Run tests (if you changed check-sync.sh)
-./scripts/test-check-sync.sh
+# 3. Run tests (if you changed check-sync.sh)
+make test
 ```
 
 ## How Sync Works
@@ -169,4 +149,4 @@ check-sync
 3. Add the language's coding patterns to `claude/CLAUDE.md` (with sync comments)
 4. Add a `check-sync` section in `scripts/check-sync.sh` for the new rule
 5. Update the agent definitions list in `claude/CLAUDE.md`
-6. Run `sync-rules claude && sync-rules cursor && check-sync`
+6. Run `make deploy`
