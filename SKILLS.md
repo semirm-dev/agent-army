@@ -25,13 +25,3 @@ Skills are installed locally and symlinked into `~/.claude/skills/`.
 | `skill-creator` | `npx skills add https://github.com/anthropics/skills --skill skill-creator` |
 | `find-skills` | `npx skills add https://github.com/anthropics/skills --skill find-skills` |
 
-## Why Only 5 npm Skills?
-
-Four skills that were previously installed via npm are now provided by plugins:
-
-- `brainstorming` → superpowers plugin
-- `systematic-debugging` → superpowers plugin
-- `writing-plans` → superpowers plugin
-- `frontend-design` → frontend-design plugin
-
-Installing both causes double-loading. Use the plugin versions.
