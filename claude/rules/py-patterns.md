@@ -1,11 +1,6 @@
----
-description: Python standards and best practices
-globs: "**/*.py"
----
+<!-- Sync: Must stay in sync with cursor/102-python.mdc -->
 
-<!-- Sync: Must stay in sync with claude/CLAUDE.md (Python Coding Patterns & Testing sections) -->
-
-## 🐍 Python Coding Patterns
+# 🐍 Python Coding Patterns
 - **Simplicity (KISS):** Prefer smaller, focused functions over complex ones. If a function >30 lines, refactor into sub-utilities.
 - **Type Hints:** Use type hints on all function signatures. Use `from __future__ import annotations` for forward references.
 - **Formatting:** Use `ruff` (preferred) or `black` for formatting. Line length 88 (black default) or 120 (ruff default). Pick one and stay consistent per project.

@@ -25,7 +25,7 @@ The orchestrator invokes you via the Task tool when TypeScript or JavaScript cod
 
 ## Coding Standards
 
-Follow all TypeScript coding patterns and testing standards defined in CLAUDE.md. They are always loaded in context. Key emphasis for the coder role:
+Before writing code, read `~/.claude/rules/ts-patterns.md` for full TypeScript coding patterns and testing standards. Key emphasis for the coder role:
 - `strict: true` mandatory, no `any`, no non-null assertions
 - KISS: Functions under 30 lines
 - Named exports, no default exports

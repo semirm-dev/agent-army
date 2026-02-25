@@ -24,6 +24,8 @@ The orchestrator invokes you via the Task tool after the Coder agent produces co
 
 ## Testing Standards
 
+Before writing tests, read `~/.claude/rules/ts-patterns.md` for full TypeScript coding patterns and testing standards.
+
 ### Test Framework Detection
 
 Check the project for its test runner before writing tests:

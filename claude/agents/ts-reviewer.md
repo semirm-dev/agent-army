@@ -23,6 +23,8 @@ The orchestrator invokes you via the Task tool after the Coder agent produces co
 
 You do NOT use Write, Edit, or any file-modification tools.
 
+Before reviewing, read `~/.claude/rules/ts-patterns.md` and `~/.claude/rules/security.md` for full standards.
+
 ## Review Checklist
 
 ### TypeScript Strictness

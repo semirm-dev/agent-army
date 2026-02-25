@@ -1,0 +1,42 @@
+# 🗄️ Database Patterns
+
+## Migrations
+- **Versioned, forward-only.** Never edit an already-applied migration. Create a new one.
+- **Tools per language:** `golang-migrate` (Go), `prisma migrate` (TS), `alembic` (Python).
+- **Naming:** Use timestamps: `20260225120000_create_users.sql`. Include both `up` and `down` migrations.
+- **Review:** Every migration must be reviewed for data safety. DROP/ALTER on production tables requires explicit confirmation.
+
+## Connection Pooling
+- **Always pool.** Never create per-request connections.
+- **Set limits:** `max_connections`, `idle_timeout`, `connection_lifetime`. Size pool based on expected concurrency.
+- **Health checks:** Validate connections before use (ping or lightweight query).
+- **Graceful shutdown:** Drain pool on application shutdown. Close idle connections first, wait for active queries.
+
+## Transactions
+- **Keep short.** No network calls (HTTP, gRPC) inside transactions.
+- **Explicit boundaries.** Use `BEGIN`/`COMMIT`/`ROLLBACK` explicitly. Avoid auto-commit for multi-statement operations.
+- **Isolation levels:** Default to READ COMMITTED. Use SERIALIZABLE only when required (e.g., financial operations). Document the choice.
+- **Retry on conflict.** Serialization failures should be retried, not surfaced as user errors.
+
+## Query Safety
+- **Always parameterized.** Never string-concatenate user input into queries.
+- **Query builders/ORMs:** Use parameterized execution. Verify generated SQL in development.
+- **Avoid `SELECT *`.** List columns explicitly. Prevents schema change breakage and reduces data transfer.
+
+## Indexes
+- **Index `WHERE`, `JOIN`, `ORDER BY` columns.** Review query plans with `EXPLAIN ANALYZE` for N+1 detection.
+- **Composite indexes:** Order columns by selectivity (most selective first).
+- **Partial indexes:** Use for filtered queries on large tables (e.g., `WHERE status = 'active'`).
+- **Monitor:** Watch for unused indexes (bloat) and missing indexes (slow queries).
+
+## Schema Conventions
+- **Primary keys:** UUID for distributed systems, BIGINT/SERIAL for single-database systems.
+- **Timestamps:** Use `timestamptz` for all date/time columns. Never `timestamp` without timezone.
+- **Audit columns:** `created_at` and `updated_at` on every table. Set `created_at` at insert, update `updated_at` via trigger or application.
+- **Soft deletes:** Use `deleted_at` timestamp instead of physical deletion when audit trail matters.
+- **Naming:** `snake_case` for tables and columns. Plural table names (`users`, `orders`). Foreign keys: `<table>_id` (e.g., `user_id`).
+
+## ORMs vs Raw SQL
+- **ORMs:** Use when productivity matters (CRUD-heavy code, rapid prototyping). Good for simple queries and schema management.
+- **Raw SQL:** Use for complex queries, performance-critical paths, bulk operations, and advanced database features.
+- **Never mix both in the same function.** Pick one approach per operation. Mixing creates confusion about query execution and error handling.

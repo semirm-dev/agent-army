@@ -1,0 +1,89 @@
+# Pre-commit hook configuration template
+# Install: pip install pre-commit && pre-commit install
+# Run all: pre-commit run --all-files
+#
+# Customize for your project: uncomment language-specific hooks below.
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: no-commit-to-branch
+        args: ['--branch', 'main', '--branch', 'master']
+
+  # Conventional Commits format validation
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, refactor, test, chore, ci, perf]
+
+  # Secret detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+  # Prevent rm -rf in scripts
+  - repo: local
+    hooks:
+      - id: no-rm-rf
+        name: Prevent rm -rf in staged files
+        entry: bash -c 'if grep -rn "rm -rf" "$@"; then echo "ERROR: rm -rf detected. Use trash instead."; exit 1; fi'
+        language: system
+        types: [shell]
+
+  ## ── Go ──────────────────────────────────────────────────────
+  # - repo: https://github.com/golangci/golangci-lint
+  #   rev: v1.62.0
+  #   hooks:
+  #     - id: golangci-lint
+  #
+  # - repo: local
+  #   hooks:
+  #     - id: go-vet
+  #       name: go vet
+  #       entry: go vet ./...
+  #       language: system
+  #       types: [go]
+  #       pass_filenames: false
+
+  ## ── TypeScript / JavaScript ────────────────────────────────
+  # - repo: local
+  #   hooks:
+  #     - id: eslint
+  #       name: eslint
+  #       entry: npx eslint --fix
+  #       language: system
+  #       types_or: [javascript, jsx, ts, tsx]
+  #
+  #     - id: tsc
+  #       name: tsc --noEmit
+  #       entry: npx tsc --noEmit
+  #       language: system
+  #       types_or: [ts, tsx]
+  #       pass_filenames: false
+
+  ## ── Python ─────────────────────────────────────────────────
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   rev: v0.8.0
+  #   hooks:
+  #     - id: ruff
+  #       args: [--fix]
+  #     - id: ruff-format
+  #
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.13.0
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies: []

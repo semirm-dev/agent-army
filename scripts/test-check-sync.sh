@@ -196,9 +196,61 @@ chmod +x "$TMPDIR_TEST/check_headings.sh"
 bash "$TMPDIR_TEST/check_headings.sh" > /dev/null 2>&1 && exit_code=0 || exit_code=$?
 assert_exit "Different heading levels → exit 0 (no drift)" 0 "$exit_code"
 
-# ── Test 4: Real check-sync.sh against repo ───────────────────────
+# ── Test 4: Rule file vs cursor file parity ────────────────────────
 
-echo "── Test 4: Real check-sync.sh on repo (should pass) ──"
+echo "── Test 4: Rule file drift detection ──"
+
+cat > "$TMPDIR_TEST/rule.md" <<'EOF'
+<!-- Sync: Must stay in sync with cursor/test.mdc -->
+
+# 🐍 Python Patterns
+- Rule A
+- Rule B
+EOF
+
+cat > "$TMPDIR_TEST/cursor_rule.mdc" <<'EOF'
+---
+globs: "**/*.py"
+---
+
+<!-- Sync: Must stay in sync with claude/rules/py-patterns.md -->
+
+## 🐍 Python Patterns
+- Rule A
+- Rule B
+- Rule C EXTRA
+EOF
+
+cat > "$TMPDIR_TEST/check_rule.sh" <<SCRIPT
+#!/bin/bash
+set -euo pipefail
+DRIFT_FOUND=0
+
+diff_rule_file() {
+  local label="\$1" rule_file="\$2" cursor_file="\$3"
+  local tmp_a=\$(mktemp) tmp_b=\$(mktemp)
+  grep -v '^<!-- Sync:' "\$rule_file" | grep -v '^[[:space:]]*\$' | sed 's/^#\\{1,6\\} //' > "\$tmp_a"
+  sed -n '/^---\$/,/^---\$/!p' "\$cursor_file" | grep -v '^<!-- Sync:' | grep -v '^[[:space:]]*\$' | sed 's/^#\\{1,6\\} //' > "\$tmp_b"
+  if ! diff -q "\$tmp_a" "\$tmp_b" > /dev/null 2>&1; then
+    DRIFT_FOUND=1
+  fi
+  rm -f "\$tmp_a" "\$tmp_b"
+}
+
+diff_rule_file "Python" \\
+  "$TMPDIR_TEST/rule.md" \\
+  "$TMPDIR_TEST/cursor_rule.mdc"
+
+exit \$DRIFT_FOUND
+SCRIPT
+chmod +x "$TMPDIR_TEST/check_rule.sh"
+
+bash "$TMPDIR_TEST/check_rule.sh" > /dev/null 2>&1 && exit_code=0 || exit_code=$?
+assert_exit "Rule file drift detected → exit 1" 1 "$exit_code"
+
+# ── Test 5: Real check-sync.sh against repo ───────────────────────
+
+echo "── Test 5: Real check-sync.sh on repo (should pass) ──"
 
 bash "$SCRIPT_DIR/check-sync.sh" > /dev/null 2>&1 && exit_code=0 || exit_code=$?
 assert_exit "Real check-sync on repo → exit 0" 0 "$exit_code"

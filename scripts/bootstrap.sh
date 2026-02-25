@@ -73,17 +73,13 @@ fi
 step "Step 3: Install npm skills"
 echo "  Skills to install:"
 echo "    - golang-pro"
-echo "    - browser-use"
 echo "    - database-schema-designer"
 echo "    - skill-creator"
-echo "    - find-skills"
-if ask "Install 5 skills?"; then
+if ask "Install 3 skills?"; then
   SKILLS=(
     "https://github.com/jeffallan/claude-skills --skill golang-pro"
-    "https://github.com/browser-use/browser-use --skill browser-use"
     "https://github.com/softaworks/agent-toolkit --skill database-schema-designer"
     "https://github.com/anthropics/skills --skill skill-creator"
-    "https://github.com/anthropics/skills --skill find-skills"
   )
   for skill_cmd in "${SKILLS[@]}"; do
     skill_name="${skill_cmd##*--skill }"

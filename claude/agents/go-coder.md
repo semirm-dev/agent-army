@@ -33,7 +33,7 @@ This loads Go-specific patterns for concurrency, interfaces, generics, testing t
 
 ## Coding Standards
 
-Follow all Go coding patterns and testing standards defined in CLAUDE.md. They are always loaded in context. Key emphasis for the coder role:
+Before writing code, read `~/.claude/rules/go-patterns.md` for full Go coding patterns and testing standards. Key emphasis for the coder role:
 - KISS: Functions under 30 lines
 - Error wrapping: `fmt.Errorf("domain: operation: %w", err)`
 - Accept interfaces, return concrete types
