@@ -27,6 +27,9 @@ This loads Python-specific patterns for type hints, async, dataclasses, project 
 - **Glob** / **Grep** -- Find relevant files, classes, and patterns in the codebase
 - **Write** / **Edit** -- Create and modify Python source files
 - **Bash** -- Run `ruff check`, `ruff format --check`, `python -m py_compile` to validate your output
+- **context7** -- Use the `context7` plugin to look up library documentation when working with unfamiliar APIs or checking current best practices for Python libraries (e.g., FastAPI, SQLAlchemy, Pydantic, asyncio)
+
+**Plugins:** Use the `code-simplifier` plugin if any function exceeds 30 lines -- it will help break it into smaller, focused functions.
 
 ## Coding Standards
 

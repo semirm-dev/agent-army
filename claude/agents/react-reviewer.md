@@ -25,6 +25,8 @@ You do NOT use Write, Edit, or any file-modification tools.
 
 Before reviewing, read `~/.claude/rules/react-patterns.md`, `~/.claude/rules/ts-patterns.md`, and `~/.claude/rules/security.md` for full standards.
 
+**Plugins:** Use the `code-review` plugin for structured PR review feedback. Use `security-guidance` plugin when reviewing authentication, authorization, or XSS/injection-related code.
+
 ## Review Checklist
 
 ### Component Patterns

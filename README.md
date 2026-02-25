@@ -31,26 +31,61 @@ agent-rules/
 │   ├── CLAUDE.md              # Main instructions (safety, patterns, planning)
 │   ├── settings.json          # Reference settings template
 │   ├── statusline-command.sh  # Status line script (deployed to ~/.claude/)
-│   └── agents/
-│       ├── go-coder.md        # Go code writer
-│       ├── go-reviewer.md     # Go code reviewer (read-only)
-│       ├── go-tester.md       # Go test writer
-│       ├── ts-coder.md        # TypeScript/JS code writer
-│       ├── ts-reviewer.md     # TypeScript/JS code reviewer (read-only)
-│       ├── ts-tester.md       # TypeScript/JS test writer
-│       └── docker-builder.md  # Dockerfile, compose, CI/CD writer
-├── cursor/
+│   ├── agents/                # 17 reusable agent prompts
+│   │   ├── go-coder.md        # Go code writer (uses golang-pro skill)
+│   │   ├── go-reviewer.md     # Go code reviewer (read-only)
+│   │   ├── go-tester.md       # Go test writer
+│   │   ├── ts-coder.md        # TypeScript/JS code writer
+│   │   ├── ts-reviewer.md     # TypeScript/JS code reviewer (read-only)
+│   │   ├── ts-tester.md       # TypeScript/JS test writer
+│   │   ├── py-coder.md        # Python code writer
+│   │   ├── py-reviewer.md     # Python code reviewer (read-only)
+│   │   ├── py-tester.md       # Python test writer
+│   │   ├── react-coder.md     # React/frontend component writer
+│   │   ├── react-reviewer.md  # React/frontend code reviewer (read-only)
+│   │   ├── react-tester.md    # React component test writer
+│   │   ├── db-coder.md        # Database engineer (migrations, queries)
+│   │   ├── db-reviewer.md     # Database reviewer (read-only)
+│   │   ├── db-tester.md       # Database test writer
+│   │   ├── docker-builder.md  # Dockerfile, compose, CI/CD writer
+│   │   └── docker-reviewer.md # Docker/infra reviewer (read-only)
+│   └── rules/                 # 10 domain-specific rule files
+│       ├── go-patterns.md     # Go coding + testing standards
+│       ├── ts-patterns.md     # TypeScript coding + testing standards
+│       ├── py-patterns.md     # Python coding + testing standards
+│       ├── react-patterns.md  # React component, accessibility, error boundaries
+│       ├── git-workflow.md    # Git conventions (branch, commit, PR)
+│       ├── api-design.md      # REST/gRPC API patterns
+│       ├── database.md        # Migrations, pooling, transactions, ORMs
+│       ├── observability.md   # Logging, metrics, health checks, Docker, CI/CD
+│       ├── security.md        # Auth, CORS, rate limiting, secrets
+│       └── cross-cutting.md   # Error taxonomy, coverage targets, deps
+├── cursor/                    # 12 Cursor IDE rules
 │   ├── 000-index.mdc          # Safety & communication (alwaysApply)
 │   ├── 100-golang.mdc         # Go coding patterns (globs: **/*.go)
 │   ├── 101-typescript.mdc     # TypeScript patterns (globs: **/*.ts,tsx,js,jsx)
 │   ├── 102-python.mdc         # Python patterns (globs: **/*.py)
+│   ├── 103-react.mdc          # React patterns (globs: **/*.tsx,jsx)
 │   ├── 200-planning.mdc       # Planning template (alwaysApply)
-│   └── 300-git.mdc            # Git workflow conventions (alwaysApply)
+│   ├── 300-git.mdc            # Git workflow conventions (alwaysApply)
+│   ├── 400-api-design.mdc     # API design patterns
+│   ├── 401-database.mdc       # Database patterns
+│   ├── 500-observability.mdc  # Observability & infrastructure
+│   ├── 501-security.mdc       # Security patterns
+│   └── 502-cross-cutting.mdc  # Error taxonomy, coverage, deps (alwaysApply)
+├── skills/                    # 3 custom skills
+│   ├── api-designer.md        # API design checklist and scaffolding
+│   ├── git-conventions.md     # Branch naming, commit format, PR templates
+│   └── migration-safety.md    # Database migration safety checklist
 ├── scripts/
 │   ├── bootstrap.sh           # Interactive new-device setup
 │   ├── rsync-rules.sh         # Sync repo → ~/.claude/ or ~/.cursor/rules/
 │   ├── check-sync.sh          # Verify CLAUDE.md ↔ Cursor .mdc parity
+│   ├── validate-structure.sh  # Structural validation (agents, rules, triads)
+│   ├── verify-deployed.sh     # Verify deployed state matches repo
 │   └── test-check-sync.sh     # Tests for check-sync drift detection
+├── .githooks/
+│   └── pre-commit             # Sync check before commit
 ├── templates/
 │   └── PROJECT-CLAUDE.md      # Project-level CLAUDE.md starter template
 ├── SKILLS.md                  # What to install (plugins vs npm skills)
@@ -64,6 +99,7 @@ Repo                            → Deployed to
 ─────────────────────────────────────────────────────────
 claude/CLAUDE.md                → ~/.claude/CLAUDE.md
 claude/agents/*.md              → ~/.claude/agents/*.md
+claude/rules/*.md               → ~/.claude/rules/*.md
 claude/statusline-command.sh    → ~/.claude/statusline-command.sh
 claude/settings.json            → ~/.claude/settings.json (bootstrap only)
 cursor/*.mdc                    → ~/.cursor/rules/*.mdc
@@ -73,17 +109,20 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 
 ## Commands
 
-| Command              | Purpose                                    |
-|----------------------|--------------------------------------------|
-| `make`               | Show all available targets                 |
-| `make bootstrap`     | First-time interactive setup               |
-| `make sync`          | Sync rules to Claude and Cursor            |
-| `make sync-claude`   | Sync rules to Claude only                  |
-| `make sync-cursor`   | Sync rules to Cursor only                  |
-| `make check`         | Verify nothing drifted                     |
-| `make deploy`        | Sync + check (day-to-day loop)             |
-| `make test`          | Run test suite                             |
-| `make init-project`  | Scaffold a project-level CLAUDE.md         |
+| Command                | Purpose                                        |
+|------------------------|------------------------------------------------|
+| `make`                 | Show all available targets                     |
+| `make bootstrap`       | First-time interactive setup                   |
+| `make sync`            | Sync rules to Claude and Cursor                |
+| `make sync-claude`     | Sync rules to Claude only                      |
+| `make sync-cursor`     | Sync rules to Cursor only                      |
+| `make check`           | Verify nothing drifted                         |
+| `make deploy`          | Sync + check (day-to-day loop)                 |
+| `make validate`        | Structural validation (agents, rules, triads)  |
+| `make verify-deployed` | Verify deployed state matches repo             |
+| `make test`            | Run test suite                                 |
+| `make install-hooks`   | Install git pre-commit hook                    |
+| `make init-project`    | Scaffold a project-level CLAUDE.md             |
 
 `make check` exit codes:
 
@@ -92,16 +131,18 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `0`       | All sections in sync                |
 | `1`       | Drift detected — shows unified diff |
 
-Sections checked: Go Coding Patterns, Go Testing, TypeScript Coding Patterns, TypeScript Testing, Python Coding Patterns, Python Testing, Safety, Communication, Planning, Git Workflow.
+Sections checked: Go Coding Patterns, Go Testing, TypeScript Coding Patterns, TypeScript Testing, Python Coding Patterns, Python Testing, Safety, Communication, Planning, Git Workflow. Structural validation (`make validate`) checks agent triads, rule references, and sync pairs.
 
 ## Capabilities
 
-| Source           | What                                      | Items                                                                                   |
-| ---------------- | ----------------------------------------- | --------------------------------------------------------------------------------------- |
-| **Plugins**      | Auto-updating, managed by Claude CLI      | superpowers, context7, frontend-design, code-review, security-guidance, code-simplifier |
-| **npm Skills**   | Installed locally via `npx skills add`    | golang-pro, browser-use, database-schema-designer, skill-creator, find-skills           |
-| **Agents**       | Reusable prompts for Task tool delegation | go-coder, go-reviewer, go-tester, ts-coder, ts-reviewer, ts-tester, docker-builder       |
-| **Cursor Rules** | Glob-matched coding standards             | 000-index, 100-golang, 101-typescript, 102-python, 200-planning, 300-git                 |
+| Source             | What                                      | Count | Items                                                                                   |
+| ------------------ | ----------------------------------------- | ----- | --------------------------------------------------------------------------------------- |
+| **Plugins**        | Auto-updating, managed by Claude CLI      | 6     | superpowers, context7, frontend-design, code-review, security-guidance, code-simplifier |
+| **npm Skills**     | Installed locally via `npx skills add`    | 5     | golang-pro, browser-use, database-schema-designer, skill-creator, find-skills           |
+| **Custom Skills**  | Built-in, located in `skills/`            | 3     | api-designer, git-conventions, migration-safety                                         |
+| **Agents**         | Reusable prompts for Task tool delegation | 17    | go-{coder,reviewer,tester}, ts-{coder,reviewer,tester}, py-{coder,reviewer,tester}, react-{coder,reviewer,tester}, db-{coder,reviewer,tester}, docker-{builder,reviewer} |
+| **Claude Rules**   | Domain-specific standards                 | 10    | go-patterns, ts-patterns, py-patterns, react-patterns, git-workflow, api-design, database, observability, security, cross-cutting |
+| **Cursor Rules**   | Glob-matched coding standards             | 12    | 000-index, 100-golang, 101-typescript, 102-python, 103-react, 200-planning, 300-git, 400-api-design, 401-database, 500-observability, 501-security, 502-cross-cutting |
 
 ## How Agents Work
 
@@ -137,7 +178,10 @@ nano claude/CLAUDE.md
 # 2. Deploy + verify
 make deploy
 
-# 3. Run tests (if you changed check-sync.sh)
+# 3. Structural validation (agents, rules, triads)
+make validate
+
+# 4. Run tests (if you changed check-sync.sh)
 make test
 ```
 

@@ -30,6 +30,8 @@ Before writing code, read:
 
 Invoke the `frontend-design` plugin when working on UI layout, design systems, or component structure decisions.
 
+**Plugins:** Use `code-simplifier` if any function or component exceeds 30 lines. Use `context7` to look up library docs for TanStack Query, Zustand, or other React ecosystem libraries.
+
 ## Patterns
 
 ### Functional Components Only

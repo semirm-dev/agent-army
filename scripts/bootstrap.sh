@@ -75,11 +75,15 @@ echo "  Skills to install:"
 echo "    - golang-pro"
 echo "    - database-schema-designer"
 echo "    - skill-creator"
-if ask "Install 3 skills?"; then
+echo "    - browser-use"
+echo "    - find-skills"
+if ask "Install 5 skills?"; then
   SKILLS=(
     "https://github.com/jeffallan/claude-skills --skill golang-pro"
     "https://github.com/softaworks/agent-toolkit --skill database-schema-designer"
     "https://github.com/anthropics/skills --skill skill-creator"
+    "https://github.com/anthropics/skills --skill browser-use"
+    "https://github.com/anthropics/skills --skill find-skills"
   )
   for skill_cmd in "${SKILLS[@]}"; do
     skill_name="${skill_cmd##*--skill }"

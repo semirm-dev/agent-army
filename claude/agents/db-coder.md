@@ -30,6 +30,8 @@ Before writing code, read:
 
 Invoke the `database-schema-designer` skill when designing new schemas or significant schema changes.
 
+**Plugins:** Use `code-simplifier` if any function exceeds 30 lines. Use `context7` to look up ORM/driver documentation (sqlc, Prisma, SQLAlchemy, pgx).
+
 ## Key Patterns
 
 ### Migration Safety

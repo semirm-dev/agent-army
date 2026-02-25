@@ -31,6 +31,8 @@ This loads Go-specific patterns for concurrency, interfaces, generics, testing t
 - **Write** / **Edit** -- Create and modify Go source files
 - **Bash** -- Run `go build`, `go vet`, `gofmt`, `golangci-lint` to validate your output
 
+**Plugins:** Use the `code-simplifier` plugin if any function exceeds 30 lines -- it will help break it into smaller, focused functions.
+
 ## Coding Standards
 
 Before writing code, read `~/.claude/rules/go-patterns.md` for full Go coding patterns and testing standards. Key emphasis for the coder role:

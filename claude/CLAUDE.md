@@ -18,9 +18,19 @@
   - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
   - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
   - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
-  - **Database:** `db-coder.md` (invokes `database-schema-designer` skill)
+  - **Database:** `db-coder.md` (invokes `database-schema-designer` skill), `db-reviewer.md` (read-only), `db-tester.md`
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only)
+- **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
+  - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
+  - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
+  - `migration-safety` -- Invoke when writing or reviewing database migrations.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
+- **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
+  - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.
+  - `test-driven-development` -- When implementing features, write tests first.
+  - `dispatching-parallel-agents` -- When facing 2+ independent tasks with no shared state.
+  - `writing-plans` / `executing-plans` -- For multi-step implementation tasks.
+  - `verification-before-completion` -- Before claiming work is done, run verification.
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
 
 ## 🛠️ Communication Style
@@ -50,6 +60,27 @@ Before any code execution for complex tasks, generate a plan using this structur
 - Expected visual/log output for success.
 - Write new temporary tests to verify your changes (if possible).
 
+### Example: "Add a /health endpoint"
+
+```
+## 1. 🎯 Summary
+Add /healthz and /readyz endpoints to the API server.
+Sub-agents: go-coder (endpoint), go-tester (tests), go-reviewer (review).
+
+## 2. 🗺️ Strategy
+- Create: internal/health/handler.go, internal/health/handler_test.go
+- Modify: cmd/server/main.go (register routes)
+- Breaking Changes: None.
+
+## 3. 🚨 Risk Assessment
+- Risk Level: LOW
+- Rollback Plan: Revert the 2 new files and 1 route registration line.
+
+## 4. 🧪 Verification Plan
+- go build ./... && go test ./internal/health/... -race
+- Expected: 200 on /healthz, 503 on /readyz when DB is down.
+```
+
 ---
 
 # Language & Domain Rules
@@ -63,10 +94,10 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 | `rules/py-patterns.md` | `cursor/102-python.mdc` | Python coding + testing patterns |
 | `rules/git-workflow.md` | `cursor/300-git.mdc` | Git conventions |
 | `rules/api-design.md` | `cursor/400-api-design.mdc` | API design patterns |
-| `rules/observability.md` | _(Claude-only)_ | Logging, metrics, health checks, Docker, CI/CD |
-| `rules/cross-cutting.md` | _(Claude-only)_ | Error taxonomy, coverage targets, dependency policy |
+| `rules/observability.md` | `cursor/500-observability.mdc` | Logging, metrics, health checks, Docker, CI/CD |
+| `rules/cross-cutting.md` | `cursor/502-cross-cutting.mdc` | Error taxonomy, coverage targets, dependency policy |
 | `rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
 | `rules/react-patterns.md` | `cursor/103-react.mdc` | React component and frontend patterns |
-| `rules/security.md` | _(Claude-only)_ | Auth, CORS, rate limiting, secrets management |
+| `rules/security.md` | `cursor/501-security.mdc` | Auth, CORS, rate limiting, secrets management |
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.

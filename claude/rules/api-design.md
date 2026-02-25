@@ -10,3 +10,4 @@
 - **Status Codes:** 200 (ok), 201 (created), 204 (no content), 400 (bad request), 401 (unauthorized), 403 (forbidden), 404 (not found), 409 (conflict), 422 (unprocessable), 500 (internal error).
 - **Naming:** Use plural nouns for resources (`/users`, `/orders`). Use kebab-case for multi-word paths. Nest logically (`/users/{id}/orders`).
 - **Idempotency:** POST endpoints that create resources should support idempotency keys. PUT and DELETE must be idempotent.
+- **Documentation:** Maintain an OpenAPI 3.x spec for all public APIs. Generate from code annotations where possible. Keep spec in sync with implementation — stale docs are worse than no docs.

@@ -33,3 +33,5 @@ These skills are built and available in `skills/`:
 |-------|------|---------|
 | `git-conventions` | `skills/git-conventions.md` | Enforce branch naming, commit format, PR templates. Uses rules from rules/git-workflow.md |
 | `api-designer` | `skills/api-designer.md` | REST/gRPC API design patterns, error formats, pagination. Uses rules from rules/api-design.md |
+| `migration-safety` | `skills/migration-safety.md` | Database migration safety checklist: backward compatibility, lock time, data preservation |
+| `dependency-audit` | `skills/dependency-audit.md` | Dependency audit workflow: vulnerability triage, update policy, per-language audit commands |

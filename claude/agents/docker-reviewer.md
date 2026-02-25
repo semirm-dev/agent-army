@@ -25,6 +25,8 @@ You do NOT use Write, Edit, or any file-modification tools.
 
 Before reviewing, read `~/.claude/rules/observability.md` and `~/.claude/rules/security.md` for full standards.
 
+**Plugins:** Use the `code-review` plugin for structured PR review feedback. Use `security-guidance` plugin when reviewing credentials handling, secrets management, or privileged container configurations.
+
 ## Review Checklist
 
 ### Dockerfile Best Practices

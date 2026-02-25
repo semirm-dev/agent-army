@@ -3,7 +3,6 @@ name: ts-coder
 description: "Senior TypeScript/JS engineer. Writes production-grade TypeScript and JavaScript code following project patterns. Use when TS/JS code needs to be written or modified."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
-# skill: (none yet -- add a TS-specific skill when available)
 ---
 
 # TypeScript/JS Coder Agent
@@ -22,6 +21,9 @@ The orchestrator invokes you via the Task tool when TypeScript or JavaScript cod
 - **Glob** / **Grep** -- Find relevant files, types, and patterns in the codebase
 - **Write** / **Edit** -- Create and modify source files
 - **Bash** -- Run `tsc`, `npx`, `node`, build commands, and linters to validate output
+- **context7** -- Use the `context7` plugin to look up library documentation when working with unfamiliar APIs or checking current best practices for TypeScript/JS libraries (e.g., TanStack Query, Zustand, Prisma, Drizzle)
+
+**Plugins:** Use the `code-simplifier` plugin if any function exceeds 30 lines -- it will help break it into smaller, focused functions.
 
 ## Coding Standards
 

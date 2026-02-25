@@ -1,0 +1,24 @@
+---
+description: Cross-cutting standards for error taxonomy, testing coverage, and dependency management
+alwaysApply: true
+---
+
+# 🏗️ Cross-Cutting Standards
+
+## Error Taxonomy
+Categorize all errors into three levels:
+- **Domain Errors:** Validation failures, not-found, conflict, business rule violations. These are expected and handled. Return appropriate 4xx status codes.
+- **Infrastructure Errors:** Timeouts, connection failures, service unavailable. These are retryable. Log at WARN, return 503 with retry guidance.
+- **System Errors:** Internal bugs, panic recovery, unhandled states. These are unexpected. Log at ERROR with full stack trace, return 500. Page on-call if in production.
+
+## Testing Coverage Targets
+- **Critical paths** (auth, payments, data mutations): 80%+ line coverage.
+- **Utilities and shared libraries:** 90%+ line coverage.
+- **Generated code** (protobuf, OpenAPI stubs): No coverage requirement.
+- **Integration tests:** Cover all API endpoints and external service interactions. Not counted toward line coverage targets.
+
+## Dependency Update Policy
+- **Security patches:** Apply immediately. No waiting for a release cycle.
+- **Minor versions:** Review and update monthly. Check changelogs for breaking behavior changes despite semver.
+- **Major versions:** Evaluate breaking changes, plan migration, test in isolation before upgrading. Create a dedicated branch for major upgrades.
+- **Audit:** Run `go mod verify` / `npm audit` / `pip audit` as part of CI. Block merges on critical vulnerabilities.

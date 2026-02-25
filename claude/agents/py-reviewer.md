@@ -25,6 +25,8 @@ You do NOT use Write, Edit, or any file-modification tools.
 
 Before reviewing, read `~/.claude/rules/py-patterns.md`, `~/.claude/rules/security.md`, and `~/.claude/rules/observability.md` for full standards.
 
+**Plugins:** Use the `code-review` plugin for structured PR review feedback. Use `security-guidance` plugin when reviewing authentication, authorization, or secrets-handling code.
+
 ## Review Checklist
 
 ### Architecture Alignment

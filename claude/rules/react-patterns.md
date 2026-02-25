@@ -1,3 +1,5 @@
+<!-- Sync: React patterns must stay in sync with cursor/103-react.mdc -->
+
 # ⚛️ React & Frontend Patterns
 
 ## Component Structure
@@ -29,6 +31,21 @@
 - **`useMemo` / `useCallback`:** Only use when there's a measured performance issue or when passing to memoized children.
 - **Lazy loading:** Use `React.lazy()` + `Suspense` for route-level code splitting.
 - **List rendering:** Use stable, unique keys (never array index). Virtualize long lists (>100 items) with `react-window` or `tanstack-virtual`.
+
+## Accessibility (WCAG 2.1 AA)
+- **Semantic HTML:** Use `<button>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<header>`, `<footer>` instead of generic `<div>` with click handlers.
+- **ARIA labels:** Add `aria-label` or `aria-labelledby` to interactive elements that lack visible text. Use `aria-live` regions for dynamic content updates.
+- **Keyboard navigation:** All interactive elements must be reachable via Tab and activatable via Enter/Space. Custom components need `tabIndex`, `onKeyDown` handlers, and visible focus indicators.
+- **Color:** Never use color as the sole indicator of state. Pair with icons, text, or patterns. Maintain minimum 4.5:1 contrast ratio for normal text, 3:1 for large text.
+- **Images:** All `<img>` elements must have meaningful `alt` text. Decorative images use `alt=""` with `aria-hidden="true"`.
+- **Forms:** Every `<input>` must have an associated `<label>` (via `htmlFor` or wrapping). Use `aria-describedby` for help text and `aria-invalid` for error states.
+- **Focus management:** Manage focus on route changes and modal open/close. Use `autoFocus` sparingly and only for primary actions.
+
+## Error Boundaries
+- **Use `react-error-boundary` library** (not class components). Maintains "functional components only" rule.
+- **Wrap at route level:** Each route should have an error boundary with a fallback UI.
+- **Fallback UI:** Show actionable error messages with a "Try again" button using `resetErrorBoundary`.
+- **Logging:** Use `onError` prop to report errors to your logging service.
 
 ## Testing
 - **`@testing-library/react`** for all component tests. Test behavior, not implementation.
