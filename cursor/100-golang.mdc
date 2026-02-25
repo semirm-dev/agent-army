@@ -5,7 +5,7 @@ globs: "**/*.go"
 
 <!-- Sync: Must stay in sync with claude/CLAUDE.md (Coding Patterns & Testing sections) -->
 
-## 💻 Coding Patterns
+## 💻 Go Coding Patterns
 - **Simplicity (KISS):** Prefer smaller, focused functions over complex ones. If a function >30 lines, refactor into sub-utilities.
 - **Packages:** Avoid "stuttering." Use `auth.Service` instead of `auth.AuthService`.
 - **Error Handling:** ALWAYS wrap errors with context: `fmt.Errorf("domain: operation: %w", err)`.
@@ -28,7 +28,7 @@ globs: "**/*.go"
 - **Generics:** Use generics for type-safe collections and utilities; prefer interfaces for domain logic.
 - **defer:** Use `defer` for resource cleanup. Be aware of loop and closure pitfalls (e.g., `defer` in a loop defers until function exit, not iteration end).
 
-## 🧪 Testing & Quality
+## 🧪 Go Testing & Quality
 - **Table-Driven Tests:** Use table-driven patterns for all logic-heavy functions.
 - **Mocks:** Avoid heavy mocking libraries. Prefer "fake" implementations or thin interfaces for external I/O.
 - **Test Organization:** Test files live next to the code they test: `service.go` -> `service_test.go`. Use `t.Helper()` for shared assertion functions and `t.Cleanup()` for resource teardown.

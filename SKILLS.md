@@ -1,11 +1,37 @@
-## General
-- npx skills add https://github.com/anthropics/skills --skill skill-creator
-- npx skills add https://github.com/obra/superpowers --skill brainstorming
-- npx skills add https://github.com/browser-use/browser-use --skill browser-use
-- npx skills add https://github.com/obra/superpowers --skill systematic-debugging
-- npx skills add https://github.com/obra/superpowers --skill writing-plans
+# Capabilities
 
-## Technical
-- npx skills add https://github.com/jeffallan/claude-skills --skill golang-pro
-- npx skills add https://github.com/softaworks/agent-toolkit --skill database-schema-designer
-- npx skills add https://github.com/anthropics/skills --skill frontend-design
+## Plugins (`claude plugins add`)
+
+Plugins are maintained upstream and auto-update. No local files to manage.
+
+| Plugin | What it provides |
+|--------|-----------------|
+| `superpowers` | brainstorming, systematic-debugging, writing-plans, TDD, code-review, parallel agents, git worktrees |
+| `context7` | Documentation lookup for any library |
+| `frontend-design` | UI/design guidance and component generation |
+| `code-review` | PR review command (`/review-pr`) |
+| `security-guidance` | Security analysis hooks |
+| `code-simplifier` | Refactoring and code simplification agent |
+
+## npm Skills (`npx skills add`)
+
+Skills are installed locally and symlinked into `~/.claude/skills/`.
+
+| Skill | Install command |
+|-------|----------------|
+| `golang-pro` | `npx skills add https://github.com/jeffallan/claude-skills --skill golang-pro` |
+| `browser-use` | `npx skills add https://github.com/browser-use/browser-use --skill browser-use` |
+| `database-schema-designer` | `npx skills add https://github.com/softaworks/agent-toolkit --skill database-schema-designer` |
+| `skill-creator` | `npx skills add https://github.com/anthropics/skills --skill skill-creator` |
+| `find-skills` | `npx skills add https://github.com/anthropics/skills --skill find-skills` |
+
+## Why Only 5 npm Skills?
+
+Four skills that were previously installed via npm are now provided by plugins:
+
+- `brainstorming` → superpowers plugin
+- `systematic-debugging` → superpowers plugin
+- `writing-plans` → superpowers plugin
+- `frontend-design` → frontend-design plugin
+
+Installing both causes double-loading. Use the plugin versions.

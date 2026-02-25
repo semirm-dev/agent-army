@@ -1,5 +1,6 @@
 <!-- Sync: Safety/Communication sections must stay in sync with cursor/000-index.mdc -->
-<!-- Sync: Coding Patterns/Testing sections must stay in sync with cursor/100-golang.mdc -->
+<!-- Sync: Go Coding Patterns/Testing sections must stay in sync with cursor/100-golang.mdc -->
+<!-- Sync: TypeScript Coding Patterns/Testing sections must stay in sync with cursor/101-typescript.mdc -->
 <!-- Sync: Planning section must stay in sync with cursor/200-planning.mdc -->
 
 # Global Orchestrator & Safety DNA
@@ -14,9 +15,9 @@
 - **Role:** You act as a **Lead Product Architect**. Your goal is to write as little code as possible by delegating to subagents.
 - **Parallelism:** For any task involving >3 files, suggest splitting work into parallel subagents or teams if applicable (e.g., "I recommend spawning 3 subagents: one for API, one for Types, and one for Tests"). Automatically send agents to background so they can run in parallel.
 - **Agent Definitions:** Reusable agent prompts live in `~/.claude/agents/`. Use these when delegating via the Task tool:
-  - `claude/agents/go-coder.md` -- Golang Coder. Invokes `golang-pro` skill. Writes production Go code.
-  - `claude/agents/go-reviewer.md` -- Reviewer. Read-only code critique and architecture analysis.
-  - `claude/agents/go-tester.md` -- Tester. Writes and runs table-driven Go tests.
+  - **Go:** `go-coder.md` (invokes `golang-pro` skill), `go-reviewer.md`, `go-tester.md`
+  - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
+  - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
 
 ## 🛠️ Communication Style
@@ -46,7 +47,7 @@ Before any code execution for complex tasks, generate a plan using this structur
 - Expected visual/log output for success.
 - Write new temporary tests to verify your changes (if possible).
 
-# 💻 Coding Patterns
+# 💻 Go Coding Patterns
 - **Simplicity (KISS):** Prefer smaller, focused functions over complex ones. If a function >30 lines, refactor into sub-utilities.
 - **Packages:** Avoid "stuttering." Use `auth.Service` instead of `auth.AuthService`.
 - **Error Handling:** ALWAYS wrap errors with context: `fmt.Errorf("domain: operation: %w", err)`.
@@ -69,8 +70,29 @@ Before any code execution for complex tasks, generate a plan using this structur
 - **Generics:** Use generics for type-safe collections and utilities; prefer interfaces for domain logic.
 - **defer:** Use `defer` for resource cleanup. Be aware of loop and closure pitfalls (e.g., `defer` in a loop defers until function exit, not iteration end).
 
-## 🧪 Testing & Quality
+## 🧪 Go Testing & Quality
 - **Table-Driven Tests:** Use table-driven patterns for all logic-heavy functions.
 - **Mocks:** Avoid heavy mocking libraries. Prefer "fake" implementations or thin interfaces for external I/O.
 - **Test Organization:** Test files live next to the code they test: `service.go` -> `service_test.go`. Use `t.Helper()` for shared assertion functions and `t.Cleanup()` for resource teardown.
 - **Race Detection:** Always run tests with `-race` flag: `go test ./... -race`.
+
+# 💻 TypeScript Coding Patterns
+- **Strict Mode:** All projects must use `strict: true` in tsconfig.json. No exceptions.
+- **No `any`:** Never use `any`. Use `unknown` and narrow with type guards. Only exception: third-party interop where types are unavailable.
+- **No non-null assertions:** Avoid the `!` operator. Use proper null checks or optional chaining.
+- **Explicit return types:** All exported functions must have explicit return types.
+- **Simplicity (KISS):** Prefer smaller, focused functions over complex ones. If a function >30 lines, refactor into sub-utilities.
+- **Naming:** `camelCase` for variables/functions, `PascalCase` for types/classes/components, `UPPER_SNAKE_CASE` for constants.
+- **Exports:** Use named exports, not default exports. Barrel files limited to one level.
+- **Imports:** Order: Node built-ins → external packages → internal (absolute) → relative. Separate groups with blank lines. No circular imports.
+- **Error Handling:** Define typed error classes for domain errors. Never throw plain strings. Validate external input at boundaries.
+- **Async:** Always use async/await over raw promises. Never mix callbacks and promises.
+- **Configuration:** No hardcoded config values. Access env vars through a validated config module, never directly via `process.env` in business logic.
+- **Security:** No hardcoded secrets, tokens, or credentials. Validate and sanitize all external input. Use parameterized queries for databases. Escape user content in HTML contexts.
+- **React (if applicable):** Functional components only. Custom hooks prefixed with `use`. Minimize state; derive values. Avoid `useEffect` for derived state.
+
+## 🧪 TypeScript Testing & Quality
+- **Table-Driven Tests:** Use table-driven patterns (array of cases with `for...of`) for all logic-heavy functions.
+- **Mocks:** Avoid heavy mocking. Prefer fake implementations or thin interfaces. Use `vi.fn()` / `jest.fn()` only for call verification.
+- **Test Organization:** Test files live next to the code they test: `service.ts` → `service.test.ts`. Use `describe` blocks for grouping. Use `beforeEach`/`afterEach` for setup/teardown.
+- **Async Tests:** Always `await` async operations. Test both resolved and rejected paths. Clean up fake timers in `afterEach`.

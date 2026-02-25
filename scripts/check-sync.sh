@@ -63,15 +63,15 @@ echo ""
 # 1. Coding Patterns: CLAUDE.md vs 100-golang.mdc
 diff_sections \
   "Coding Patterns" \
-  "$CLAUDE" "💻 Coding Patterns" \
-  "$CURSOR_DIR/100-golang.mdc" "💻 Coding Patterns" \
-  "🧪 Testing" "🧪 Testing"
+  "$CLAUDE" "💻 Go Coding Patterns" \
+  "$CURSOR_DIR/100-golang.mdc" "💻 Go Coding Patterns" \
+  "🧪 Go Testing" "🧪 Go Testing"
 
 # 2. Testing & Quality: CLAUDE.md vs 100-golang.mdc
 diff_sections \
   "Testing & Quality" \
-  "$CLAUDE" "🧪 Testing & Quality" \
-  "$CURSOR_DIR/100-golang.mdc" "🧪 Testing & Quality" \
+  "$CLAUDE" "🧪 Go Testing & Quality" \
+  "$CURSOR_DIR/100-golang.mdc" "🧪 Go Testing & Quality" \
   "^$" "^$"
 
 # 3. Safety section: CLAUDE.md vs 000-index.mdc
@@ -88,7 +88,21 @@ diff_sections \
   "$CURSOR_DIR/000-index.mdc" "🛠️ Communication Style" \
   "^---" "^$"
 
-# 5. Planning: CLAUDE.md vs 200-planning.mdc
+# 5. TypeScript Coding Patterns: CLAUDE.md vs 101-typescript.mdc
+diff_sections \
+  "TypeScript Coding Patterns" \
+  "$CLAUDE" "💻 TypeScript Coding Patterns" \
+  "$CURSOR_DIR/101-typescript.mdc" "💻 TypeScript Coding Patterns" \
+  "🧪 TypeScript Testing" "🧪 TypeScript Testing"
+
+# 6. TypeScript Testing & Quality: CLAUDE.md vs 101-typescript.mdc
+diff_sections \
+  "TypeScript Testing & Quality" \
+  "$CLAUDE" "🧪 TypeScript Testing & Quality" \
+  "$CURSOR_DIR/101-typescript.mdc" "🧪 TypeScript Testing & Quality" \
+  "^$" "^$"
+
+# 7. Planning: CLAUDE.md vs 200-planning.mdc
 # Compare the full planning section. Use 💻 as the end marker for CLAUDE.md
 # (next section after planning) and a sentinel for 200-planning.mdc (runs to EOF).
 # Normalize known platform terms: "sub-agents" (Claude) vs "agents/cycles" (Cursor).
@@ -96,7 +110,7 @@ diff_sections \
   "Planning" \
   "$CLAUDE" "Agentic Implementation Plan" \
   "$CURSOR_DIR/200-planning.mdc" "Agentic Implementation Plan" \
-  "💻 Coding Patterns" "ZZZZZ_SENTINEL_EOF" \
+  "💻 Go Coding Patterns" "ZZZZZ_SENTINEL_EOF" \
   "s/sub-agents/agents/g;s/agents\/cycles/agents/g"
 
 if [ "$DRIFT_FOUND" -eq 0 ]; then

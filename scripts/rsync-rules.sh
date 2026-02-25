@@ -1,6 +1,6 @@
 #!/bin/bash
 # 1. Master Library Path
-LIB_DIR="$HOME/workspace/agent-rules"
+LIB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 # 2. Check for folder argument
 if [ -z "$1" ]; then
@@ -26,12 +26,25 @@ case "$FOLDER" in
     ;;
 esac
 
-# 5. Create target directory
+# 4. Create target directory
 mkdir -p "$TARGET_DIR"
 
 echo "🔄 Mirroring $FOLDER/ to: $TARGET_DIR"
 
-# 6. Mirror all files
-rsync -av "$LIB_DIR/$FOLDER/" "$TARGET_DIR/"
+# 5. Mirror all files (exclude user-managed files that shouldn't be overwritten)
+EXCLUDES=()
+if [ "$FOLDER" = "claude" ]; then
+  EXCLUDES=(
+    --exclude settings.json
+    --exclude installed_plugins.json
+    --exclude skills/
+    --exclude plugins/
+    --exclude projects/
+    --exclude todos/
+  )
+fi
+
+rsync -av "${EXCLUDES[@]}" "$LIB_DIR/$FOLDER/" "$TARGET_DIR/" \
+  || { echo "rsync failed"; exit 1; }
 
 echo "🎉 Done. Rules are now physically mirrored (fixes Cursor indexing bugs)."
