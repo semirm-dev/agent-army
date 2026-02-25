@@ -11,11 +11,20 @@ LIB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
 NC='\033[0m'
 
 ok()   { echo -e "${GREEN}✓${NC} $1"; }
 warn() { echo -e "${YELLOW}⚠${NC} $1"; }
 fail() { echo -e "${RED}✗${NC} $1"; }
+
+step() {
+  echo ""
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "${BOLD}${CYAN}  $1${NC}"
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+}
 
 ask() {
   local prompt="$1"
@@ -25,16 +34,16 @@ ask() {
   [[ "$answer" =~ ^[Yy]$ ]]
 }
 
-echo "================================="
-echo "  agent-rules bootstrap"
-echo "================================="
+echo ""
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BOLD}${CYAN}  agent-rules bootstrap${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo "Repo: $LIB_DIR"
-echo ""
 
 # ── Step 1: Prerequisites ──────────────────────────────────────────
 
-echo "── Step 1: Check prerequisites ──"
+step "Step 1: Check prerequisites"
 
 MISSING=()
 command -v node   >/dev/null 2>&1 && ok "node $(node -v)"   || MISSING+=("node")
@@ -50,7 +59,8 @@ fi
 
 # ── Step 2: Sync rules ─────────────────────────────────────────────
 
-if ask "Step 2: Sync rules to ~/.claude/ and ~/.cursor/rules/?"; then
+step "Step 2: Sync rules"
+if ask "Sync rules to ~/.claude/ and ~/.cursor/rules/?"; then
   bash "$LIB_DIR/scripts/rsync-rules.sh" claude
   bash "$LIB_DIR/scripts/rsync-rules.sh" cursor
   ok "Rules synced"
@@ -60,13 +70,14 @@ fi
 
 # ── Step 3: Install npm skills ─────────────────────────────────────
 
+step "Step 3: Install npm skills"
 echo "  Skills to install:"
 echo "    - golang-pro"
 echo "    - browser-use"
 echo "    - database-schema-designer"
 echo "    - skill-creator"
 echo "    - find-skills"
-if ask "Step 3: Install npm skills (5 skills)?"; then
+if ask "Install 5 skills?"; then
   SKILLS=(
     "https://github.com/jeffallan/claude-skills --skill golang-pro"
     "https://github.com/browser-use/browser-use --skill browser-use"
@@ -93,6 +104,7 @@ fi
 SETTINGS_SRC="$LIB_DIR/claude/settings.json"
 SETTINGS_DST="$HOME/.claude/settings.json"
 
+step "Step 4: Deploy settings.json"
 echo "  Plugins enabled via settings.json:"
 echo "    - context7"
 echo "    - frontend-design"
@@ -100,7 +112,7 @@ echo "    - code-review"
 echo "    - superpowers"
 echo "    - security-guidance"
 echo "    - code-simplifier"
-if ask "Step 4: Deploy settings.json to $SETTINGS_DST?"; then
+if ask "Deploy settings.json to $SETTINGS_DST?"; then
   if [ -f "$SETTINGS_DST" ]; then
     echo "  Current diff:"
     diff --unified=3 "$SETTINGS_DST" "$SETTINGS_SRC" || true
@@ -121,7 +133,8 @@ fi
 
 # ── Step 5: Add shell aliases ──────────────────────────────────────
 
-if ask "Step 5: Add aliases to ~/.zshrc?"; then
+step "Step 5: Add shell aliases"
+if ask "Add aliases to ~/.zshrc?"; then
   ALIASES=(
     "alias sync-rules='$LIB_DIR/scripts/rsync-rules.sh'"
     "alias check-sync='$LIB_DIR/scripts/check-sync.sh'"
@@ -142,8 +155,7 @@ fi
 
 # ── Step 6: Verify ─────────────────────────────────────────────────
 
-echo ""
-echo "── Verification ──"
+step "Step 6: Verify installation"
 
 echo "Skills installed:"
 ls "$HOME/.claude/skills/" 2>/dev/null || warn "No skills directory"
@@ -161,6 +173,6 @@ else
 fi
 
 echo ""
-echo "================================="
-echo "  Bootstrap complete"
-echo "================================="
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BOLD}${GREEN}  Bootstrap complete${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
