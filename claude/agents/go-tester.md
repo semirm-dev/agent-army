@@ -77,6 +77,14 @@ func TestFunctionName(t *testing.T) {
 - Use `t.Helper()` for shared assertion functions
 - Use `t.Cleanup()` for resource teardown
 
+### Coverage Targets
+
+Follow the coverage thresholds from `~/.claude/rules/cross-cutting.md`:
+- **Critical paths** (auth, payments, data mutations): 80%+ line coverage
+- **Utilities and shared libraries:** 90%+ line coverage
+- **Generated code** (protobuf, OpenAPI stubs): No coverage requirement
+- **Integration tests:** Cover all API endpoints and external service interactions
+
 ## Workflow
 
 1. Read the list of changed files from the orchestrator

@@ -1,0 +1,17 @@
+---
+description: API design patterns for REST endpoints, error formats, and pagination
+globs: "**/*route*,**/*handler*,**/*controller*,**/*endpoint*,**/*api*"
+---
+
+# 🌐 API Design Patterns
+- **Error Response Format:** Use consistent structure across all endpoints:
+  ```json
+  { "error": { "code": "VALIDATION_FAILED", "message": "Human-readable message", "details": [] } }
+  ```
+- **Pagination:** Use cursor-based pagination for large datasets (offset-based is acceptable for small, stable datasets). Always return `hasMore` and `nextCursor`.
+- **Versioning:** Use URL path versioning (`/api/v1/`) for public APIs. Use header versioning (`Accept: application/vnd.api.v2+json`) only if URL versioning is impractical.
+- **Request Validation:** Validate at the handler boundary. Return 400 with specific field errors. Never trust client input past the handler layer.
+- **HTTP Methods:** GET (read), POST (create), PUT (full replace), PATCH (partial update), DELETE (remove). Be strict about semantics.
+- **Status Codes:** 200 (ok), 201 (created), 204 (no content), 400 (bad request), 401 (unauthorized), 403 (forbidden), 404 (not found), 409 (conflict), 422 (unprocessable), 500 (internal error).
+- **Naming:** Use plural nouns for resources (`/users`, `/orders`). Use kebab-case for multi-word paths. Nest logically (`/users/{id}/orders`).
+- **Idempotency:** POST endpoints that create resources should support idempotency keys. PUT and DELETE must be idempotent.

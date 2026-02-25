@@ -16,7 +16,9 @@
 - **Agent Definitions:** Reusable agent prompts live in `~/.claude/agents/`. Use these when delegating via the Task tool:
   - **Go:** `go-coder.md` (invokes `golang-pro` skill), `go-reviewer.md`, `go-tester.md`
   - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
+  - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
   - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
+  - **Database:** `db-coder.md` (invokes `database-schema-designer` skill)
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only)
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
@@ -60,10 +62,11 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 | `rules/ts-patterns.md` | `cursor/101-typescript.mdc` | TypeScript coding + testing patterns |
 | `rules/py-patterns.md` | `cursor/102-python.mdc` | Python coding + testing patterns |
 | `rules/git-workflow.md` | `cursor/300-git.mdc` | Git conventions |
-| `rules/api-design.md` | _(Claude-only)_ | API design patterns |
+| `rules/api-design.md` | `cursor/400-api-design.mdc` | API design patterns |
 | `rules/observability.md` | _(Claude-only)_ | Logging, metrics, health checks, Docker, CI/CD |
 | `rules/cross-cutting.md` | _(Claude-only)_ | Error taxonomy, coverage targets, dependency policy |
-| `rules/database.md` | _(Claude-only)_ | Database patterns, migrations, pooling |
+| `rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
+| `rules/react-patterns.md` | `cursor/103-react.mdc` | React component and frontend patterns |
 | `rules/security.md` | _(Claude-only)_ | Auth, CORS, rate limiting, secrets management |
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.

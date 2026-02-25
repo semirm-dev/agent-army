@@ -84,6 +84,14 @@ describe("functionName", () => {
 - Use `vi.useFakeTimers()` / `jest.useFakeTimers()` for timer-dependent code
 - Clean up timers in `afterEach`
 
+### Coverage Targets
+
+Follow the coverage thresholds from `~/.claude/rules/cross-cutting.md`:
+- **Critical paths** (auth, payments, data mutations): 80%+ line coverage
+- **Utilities and shared libraries:** 90%+ line coverage
+- **Generated code** (protobuf, OpenAPI stubs): No coverage requirement
+- **Integration tests:** Cover all API endpoints and external service interactions
+
 ## Workflow
 
 1. Read the list of changed files from the orchestrator

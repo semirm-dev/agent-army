@@ -12,6 +12,15 @@ RULES_DIR="$LIB_DIR/claude/rules"
 CURSOR_DIR="$LIB_DIR/cursor"
 
 DRIFT_FOUND=0
+DEPLOYED_DIR="$HOME/.claude"
+CHECK_DEPLOYED=0
+
+# Parse flags
+for arg in "$@"; do
+  case "$arg" in
+    --deployed) CHECK_DEPLOYED=1 ;;
+  esac
+done
 
 # Extract lines between two patterns (exclusive of the marker lines themselves)
 extract_section() {
@@ -154,6 +163,77 @@ diff_sections \
   "$CURSOR_DIR/200-planning.mdc" "Agentic Implementation Plan" \
   "^---" "ZZZZZ_SENTINEL_EOF" \
   "s/sub-agents/agents/g;s/agents\/cycles/agents/g"
+
+# 8. React patterns: rules/react-patterns.md vs 103-react.mdc
+diff_rule_file \
+  "React Patterns" \
+  "$RULES_DIR/react-patterns.md" \
+  "$CURSOR_DIR/103-react.mdc"
+
+# 9. API design: rules/api-design.md vs 400-api-design.mdc
+diff_rule_file \
+  "API Design" \
+  "$RULES_DIR/api-design.md" \
+  "$CURSOR_DIR/400-api-design.mdc"
+
+# 10. Database: rules/database.md vs 401-database.mdc
+diff_rule_file \
+  "Database Patterns" \
+  "$RULES_DIR/database.md" \
+  "$CURSOR_DIR/401-database.mdc"
+
+# Deployed vs repo comparison (--deployed flag)
+if [ "$CHECK_DEPLOYED" -eq 1 ]; then
+  echo ""
+  echo "=== Checking repo vs deployed (~/.claude/) ==="
+  echo ""
+
+  for f in "$LIB_DIR/claude/CLAUDE.md" "$LIB_DIR/claude/settings.json"; do
+    basename=$(basename "$f")
+    deployed="$DEPLOYED_DIR/$basename"
+    if [ -f "$deployed" ]; then
+      if ! diff -q "$f" "$deployed" > /dev/null 2>&1; then
+        echo "DRIFT in [deployed $basename]"
+        echo "  Between: $f"
+        echo "  And:     $deployed"
+        diff --unified=2 "$f" "$deployed" | head -40
+        echo ""
+        DRIFT_FOUND=1
+      fi
+    else
+      echo "MISSING: $deployed (not deployed yet)"
+      DRIFT_FOUND=1
+    fi
+  done
+
+  # Check agents
+  for f in "$LIB_DIR/claude/agents/"*.md; do
+    basename=$(basename "$f")
+    deployed="$DEPLOYED_DIR/agents/$basename"
+    if [ -f "$deployed" ]; then
+      if ! diff -q "$f" "$deployed" > /dev/null 2>&1; then
+        echo "DRIFT in [deployed agents/$basename]"
+        diff --unified=2 "$f" "$deployed" | head -20
+        echo ""
+        DRIFT_FOUND=1
+      fi
+    fi
+  done
+
+  # Check rules
+  for f in "$LIB_DIR/claude/rules/"*.md; do
+    basename=$(basename "$f")
+    deployed="$DEPLOYED_DIR/rules/$basename"
+    if [ -f "$deployed" ]; then
+      if ! diff -q "$f" "$deployed" > /dev/null 2>&1; then
+        echo "DRIFT in [deployed rules/$basename]"
+        diff --unified=2 "$f" "$deployed" | head -20
+        echo ""
+        DRIFT_FOUND=1
+      fi
+    fi
+  done
+fi
 
 if [ "$DRIFT_FOUND" -eq 0 ]; then
   echo "All sections in sync."

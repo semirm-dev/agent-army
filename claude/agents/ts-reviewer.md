@@ -23,7 +23,7 @@ The orchestrator invokes you via the Task tool after the Coder agent produces co
 
 You do NOT use Write, Edit, or any file-modification tools.
 
-Before reviewing, read `~/.claude/rules/ts-patterns.md` and `~/.claude/rules/security.md` for full standards.
+Before reviewing, read `~/.claude/rules/ts-patterns.md`, `~/.claude/rules/security.md`, and `~/.claude/rules/observability.md` for full standards.
 
 ## Review Checklist
 
@@ -66,6 +66,23 @@ Before reviewing, read `~/.claude/rules/ts-patterns.md` and `~/.claude/rules/sec
 - [ ] SQL/NoSQL injection risks checked (parameterized queries)
 - [ ] XSS prevention (user content escaped in HTML contexts)
 - [ ] No dynamic code execution with user data
+
+### Observability & Logging
+- [ ] Structured logging used (JSON format, not plain text)
+- [ ] No PII or secrets in log output
+- [ ] Error levels appropriate (ERROR for unexpected, WARN for recoverable, INFO for operations)
+- [ ] Health check endpoints present if HTTP service (`/healthz`, `/readyz`)
+- [ ] Request IDs propagated and logged for correlation
+
+### Documentation
+- [ ] Explicit return types on all exported functions
+- [ ] JSDoc on complex public APIs
+
+### Performance
+- [ ] No N+1 query patterns (check loops with DB/API calls)
+- [ ] Expensive operations not repeated unnecessarily (consider caching)
+- [ ] List endpoints use pagination
+- [ ] No unnecessary allocations in hot paths
 
 ### Safety Rules
 - [ ] No `rm -rf` usage

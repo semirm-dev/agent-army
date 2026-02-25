@@ -22,12 +22,14 @@ Skills are installed locally and symlinked into `~/.claude/skills/`.
 | `golang-pro` | `npx skills add https://github.com/jeffallan/claude-skills --skill golang-pro` | Active — invoked by go-coder agent |
 | `database-schema-designer` | `npx skills add https://github.com/softaworks/agent-toolkit --skill database-schema-designer` | Active — complements rules/database.md |
 | `skill-creator` | `npx skills add https://github.com/anthropics/skills --skill skill-creator` | Active — use to build custom skills |
+| `browser-use` | `npx skills add https://github.com/anthropics/skills --skill browser-use` | Active — browser automation and testing |
+| `find-skills` | `npx skills add https://github.com/anthropics/skills --skill find-skills` | Active — discover available skills |
 
-## Custom Skills to Create
+## Custom Skills (Ready)
 
-These are recommended custom skills to build using `skill-creator`:
+These skills are built and available in `skills/`:
 
-| Skill | Purpose |
-|-------|---------|
-| `git-conventions` | Enforce branch naming, commit format, PR templates. Uses rules from rules/git-workflow.md |
-| `api-designer` | REST/gRPC API design patterns, error formats, pagination. Uses rules from rules/api-design.md |
+| Skill | File | Purpose |
+|-------|------|---------|
+| `git-conventions` | `skills/git-conventions.md` | Enforce branch naming, commit format, PR templates. Uses rules from rules/git-workflow.md |
+| `api-designer` | `skills/api-designer.md` | REST/gRPC API design patterns, error formats, pagination. Uses rules from rules/api-design.md |

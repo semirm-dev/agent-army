@@ -1,3 +1,8 @@
+---
+description: Database patterns for migrations, connection pooling, transactions, and schema design
+globs: "**/*migration*,**/*model*,**/*schema*,**/*repository*,**/*repo*,**/*store*,**/*dao*"
+---
+
 # 🗄️ Database Patterns
 
 ## Migrations

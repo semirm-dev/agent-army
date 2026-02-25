@@ -16,3 +16,51 @@
   - Tests must pass before deploy. No manual "skip test" overrides.
   - Use caching for dependencies (go mod cache, node_modules, pip cache).
   - Tag images with git SHA, not `latest`.
+
+## Per-Language Logging Examples
+
+### Go (log/slog)
+
+```go
+slog.Info("request handled",
+    "request_id", reqID,
+    "duration_ms", dur.Milliseconds(),
+    "status", statusCode,
+)
+
+slog.Error("payment failed",
+    "request_id", reqID,
+    "user_id", userID,
+    "error", err,
+)
+```
+
+### TypeScript (structured logger)
+
+```typescript
+logger.info({
+  message: "request handled",
+  requestId,
+  durationMs,
+  status: statusCode,
+});
+
+logger.error({
+  message: "payment failed",
+  requestId,
+  userId,
+  error: err.message,
+});
+```
+
+### Python (structlog)
+
+```python
+import structlog
+
+log = structlog.get_logger()
+
+log.info("request_handled", request_id=req_id, duration_ms=dur, status=status_code)
+
+log.error("payment_failed", request_id=req_id, user_id=user_id, error=str(err))
+```

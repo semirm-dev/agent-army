@@ -85,6 +85,14 @@ def shared_resource():
 - Use `conftest.py` for shared fixtures
 - Group related tests in classes when it improves readability
 
+### Coverage Targets
+
+Follow the coverage thresholds from `~/.claude/rules/cross-cutting.md`:
+- **Critical paths** (auth, payments, data mutations): 80%+ line coverage
+- **Utilities and shared libraries:** 90%+ line coverage
+- **Generated code** (protobuf, OpenAPI stubs): No coverage requirement
+- **Integration tests:** Cover all API endpoints and external service interactions
+
 ## Workflow
 
 1. Read the list of changed files from the orchestrator
