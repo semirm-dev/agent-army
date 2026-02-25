@@ -28,7 +28,7 @@ Idempotent — skips already-installed components on re-run.
 ```
 agent-rules/
 ├── claude/
-│   ├── CLAUDE.md              # Main instructions (safety, coding patterns, planning)
+│   ├── CLAUDE.md              # Main instructions (safety, patterns, planning)
 │   ├── settings.json          # Reference settings template
 │   ├── statusline-command.sh  # Status line script (deployed to ~/.claude/)
 │   └── agents/
@@ -37,17 +37,22 @@ agent-rules/
 │       ├── go-tester.md       # Go test writer
 │       ├── ts-coder.md        # TypeScript/JS code writer
 │       ├── ts-reviewer.md     # TypeScript/JS code reviewer (read-only)
-│       └── ts-tester.md       # TypeScript/JS test writer
+│       ├── ts-tester.md       # TypeScript/JS test writer
+│       └── docker-builder.md  # Dockerfile, compose, CI/CD writer
 ├── cursor/
 │   ├── 000-index.mdc          # Safety & communication (alwaysApply)
 │   ├── 100-golang.mdc         # Go coding patterns (globs: **/*.go)
 │   ├── 101-typescript.mdc     # TypeScript patterns (globs: **/*.ts,tsx,js,jsx)
-│   └── 200-planning.mdc       # Planning template (alwaysApply)
+│   ├── 102-python.mdc         # Python patterns (globs: **/*.py)
+│   ├── 200-planning.mdc       # Planning template (alwaysApply)
+│   └── 300-git.mdc            # Git workflow conventions (alwaysApply)
 ├── scripts/
 │   ├── bootstrap.sh           # Interactive new-device setup
 │   ├── rsync-rules.sh         # Sync repo → ~/.claude/ or ~/.cursor/rules/
 │   ├── check-sync.sh          # Verify CLAUDE.md ↔ Cursor .mdc parity
 │   └── test-check-sync.sh     # Tests for check-sync drift detection
+├── templates/
+│   └── PROJECT-CLAUDE.md      # Project-level CLAUDE.md starter template
 ├── SKILLS.md                  # What to install (plugins vs npm skills)
 └── README.md
 ```
@@ -68,16 +73,17 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 
 ## Commands
 
-| Command            | Purpose                          |
-|--------------------|----------------------------------|
-| `make`             | Show all available targets       |
-| `make bootstrap`   | First-time interactive setup     |
-| `make sync`        | Sync rules to Claude and Cursor  |
-| `make sync-claude` | Sync rules to Claude only        |
-| `make sync-cursor` | Sync rules to Cursor only        |
-| `make check`       | Verify nothing drifted           |
-| `make deploy`      | Sync + check (day-to-day loop)   |
-| `make test`        | Run test suite                   |
+| Command              | Purpose                                    |
+|----------------------|--------------------------------------------|
+| `make`               | Show all available targets                 |
+| `make bootstrap`     | First-time interactive setup               |
+| `make sync`          | Sync rules to Claude and Cursor            |
+| `make sync-claude`   | Sync rules to Claude only                  |
+| `make sync-cursor`   | Sync rules to Cursor only                  |
+| `make check`         | Verify nothing drifted                     |
+| `make deploy`        | Sync + check (day-to-day loop)             |
+| `make test`          | Run test suite                             |
+| `make init-project`  | Scaffold a project-level CLAUDE.md         |
 
 `make check` exit codes:
 
@@ -86,7 +92,7 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `0`       | All sections in sync                |
 | `1`       | Drift detected — shows unified diff |
 
-Sections checked: Go Coding Patterns, Go Testing, Safety, Communication, TypeScript Coding Patterns, TypeScript Testing, Planning.
+Sections checked: Go Coding Patterns, Go Testing, TypeScript Coding Patterns, TypeScript Testing, Python Coding Patterns, Python Testing, Safety, Communication, Planning, Git Workflow.
 
 ## Capabilities
 
@@ -94,8 +100,8 @@ Sections checked: Go Coding Patterns, Go Testing, Safety, Communication, TypeScr
 | ---------------- | ----------------------------------------- | --------------------------------------------------------------------------------------- |
 | **Plugins**      | Auto-updating, managed by Claude CLI      | superpowers, context7, frontend-design, code-review, security-guidance, code-simplifier |
 | **npm Skills**   | Installed locally via `npx skills add`    | golang-pro, browser-use, database-schema-designer, skill-creator, find-skills           |
-| **Agents**       | Reusable prompts for Task tool delegation | go-coder, go-reviewer, go-tester, ts-coder, ts-reviewer, ts-tester                      |
-| **Cursor Rules** | Glob-matched coding standards             | 000-index, 100-golang, 101-typescript, 200-planning                                     |
+| **Agents**       | Reusable prompts for Task tool delegation | go-coder, go-reviewer, go-tester, ts-coder, ts-reviewer, ts-tester, docker-builder       |
+| **Cursor Rules** | Glob-matched coding standards             | 000-index, 100-golang, 101-typescript, 102-python, 200-planning, 300-git                 |
 
 ## How Agents Work
 

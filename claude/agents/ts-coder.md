@@ -25,44 +25,13 @@ The orchestrator invokes you via the Task tool when TypeScript or JavaScript cod
 
 ## Coding Standards
 
-### TypeScript Strictness
-- **strict mode**: All projects must use `strict: true` in tsconfig.json
-- **No `any`**: Never use `any`. Use `unknown` and narrow with type guards. The only exception is third-party library interop where types are unavailable.
-- **No non-null assertions**: Avoid `!` operator. Use proper null checks or optional chaining.
-- **Explicit return types**: All exported functions must have explicit return types.
-
-### Code Quality
-- **KISS**: Functions under 30 lines. Refactor into sub-utilities if longer.
-- **Naming**: `camelCase` for variables/functions, `PascalCase` for types/classes/components, `UPPER_SNAKE_CASE` for constants.
-- **No default exports**: Use named exports for better refactoring and tree-shaking.
-- **Barrel files**: Avoid deep barrel files (`index.ts` re-exports). One level max.
-
-### Error Handling
-- **Typed errors**: Define error types/classes for domain errors. Never throw plain strings.
-- **Result pattern**: For operations that can fail, prefer returning `{ data, error }` or a Result type over try/catch for control flow.
-- **Boundary validation**: Validate all external input (API responses, user input, env vars) at the boundary. Trust internal types after validation.
-
-### Imports
-- **Order**: Node built-ins → external packages → internal (absolute) → relative. Separate groups with blank lines.
-- **No circular imports**: If detected, restructure into a shared module.
-
-### React Patterns (when applicable)
-- **Functional components**: No class components.
-- **Hooks**: Custom hooks for reusable logic. Prefix with `use`.
-- **Props**: Define props as a `type` (not `interface`) unless extending. Destructure in function signature.
-- **State**: Minimize state. Derive values instead of storing them. Lift state only when needed.
-- **Effects**: Avoid `useEffect` for derived state. Use it only for synchronization with external systems.
-
-### Node/Backend Patterns (when applicable)
-- **Async/await**: Always use async/await over raw promises. Never mix callbacks and promises.
-- **Environment**: Access env vars through a validated config module, never directly via `process.env` in business logic.
-- **Streams**: Use Node streams for large data. Never load unbounded data into memory.
-
-### Security
-- No hardcoded secrets, tokens, or credentials.
-- Validate and sanitize all external input.
-- Use parameterized queries for databases (never string concatenation).
-- Escape user content in HTML contexts (XSS prevention).
+Follow all TypeScript coding patterns and testing standards defined in CLAUDE.md. They are always loaded in context. Key emphasis for the coder role:
+- `strict: true` mandatory, no `any`, no non-null assertions
+- KISS: Functions under 30 lines
+- Named exports, no default exports
+- Typed error classes, never throw plain strings
+- Async/await only, validate at boundaries
+- React: functional components, custom hooks with `use` prefix
 
 ## Workflow
 

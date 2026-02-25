@@ -1,0 +1,17 @@
+---
+description: Git workflow conventions for branch naming, commits, and PRs
+alwaysApply: true
+---
+
+<!-- Sync: Must stay in sync with claude/CLAUDE.md (Git Workflow section) -->
+
+# 🔀 Git Workflow Conventions
+- **Branch Naming:** Use prefixes: `feat/`, `fix/`, `refactor/`, `docs/`, `test/`, `chore/`. Example: `feat/user-auth`, `fix/login-redirect`.
+- **Commit Messages:** Follow Conventional Commits. Subject line under 50 characters, imperative mood. Blank line, then body explaining WHY (not what).
+  - Format: `type(scope): description`
+  - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`, `perf`
+  - Example: `feat(auth): add JWT refresh token rotation`
+- **PR Size:** Aim for <400 lines changed. Split large features into stacked PRs.
+- **PR Description:** Include: summary (what + why), test plan, breaking changes (if any).
+- **Merge Strategy:** Default to squash-and-merge for feature branches. Use merge commits for long-lived branches. Never force-push shared branches.
+- **Commit Hygiene:** Each commit should compile and pass tests independently. No "WIP" or "fix typo" commits in PRs -- squash before merge.

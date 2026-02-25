@@ -91,7 +91,7 @@ if ask "Install 5 skills?"; then
       ok "$skill_name already installed, skipping"
     else
       echo "  Installing $skill_name..."
-      npx skills add "$skill_cmd" || warn "Failed to install $skill_name"
+      npx skills add $skill_cmd || warn "Failed to install $skill_name"
     fi
   done
   ok "Skills installed"

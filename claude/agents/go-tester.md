@@ -24,7 +24,7 @@ The orchestrator invokes you via the Task tool after the Coder agent produces co
 
 ## Testing Standards
 
-Follow all testing patterns from the project's coding standards.
+Follow all Go coding patterns and testing standards defined in CLAUDE.md.
 
 ### Table-Driven Tests (mandatory for logic-heavy functions)
 
