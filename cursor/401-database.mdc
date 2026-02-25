@@ -3,6 +3,8 @@ description: Database patterns for migrations, connection pooling, transactions,
 globs: "**/*migration*,**/*model*,**/*schema*,**/*repository*,**/*repo*,**/*store*,**/*dao*"
 ---
 
+<!-- Sync: Must stay in sync with claude/rules/database.md -->
+
 # 🗄️ Database Patterns
 
 ## Migrations

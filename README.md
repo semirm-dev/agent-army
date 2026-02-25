@@ -30,6 +30,7 @@ agent-rules/
 ├── claude/
 │   ├── CLAUDE.md              # Main instructions (safety, patterns, planning)
 │   ├── settings.json          # Reference settings template
+│   ├── SKILLS.md              # What to install (plugins vs npm skills)
 │   ├── statusline-command.sh  # Status line script (deployed to ~/.claude/)
 │   ├── agents/                # 17 reusable agent prompts
 │   │   ├── go-coder.md        # Go code writer (uses golang-pro skill)
@@ -73,8 +74,9 @@ agent-rules/
 │   ├── 500-observability.mdc  # Observability & infrastructure
 │   ├── 501-security.mdc       # Security patterns
 │   └── 502-cross-cutting.mdc  # Error taxonomy, coverage, deps (alwaysApply)
-├── skills/                    # 3 custom skills
+├── skills/                    # 4 custom skills
 │   ├── api-designer.md        # API design checklist and scaffolding
+│   ├── dependency-audit.md    # Dependency audit and update workflow
 │   ├── git-conventions.md     # Branch naming, commit format, PR templates
 │   └── migration-safety.md    # Database migration safety checklist
 ├── scripts/
@@ -88,7 +90,6 @@ agent-rules/
 │   └── pre-commit             # Sync check before commit
 ├── templates/
 │   └── PROJECT-CLAUDE.md      # Project-level CLAUDE.md starter template
-├── SKILLS.md                  # What to install (plugins vs npm skills)
 └── README.md
 ```
 
@@ -131,7 +132,7 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `0`       | All sections in sync                |
 | `1`       | Drift detected — shows unified diff |
 
-Sections checked: Go Coding Patterns, Go Testing, TypeScript Coding Patterns, TypeScript Testing, Python Coding Patterns, Python Testing, Safety, Communication, Planning, Git Workflow. Structural validation (`make validate`) checks agent triads, rule references, and sync pairs.
+Sections checked: Go, TypeScript, Python, React, Git Workflow, Safety, Communication, Planning, API Design, Database, Observability, Security, Cross-Cutting. Structural validation (`make validate`) checks agent triads, rule references, and sync pairs.
 
 ## Capabilities
 
@@ -139,7 +140,7 @@ Sections checked: Go Coding Patterns, Go Testing, TypeScript Coding Patterns, Ty
 | ------------------ | ----------------------------------------- | ----- | --------------------------------------------------------------------------------------- |
 | **Plugins**        | Auto-updating, managed by Claude CLI      | 6     | superpowers, context7, frontend-design, code-review, security-guidance, code-simplifier |
 | **npm Skills**     | Installed locally via `npx skills add`    | 5     | golang-pro, browser-use, database-schema-designer, skill-creator, find-skills           |
-| **Custom Skills**  | Built-in, located in `skills/`            | 3     | api-designer, git-conventions, migration-safety                                         |
+| **Custom Skills**  | Built-in, located in `skills/`            | 4     | api-designer, git-conventions, migration-safety, dependency-audit                       |
 | **Agents**         | Reusable prompts for Task tool delegation | 17    | go-{coder,reviewer,tester}, ts-{coder,reviewer,tester}, py-{coder,reviewer,tester}, react-{coder,reviewer,tester}, db-{coder,reviewer,tester}, docker-{builder,reviewer} |
 | **Claude Rules**   | Domain-specific standards                 | 10    | go-patterns, ts-patterns, py-patterns, react-patterns, git-workflow, api-design, database, observability, security, cross-cutting |
 | **Cursor Rules**   | Glob-matched coding standards             | 12    | 000-index, 100-golang, 101-typescript, 102-python, 103-react, 200-planning, 300-git, 400-api-design, 401-database, 500-observability, 501-security, 502-cross-cutting |

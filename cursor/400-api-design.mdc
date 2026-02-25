@@ -3,6 +3,8 @@ description: API design patterns for REST endpoints, error formats, and paginati
 globs: "**/*route*,**/*handler*,**/*controller*,**/*endpoint*,**/*api*"
 ---
 
+<!-- Sync: Must stay in sync with claude/rules/api-design.md -->
+
 # 🌐 API Design Patterns
 - **Error Response Format:** Use consistent structure across all endpoints:
   ```json

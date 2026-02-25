@@ -1,3 +1,5 @@
+<!-- Sync: Must stay in sync with cursor/400-api-design.mdc -->
+
 # 🌐 API Design Patterns
 - **Error Response Format:** Use consistent structure across all endpoints:
   ```json

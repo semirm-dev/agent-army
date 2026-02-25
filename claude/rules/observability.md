@@ -1,3 +1,5 @@
+<!-- Sync: Must stay in sync with cursor/500-observability.mdc -->
+
 # 📊 Observability & Infrastructure Patterns
 - **Health Checks:** Expose `/healthz` (liveness) and `/readyz` (readiness). Liveness: process is running. Readiness: dependencies are connected.
 - **Structured Logging:** Always log as structured JSON. Include fields: `timestamp`, `level`, `message`, `request_id`, `user_id` (when available), `duration_ms` (for operations).

@@ -24,6 +24,7 @@
   - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
   - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
   - `migration-safety` -- Invoke when writing or reviewing database migrations.
+  - `dependency-audit` -- Invoke when auditing dependencies for vulnerabilities or planning updates.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 - **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
   - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.

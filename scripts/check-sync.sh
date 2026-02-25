@@ -12,6 +12,8 @@ RULES_DIR="$LIB_DIR/claude/rules"
 CURSOR_DIR="$LIB_DIR/cursor"
 
 DRIFT_FOUND=0
+TMPDIR_SYNC=$(mktemp -d)
+trap 'rm -rf "$TMPDIR_SYNC"' EXIT
 DEPLOYED_DIR="$HOME/.claude"
 CHECK_DEPLOYED=0
 
@@ -45,8 +47,8 @@ diff_sections() {
   local normalize="${8:-}"  # optional sed expression to normalize platform-specific terms
 
   local tmp_a tmp_b
-  tmp_a=$(mktemp)
-  tmp_b=$(mktemp)
+  tmp_a=$(mktemp "$TMPDIR_SYNC/tmp.XXXXXX")
+  tmp_b=$(mktemp "$TMPDIR_SYNC/tmp.XXXXXX")
 
   if [ -n "$normalize" ]; then
     extract_section "$file_a" "$section_a" "$end_a" | grep -v '^[[:space:]]*$' | sed "$normalize" > "$tmp_a"
@@ -72,8 +74,6 @@ diff_sections() {
     echo ""
     DRIFT_FOUND=1
   fi
-
-  rm -f "$tmp_a" "$tmp_b"
 }
 
 # Diff entire pattern files (after stripping comments and headings)
@@ -84,8 +84,8 @@ diff_rule_file() {
   local normalize="${4:-}"
 
   local tmp_a tmp_b
-  tmp_a=$(mktemp)
-  tmp_b=$(mktemp)
+  tmp_a=$(mktemp "$TMPDIR_SYNC/tmp.XXXXXX")
+  tmp_b=$(mktemp "$TMPDIR_SYNC/tmp.XXXXXX")
 
   # Strip sync comments, front matter, and normalize headings
   if [ -n "$normalize" ]; then
@@ -111,8 +111,6 @@ diff_rule_file() {
     echo ""
     DRIFT_FOUND=1
   fi
-
-  rm -f "$tmp_a" "$tmp_b"
 }
 
 echo "=== Checking sync between rules and Cursor .mdc files ==="
@@ -181,6 +179,24 @@ diff_rule_file \
   "Database Patterns" \
   "$RULES_DIR/database.md" \
   "$CURSOR_DIR/401-database.mdc"
+
+# 11. Observability: rules/observability.md vs 500-observability.mdc
+diff_rule_file \
+  "Observability" \
+  "$RULES_DIR/observability.md" \
+  "$CURSOR_DIR/500-observability.mdc"
+
+# 12. Security: rules/security.md vs 501-security.mdc
+diff_rule_file \
+  "Security" \
+  "$RULES_DIR/security.md" \
+  "$CURSOR_DIR/501-security.mdc"
+
+# 13. Cross-Cutting: rules/cross-cutting.md vs 502-cross-cutting.mdc
+diff_rule_file \
+  "Cross-Cutting" \
+  "$RULES_DIR/cross-cutting.md" \
+  "$CURSOR_DIR/502-cross-cutting.mdc"
 
 # Deployed vs repo comparison (--deployed flag)
 if [ "$CHECK_DEPLOYED" -eq 1 ]; then

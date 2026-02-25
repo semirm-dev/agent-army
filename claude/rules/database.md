@@ -1,3 +1,5 @@
+<!-- Sync: Must stay in sync with cursor/401-database.mdc -->
+
 # 🗄️ Database Patterns
 
 ## Migrations

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # 1. Master Library Path
 LIB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 

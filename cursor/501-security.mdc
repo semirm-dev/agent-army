@@ -3,6 +3,8 @@ description: Security patterns for authentication, authorization, CORS, rate lim
 globs: "*auth*,*session*,*cors*,*token*,*password*,*secret*,*login*,*permission*"
 ---
 
+<!-- Sync: Must stay in sync with claude/rules/security.md -->
+
 # 🔒 Security Patterns
 
 ## Password Hashing

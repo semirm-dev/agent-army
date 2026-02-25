@@ -1,3 +1,5 @@
+<!-- Sync: Must stay in sync with cursor/502-cross-cutting.mdc -->
+
 # 🏗️ Cross-Cutting Standards
 
 ## Error Taxonomy

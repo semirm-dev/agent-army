@@ -1,3 +1,5 @@
+<!-- Sync: Must stay in sync with cursor/501-security.mdc -->
+
 # 🔒 Security Patterns
 
 ## Password Hashing

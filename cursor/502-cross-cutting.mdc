@@ -3,6 +3,8 @@ description: Cross-cutting standards for error taxonomy, testing coverage, and d
 alwaysApply: true
 ---
 
+<!-- Sync: Must stay in sync with claude/rules/cross-cutting.md -->
+
 # 🏗️ Cross-Cutting Standards
 
 ## Error Taxonomy
@@ -22,3 +24,6 @@ Categorize all errors into three levels:
 - **Minor versions:** Review and update monthly. Check changelogs for breaking behavior changes despite semver.
 - **Major versions:** Evaluate breaking changes, plan migration, test in isolation before upgrading. Create a dedicated branch for major upgrades.
 - **Audit:** Run `go mod verify` / `npm audit` / `pip audit` as part of CI. Block merges on critical vulnerabilities.
+
+## Settings Notes
+- **`skipDangerousModePermissionPrompt: true`** is intentionally enabled in `settings.json`. This skips the confirmation dialog when switching to dangerous/unrestricted mode. Rationale: the safety constraints in this file (no rm-rf, no auto-commit, deletion limits) provide guardrails at the rule level, and the plan-first default mode adds an additional gate. The prompt was adding friction to legitimate mode switches without meaningful safety benefit given the existing constraints. If you prefer the extra gate, set this to `false`.
