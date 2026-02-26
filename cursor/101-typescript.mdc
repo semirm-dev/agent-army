@@ -25,3 +25,11 @@ globs: "**/*.ts,**/*.tsx,**/*.js,**/*.jsx"
 - **Mocks:** Avoid heavy mocking. Prefer fake implementations or thin interfaces. Use `vi.fn()` / `jest.fn()` only for call verification.
 - **Test Organization:** Test files live next to the code they test: `service.ts` → `service.test.ts`. Use `describe` blocks for grouping. Use `beforeEach`/`afterEach` for setup/teardown.
 - **Async Tests:** Always `await` async operations. Test both resolved and rejected paths. Clean up fake timers in `afterEach`.
+- **Vitest Configuration:** Use `pool: 'forks'` for isolation in CI, `pool: 'threads'` for speed in local dev. Set `testTimeout: 10000` for async tests.
+- **Async Error Testing:** Test rejected promises explicitly:
+  ```typescript
+  await expect(asyncFn()).rejects.toThrow(NotFoundError);
+  await expect(asyncFn()).rejects.toMatchObject({ code: "NOT_FOUND" });
+  ```
+- **Test Doubles:** Prefer `vi.fn()` (vitest) or `jest.fn()` for spies. Use `vi.spyOn()` for monitoring existing methods without replacing behavior.
+- **Snapshot Avoidance:** Do not use snapshot tests. They break on every change and provide no useful signal. Assert specific values instead.

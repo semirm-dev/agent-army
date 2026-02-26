@@ -22,3 +22,16 @@ Categorize all errors into three levels:
 
 ## Settings Notes
 - **`skipDangerousModePermissionPrompt: true`** is intentionally enabled in `settings.json`. This skips the confirmation dialog when switching to dangerous/unrestricted mode. Rationale: the safety constraints in this file (no rm-rf, no auto-commit, deletion limits) provide guardrails at the rule level, and the plan-first default mode adds an additional gate. The prompt was adding friction to legitimate mode switches without meaningful safety benefit given the existing constraints. If you prefer the extra gate, set this to `false`.
+
+## Performance Budget Targets
+- **API endpoints:** p95 response time < 200ms for reads, < 500ms for writes. Measure at the handler boundary (excluding network).
+- **Web pages (LCP):** Largest Contentful Paint < 2.5s on 4G connection. Measure with Lighthouse CI.
+- **Bundle size:** JavaScript bundle < 200KB gzipped for initial load. Use code splitting for routes.
+- **Database queries:** p95 < 50ms for indexed lookups, < 200ms for complex joins. Use `EXPLAIN ANALYZE` to verify.
+- **Startup time:** Service healthy within 10s of container start. Measure from `docker run` to first successful health check.
+
+## SBOM Requirement
+- **Production deployments** must include a Software Bill of Materials (SBOM) in CycloneDX or SPDX format.
+- Generate SBOM as part of the CI/CD build stage, before the deploy stage.
+- Store SBOM artifacts alongside release artifacts (container registry, release page).
+- Verify SBOM against known vulnerability databases before deploying to production.

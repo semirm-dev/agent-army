@@ -101,3 +101,36 @@ Is the affected table >1M rows?
   YES → Use online DDL tools, estimate lock time
   NO → Deploy with monitoring, have rollback ready
 ```
+
+## 7. Rollback vs Roll-Forward Decision
+
+```
+Migration failed or caused issues in production
+  ↓
+Is the migration reversible? (down migration works)
+  YES ↓
+  NO → Roll forward: fix with a new migration
+
+Was data transformed or deleted?
+  YES → Roll forward (data loss on rollback)
+  NO ↓
+
+How many users are affected?
+  ALL → Rollback immediately, deploy previous version
+  FEW → Assess: rollback cost vs forward-fix time
+
+Is the fix simple (< 30 min)?
+  YES → Roll forward with hotfix migration
+  NO → Rollback, plan proper fix
+```
+
+## 8. Common Migration Anti-Patterns
+
+| Anti-Pattern | Problem | Safe Alternative |
+|-------------|---------|-----------------|
+| `ADD COLUMN ... NOT NULL` without DEFAULT | Fails on tables with existing rows | Add column as nullable, backfill, then add NOT NULL constraint |
+| `DROP INDEX` on hot table | Queries slow down during drop | Drop during low-traffic window, or use `CONCURRENTLY` |
+| `ALTER COLUMN TYPE` on large table | Full table rewrite, long lock | Add new column, dual-write, migrate, drop old |
+| Rename column directly | Breaks running application code | Expand-contract: add new, migrate, drop old |
+| `DROP TABLE` without checking references | Foreign key violations or orphaned data | Check foreign keys, remove references first |
+| Data transformation in single migration | Can't rollback if transform is lossy | Split into add-column, transform-data, drop-old-column |

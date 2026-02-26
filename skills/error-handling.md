@@ -152,3 +152,89 @@ Is the original error meaningful to the consumer?
 - **Double-logging:** Log at the boundary where you handle the error, not at every layer it passes through.
 - **Generic catch-all:** Never `catch (error) { return 500 }` without distinguishing error types.
 - **Exposing internals:** Never include SQL errors, file paths, or stack traces in API responses.
+
+## Distributed Tracing Context
+
+When propagating errors across service boundaries, include trace context:
+
+### Error Response with Trace ID
+```json
+{
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "An unexpected error occurred",
+    "traceId": "abc123def456"
+  }
+}
+```
+
+### Per-Language Trace Propagation
+
+**Go:**
+```go
+// Extract trace ID from context
+traceID := trace.SpanFromContext(ctx).SpanContext().TraceID().String()
+slog.Error("operation failed", "trace_id", traceID, "error", err)
+```
+
+**TypeScript:**
+```typescript
+// Include trace ID in error response
+const traceId = context.traceId ?? req.headers["x-trace-id"];
+res.status(500).json({
+  error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred", traceId },
+});
+```
+
+**Python:**
+```python
+from opentelemetry import trace
+trace_id = trace.get_current_span().get_span_context().trace_id
+log.error("operation_failed", trace_id=format(trace_id, "032x"), error=str(err))
+```
+
+### Guidelines
+- Always include `trace_id` in error logs for correlation
+- Return `traceId` in 5xx error responses to help users report issues
+- Propagate `traceparent` header across service calls
+- Never expose internal trace data in 4xx responses (user errors don't need it)
+
+## Panic Recovery Patterns
+
+### When to Recover from Panics
+- **HTTP handlers:** Always recover — one panicking request shouldn't crash the server
+- **Background workers:** Recover, log, and continue processing next item
+- **CLI tools:** Let panic propagate — crash with stack trace is appropriate
+- **Libraries:** Never panic — return errors to the caller
+
+### Go Recovery Pattern
+```go
+func recoveryMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        defer func() {
+            if err := recover(); err != nil {
+                slog.Error("panic recovered",
+                    "error", err,
+                    "stack", string(debug.Stack()),
+                    "path", r.URL.Path,
+                )
+                http.Error(w, `{"error":{"code":"INTERNAL_ERROR","message":"Internal server error"}}`, 500)
+            }
+        }()
+        next.ServeHTTP(w, r)
+    })
+}
+```
+
+### Python Recovery Pattern
+```python
+async def error_handler(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as exc:
+        log.error("unhandled_exception", error=str(exc), path=request.url.path)
+        return JSONResponse(
+            status_code=500,
+            content={"error": {"code": "INTERNAL_ERROR", "message": "Internal server error"}},
+        )
+```

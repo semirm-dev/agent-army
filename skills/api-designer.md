@@ -120,3 +120,66 @@ When designing a new API:
 5. Add pagination for list endpoints
 6. Add rate limiting for public endpoints
 7. Document with OpenAPI/Swagger
+
+## GraphQL Patterns
+
+When designing GraphQL APIs (in addition to REST):
+
+### Schema-First Design
+- Define schema in `.graphql` files before implementing resolvers
+- Use `type`, `input`, `enum` — avoid `JSON` scalar for structured data
+- Keep queries flat where possible — deep nesting causes N+1 problems
+
+### DataLoader Pattern
+- Always use DataLoader for resolving related entities (prevents N+1 queries)
+- Batch and cache within a single request lifecycle
+- Create one DataLoader instance per request (not shared across requests)
+
+### Pagination (Relay-style)
+```graphql
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+```
+
+### Error Handling
+- Use GraphQL errors for system errors (parsing, validation, auth)
+- Use union types for domain errors:
+```graphql
+union CreateUserResult = User | ValidationErrors | ConflictError
+```
+
+### Guidelines
+- Max query depth: 5 levels (prevent abuse)
+- Max query complexity: set a cost limit per query
+- Persisted queries for production (prevent arbitrary queries)
+- Disable introspection in production
+
+## Rate Limiting by Endpoint Type
+
+| Endpoint Type | Limit | Window | Strategy |
+|--------------|-------|--------|----------|
+| Authentication (login, signup) | 5 requests | per minute per IP | Strict — prevent brute force |
+| Password reset | 3 requests | per hour per email | Very strict — prevent abuse |
+| Public API reads | 100 requests | per minute per key | Standard sliding window |
+| Public API writes | 30 requests | per minute per key | Stricter for mutations |
+| Webhook receivers | 1000 requests | per minute per source | Lenient — don't drop events |
+| Health checks | No limit | — | Exempt from rate limiting |
+| Internal service-to-service | No limit | — | Use circuit breakers instead |
+
+### Implementation Guidelines
+- Return `429 Too Many Requests` with `Retry-After` header
+- Include rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+- Use Redis/Memcached for distributed rate limiting across instances
+- Log rate limit hits at WARN level with client identifier

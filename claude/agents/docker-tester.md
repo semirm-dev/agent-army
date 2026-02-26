@@ -28,6 +28,8 @@ Before writing tests, read:
 - `~/.claude/rules/observability.md` for health check and CI/CD patterns
 - `~/.claude/rules/security.md` for container security requirements
 
+Invoke the `testing-strategy` skill when planning test coverage or deciding which validation checks to prioritize.
+
 ## Validation Checklist
 
 ### Image Build

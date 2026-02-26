@@ -92,3 +92,96 @@ Before shipping a CLI tool:
 - [ ] Required flags show clear error when missing
 - [ ] Environment variable fallbacks for sensitive flags (tokens, passwords)
 - [ ] No hardcoded paths — use `$HOME`, config dirs, or flags
+
+## Configuration Precedence
+
+CLI tools should resolve configuration in this order (highest priority first):
+
+1. **CLI flags** — `--port 3000`
+2. **Environment variables** — `APP_PORT=3000`
+3. **Config file** — `.myapp.yaml`, `myapp.toml`
+4. **Defaults** — hardcoded sensible defaults
+
+Document this precedence in `--help` output. Example:
+```
+Configuration is loaded in order of precedence:
+  1. Command-line flags (highest priority)
+  2. Environment variables (APP_ prefix)
+  3. Config file (~/.myapp/config.yaml)
+  4. Built-in defaults
+```
+
+## Shell Completion
+
+Generate shell completion scripts for major shells:
+
+### Go (cobra)
+```go
+// Add to root command
+rootCmd.AddCommand(&cobra.Command{
+    Use:   "completion [bash|zsh|fish]",
+    Short: "Generate shell completion script",
+    RunE: func(cmd *cobra.Command, args []string) error {
+        switch args[0] {
+        case "bash":
+            return rootCmd.GenBashCompletion(os.Stdout)
+        case "zsh":
+            return rootCmd.GenZshCompletion(os.Stdout)
+        case "fish":
+            return rootCmd.GenFishCompletion(os.Stdout, true)
+        }
+        return nil
+    },
+})
+```
+
+### TypeScript (yargs)
+```typescript
+yargs.completion("completion", "Generate shell completion script");
+```
+
+### Python (click)
+```bash
+# click provides _MYAPP_COMPLETE env var
+_MYAPP_COMPLETE=bash_source myapp > ~/.myapp-complete.bash
+```
+
+### Installation Instructions
+Include in `--help` or README:
+```
+# Bash
+myapp completion bash > /etc/bash_completion.d/myapp
+
+# Zsh
+myapp completion zsh > "${fpath[1]}/_myapp"
+
+# Fish
+myapp completion fish > ~/.config/fish/completions/myapp.fish
+```
+
+## Subcommand Organization
+
+For CLIs with 5+ commands, organize into groups:
+
+```
+myapp
+├── serve              # Server commands
+├── migrate            # Database commands
+│   ├── up
+│   ├── down
+│   └── status
+├── user               # User management
+│   ├── create
+│   ├── list
+│   └── delete
+└── config             # Configuration
+    ├── init
+    ├── show
+    └── validate
+```
+
+Guidelines:
+- **Max 2 levels deep:** `myapp migrate up`, not `myapp db migrate schema up`
+- **Consistent verb patterns:** `create`, `list`, `show`, `delete`, `update`
+- **Hidden commands:** Use for internal/debug commands (cobra: `Hidden: true`)
+- **Aliases:** Support common shortcuts (`myapp ls` → `myapp list`)

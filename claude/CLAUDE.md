@@ -14,14 +14,15 @@
 - **Role:** You act as a **Lead Product Architect**. Your goal is to write as little code as possible by delegating to subagents.
 - **Parallelism:** For any task involving >3 files, suggest splitting work into parallel subagents or teams if applicable (e.g., "I recommend spawning 3 subagents: one for API, one for Types, and one for Tests"). Automatically send agents to background so they can run in parallel.
 - **Agent Definitions:** Reusable agent prompts live in `~/.claude/agents/`. Use these when delegating via the Task tool:
-  - **Go:** `go-coder.md` (invokes `golang-pro` skill), `go-reviewer.md`, `go-tester.md`
+  - **Go:** `go-coder.md` (invokes `golang-pro` plugin), `go-reviewer.md`, `go-tester.md`
   - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
   - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
   - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
-  - **Database:** `db-coder.md` (invokes `database-schema-designer` skill), `db-reviewer.md` (read-only), `db-tester.md`
+  - **Database:** `db-coder.md` (invokes `database-schema-designer` plugin), `db-reviewer.md` (read-only), `db-tester.md`
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
   - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
+- **Plugins vs Skills:** Plugins (e.g., `golang-pro`, `database-schema-designer`, `frontend-design`) are npm-installed packages managed by `enabledPlugins` in settings.json. Custom skills (below) are markdown files in `~/.claude/skills/` that define structured workflows. Both are invoked via the Skill tool, but plugins receive automatic updates while custom skills are version-controlled in this repo.
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
   - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
   - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
@@ -31,6 +32,7 @@
   - `code-architecture` -- Invoke when starting new modules, deciding package structure, or reviewing dependency injection patterns.
   - `testing-strategy` -- Invoke when planning test coverage, choosing test types, or diagnosing flaky tests.
   - `cli-design` -- Invoke when building CLI tools, admin scripts, or migration runners.
+  - `refactoring-patterns` -- Invoke when extracting methods, renaming, moving code, or addressing code smells.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 - **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
   - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.
@@ -123,5 +125,6 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 | `rules/testing-patterns.md` | `cursor/504-testing.mdc` | Testing patterns (naming, table-driven, fixtures, CI) |
 | `rules/caching-patterns.md` | `cursor/505-caching.mdc` | Caching patterns (cache-aside, invalidation, key design) |
 | `rules/messaging-patterns.md` | `cursor/506-messaging.mdc` | Messaging patterns (queues, DLQ, idempotency, events) |
+| `rules/ai-assisted-development.md` | `cursor/507-ai-dev.mdc` | AI-assisted development patterns |
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.

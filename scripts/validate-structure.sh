@@ -159,7 +159,7 @@ echo "--- Skill references in agents ---"
 for agent_file in "$AGENTS_DIR"/*.md; do
   AGENT_NAME=$(basename "$agent_file")
   # Match skill names in backtick-quoted references that match known skill patterns
-  AGENT_SKILLS=$(grep -oE '`(migration-safety|error-handling|testing-strategy|code-architecture|api-designer|git-conventions|dependency-audit|cli-design)`' "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
+  AGENT_SKILLS=$(grep -oE '`(migration-safety|error-handling|testing-strategy|code-architecture|api-designer|git-conventions|dependency-audit|cli-design|refactoring-patterns)`' "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
   for skill in $AGENT_SKILLS; do
     if [ -f "$LIB_DIR/skills/${skill}.md" ]; then
       ok "$AGENT_NAME → skills/${skill}.md"

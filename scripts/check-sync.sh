@@ -222,6 +222,12 @@ diff_rule_file \
   "$RULES_DIR/messaging-patterns.md" \
   "$CURSOR_DIR/506-messaging.mdc"
 
+# 18. AI-Assisted Development: rules/ai-assisted-development.md vs 507-ai-dev.mdc
+diff_rule_file \
+  "AI-Assisted Development" \
+  "$RULES_DIR/ai-assisted-development.md" \
+  "$CURSOR_DIR/507-ai-dev.mdc"
+
 # Deployed vs repo comparison (--deployed flag)
 if [ "$CHECK_DEPLOYED" -eq 1 ]; then
   echo ""
