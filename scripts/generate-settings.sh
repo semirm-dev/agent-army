@@ -11,8 +11,8 @@ require_jq
 
 OUTPUT="$LIB_DIR/claude/settings.json"
 
-# Build enabledPlugins object: { "name@claude-plugins-official": true, ... }
-PLUGINS_OBJ=$(cfg_raw '.plugins' | jq '[.[] | {key: "\(.)@claude-plugins-official", value: true}] | from_entries')
+# Build enabledPlugins object: { "name@marketplace": true, ... }
+PLUGINS_OBJ=$(cfg_raw '.plugins' | jq '[.[] | {key: "\(.name)@\(.marketplace)", value: true}] | from_entries')
 
 # Build permissions allow array
 PERMISSIONS_ALLOW=$(cfg_raw '.settings.permissions_allow')
@@ -26,7 +26,6 @@ jq -n \
   --arg statusType "$(cfg '.settings.statusLine.type')" \
   --arg statusCmd "$(cfg '.settings.statusLine.command')" \
   '{
-    _generated: "DO NOT EDIT — generated from config.json by scripts/generate-settings.sh",
     permissions: {
       allow: $allow,
       defaultMode: $defaultMode
@@ -36,7 +35,8 @@ jq -n \
       command: $statusCmd
     },
     enabledPlugins: $plugins,
-    skipDangerousModePermissionPrompt: $skipDangerous
+    skipDangerousModePermissionPrompt: $skipDangerous,
+    _generated: "DO NOT EDIT — generated from config.json by scripts/generate-settings.sh"
   }' > "$OUTPUT"
 
 echo "Generated $OUTPUT"

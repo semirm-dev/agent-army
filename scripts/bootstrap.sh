@@ -104,9 +104,11 @@ bash "$LIB_DIR/scripts/generate-settings.sh"
 SETTINGS_SRC="$LIB_DIR/claude/settings.json"
 SETTINGS_DST="$HOME/.claude/settings.json"
 echo "  Plugins enabled via settings.json:"
-while read -r plugin; do
-  echo "    - $plugin"
-done < <(cfg '.plugins[]')
+while read -r plugin_json; do
+  pname=$(echo "$plugin_json" | jq -r '.name')
+  pmkt=$(echo "$plugin_json" | jq -r '.marketplace')
+  echo "    - ${pname}@${pmkt}"
+done < <(cfg_raw '.plugins[]')
 if ask "Deploy settings.json to $SETTINGS_DST?"; then
   if [ -f "$SETTINGS_DST" ]; then
     echo "  Current diff:"
@@ -126,6 +128,13 @@ else
   warn "Skipped settings deployment"
 fi
 
+if ask "Install plugins via claude CLI?"; then
+  bash "$LIB_DIR/scripts/sync-plugins.sh"
+  ok "Plugins installed"
+else
+  warn "Skipped plugin installation (run 'bash scripts/sync-plugins.sh' later)"
+fi
+
 # ── Step 5: Verify ─────────────────────────────────────────────────
 
 step "Step 5: Verify installation"
@@ -136,6 +145,14 @@ ls "$HOME/.claude/skills/" 2>/dev/null || warn "No skills directory"
 echo ""
 echo "Agents available:"
 ls "$HOME/.claude/agents/" 2>/dev/null || warn "No agents directory"
+
+echo ""
+echo "Plugins installed:"
+if command -v claude >/dev/null 2>&1; then
+  claude plugin list --scope user 2>/dev/null || warn "No plugins installed"
+else
+  warn "claude CLI not found — cannot list plugins"
+fi
 
 echo ""
 if [ -x "$LIB_DIR/scripts/check-sync.sh" ]; then
