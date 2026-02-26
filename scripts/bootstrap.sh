@@ -126,37 +126,9 @@ else
   warn "Skipped settings deployment"
 fi
 
-# ── Step 5: Add shell aliases ──────────────────────────────────────
+# ── Step 5: Verify ─────────────────────────────────────────────────
 
-step "Step 5: Add shell aliases"
-ALIAS_COUNT=$(cfg_raw '.shell_aliases' | jq 'length')
-echo "  Aliases to add:"
-while read -r alias_json; do
-  name=$(echo "$alias_json" | jq -r '.name')
-  desc=$(echo "$alias_json" | jq -r '.description')
-  echo "    - $name — $desc"
-done < <(cfg_raw '.shell_aliases[]')
-if ask "Add $ALIAS_COUNT aliases to ~/.zshrc?"; then
-  ZSHRC="$HOME/.zshrc"
-  touch "$ZSHRC"
-  while read -r alias_json; do
-    alias_name=$(echo "$alias_json" | jq -r '.name')
-    alias_script=$(echo "$alias_json" | jq -r '.script')
-    alias_line="alias ${alias_name}='$LIB_DIR/${alias_script}'"
-    if grep -qF "$alias_line" "$ZSHRC"; then
-      ok "Already present: $alias_line"
-    else
-      echo "$alias_line" >> "$ZSHRC"
-      ok "Added: $alias_line"
-    fi
-  done < <(cfg_raw '.shell_aliases[]')
-else
-  warn "Skipped alias setup"
-fi
-
-# ── Step 6: Verify ─────────────────────────────────────────────────
-
-step "Step 6: Verify installation"
+step "Step 5: Verify installation"
 
 echo "Skills installed:"
 ls "$HOME/.claude/skills/" 2>/dev/null || warn "No skills directory"
@@ -179,8 +151,7 @@ echo -e "${BOLD}${GREEN}  Bootstrap complete${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${BOLD}${YELLOW}  Next steps:${NC}"
-echo -e "    1. source ~/.zshrc            (or open a new terminal to load aliases)"
-echo -e "    2. cd <your-project> && claude (start using Claude Code with the new rules)"
+echo -e "    cd <your-project> && claude    (start using Claude Code with the new rules)"
 echo ""
 echo -e "${BOLD}${YELLOW}  Day-to-day after editing rules in this repo:${NC}"
-echo -e "    sync-rules claude && sync-rules cursor"
+echo -e "    make sync"

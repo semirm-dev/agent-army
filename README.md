@@ -11,7 +11,7 @@ cd ~/workspace/agent-rules
 make bootstrap
 ```
 
-Bootstrap configures your machine for the agent-rules workflow — it installs skills, deploys settings (which enables plugins), and sets up shell aliases. Every step lists what will be installed and asks for confirmation.
+Bootstrap configures your machine for the agent-rules workflow — it installs skills and deploys settings (which enables plugins). Every step lists what will be installed and asks for confirmation.
 
 | Step | Action                                                                   |
 | ---- | ------------------------------------------------------------------------ |
@@ -19,8 +19,7 @@ Bootstrap configures your machine for the agent-rules workflow — it installs s
 | 2    | Sync rules to `~/.claude/` and `~/.cursor/rules/`                        |
 | 3    | Install Agent Skills (golang-pro, database-schema-designer, skill-creator) |
 | 4    | Install Claude Plugins (deploy `settings.json`, shows diff if exists)    |
-| 5    | Add `sync-rules` and `init-project` aliases to `~/.zshrc`                |
-| 6    | Verify installation (list skills, agents, run check-sync)                |
+| 5    | Verify installation (list skills, agents, run check-sync)                |
 
 Idempotent — skips already-installed components on re-run.
 
