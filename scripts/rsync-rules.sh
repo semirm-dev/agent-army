@@ -50,6 +50,19 @@ fi
 rsync -av ${EXCLUDES[@]+"${EXCLUDES[@]}"} "$LIB_DIR/$FOLDER/" "$TARGET_DIR/" \
   || { echo "rsync failed"; exit 1; }
 
+# 5b. Symlink NPM-installed skills from ~/.agents/skills/
+if [ "$FOLDER" = "claude" ] && [ -d "$HOME/.agents/skills" ]; then
+  CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
+  mkdir -p "$CLAUDE_SKILLS_DIR"
+  for skill_dir in "$HOME/.agents/skills"/*/; do
+    skill_name=$(basename "$skill_dir")
+    if [ ! -e "$CLAUDE_SKILLS_DIR/$skill_name" ]; then
+      ln -sfn "$skill_dir" "$CLAUDE_SKILLS_DIR/$skill_name"
+      echo "  + symlinked $skill_name -> $CLAUDE_SKILLS_DIR/"
+    fi
+  done
+fi
+
 # 6. Deploy shared skills to Cursor (source of truth is claude/skills/)
 if [ "$FOLDER" = "cursor" ]; then
   CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
@@ -57,6 +70,17 @@ if [ "$FOLDER" = "cursor" ]; then
   echo "🔄 Syncing custom skills to: $CURSOR_SKILLS_DIR"
   rsync -av "$LIB_DIR/claude/skills/" "$CURSOR_SKILLS_DIR/" \
     || { echo "skills rsync failed"; exit 1; }
+
+  # Symlink NPM-installed skills from ~/.agents/skills/
+  if [ -d "$HOME/.agents/skills" ]; then
+    for skill_dir in "$HOME/.agents/skills"/*/; do
+      skill_name=$(basename "$skill_dir")
+      if [ ! -e "$CURSOR_SKILLS_DIR/$skill_name" ]; then
+        ln -sfn "$skill_dir" "$CURSOR_SKILLS_DIR/$skill_name"
+        echo "  + symlinked $skill_name -> $CURSOR_SKILLS_DIR/"
+      fi
+    done
+  fi
 fi
 
 # 7. Deploy Cursor-native agents + plugin agents

@@ -144,6 +144,20 @@ else
   warn "Skipped skill installation"
 fi
 
+# Symlink all NPM skills into ~/.claude/skills/ and ~/.cursor/skills/
+if [ -d "$HOME/.agents/skills" ]; then
+  for skill_dir in "$HOME/.agents/skills"/*/; do
+    skill_name=$(basename "$skill_dir")
+    for target in "$HOME/.claude/skills" "$HOME/.cursor/skills"; do
+      mkdir -p "$target"
+      if [ ! -e "$target/$skill_name" ]; then
+        ln -sfn "$skill_dir" "$target/$skill_name"
+        ok "Symlinked $skill_name -> $target/"
+      fi
+    done
+  done
+fi
+
 # ── Step 4: Install Claude Plugins ────────────────────────────────
 
 step "Step 4: Install Claude Plugins"
@@ -176,11 +190,48 @@ else
   warn "Skipped settings deployment"
 fi
 
-if ask "Install plugins via claude CLI?"; then
-  bash "$LIB_DIR/scripts/sync-plugins.sh"
-  ok "Plugins installed"
+INSTALLED_PLUGINS_JSON=$(claude plugin list --json 2>/dev/null || echo "[]")
+MISSING_PLUGINS=()
+echo "  Plugin status:"
+while read -r plugin_json; do
+  pname=$(echo "$plugin_json" | jq -r '.name')
+  pmkt=$(echo "$plugin_json" | jq -r '.marketplace')
+  qualified="${pname}@${pmkt}"
+  if echo "$INSTALLED_PLUGINS_JSON" | jq -e --arg id "$qualified" '.[] | select(.id == $id)' >/dev/null 2>&1; then
+    ok "$qualified already installed"
+  else
+    MISSING_PLUGINS+=("$plugin_json")
+    echo "    - $qualified (not installed)"
+  fi
+done < <(cfg_raw '.plugins[]')
+
+if [ ${#MISSING_PLUGINS[@]} -eq 0 ]; then
+  ok "All plugins already installed"
 else
-  warn "Skipped plugin installation (run 'bash scripts/sync-plugins.sh' later)"
+  if ask "Install ${#MISSING_PLUGINS[@]} missing plugin(s) via claude CLI?"; then
+    REGISTERED=$(claude plugin marketplace list 2>/dev/null || true)
+    for plugin_json in "${MISSING_PLUGINS[@]}"; do
+      pname=$(echo "$plugin_json" | jq -r '.name')
+      pmkt=$(echo "$plugin_json" | jq -r '.marketplace')
+      source_repo=$(echo "$plugin_json" | jq -r '.source // empty')
+      qualified="${pname}@${pmkt}"
+
+      if [ -n "$source_repo" ] && ! echo "$REGISTERED" | grep -q "$pmkt"; then
+        echo "  + adding marketplace $pmkt ($source_repo)..."
+        claude plugin marketplace add "$source_repo" 2>&1 || warn "Failed to add marketplace $pmkt"
+      fi
+
+      echo "  + installing $qualified..."
+      if claude plugin install "$qualified" --scope user 2>&1; then
+        ok "$qualified installed"
+      else
+        warn "Failed to install $qualified"
+      fi
+    done
+    ok "Plugin installation complete"
+  else
+    warn "Skipped plugin installation (run 'make bootstrap' later)"
+  fi
 fi
 
 # ── Step 5: Verify ─────────────────────────────────────────────────
@@ -198,18 +249,19 @@ echo "Agents available:"
 ls "$HOME/.claude/agents/" 2>/dev/null || warn "No agents directory"
 
 echo ""
-echo "Plugins configured:"
+echo "Plugins installed:"
 if command -v claude >/dev/null 2>&1; then
-  plugin_list=$(claude plugin list --scope user 2>/dev/null || true)
-  if [ -n "$plugin_list" ]; then
-    echo "$plugin_list"
+  plugin_list_json=$(claude plugin list --json 2>/dev/null || echo "[]")
+  plugin_count=$(echo "$plugin_list_json" | jq 'length')
+  if [ "$plugin_count" -gt 0 ] 2>/dev/null; then
+    echo "$plugin_list_json" | jq -r '.[] | "  - \(.id)  [\(if .enabled then "enabled" else "disabled" end)]"'
   else
     while read -r pjson; do
       pname=$(echo "$pjson" | jq -r '.name')
       pmkt=$(echo "$pjson" | jq -r '.marketplace')
       echo "  - ${pname}@${pmkt}"
     done < <(cfg_raw '.plugins[]')
-    echo "  (listed from config.json — 'claude plugin list' returned nothing)"
+    warn "'claude plugin list' returned nothing — listed from config.json"
   fi
 else
   warn "claude CLI not found — cannot list plugins"
