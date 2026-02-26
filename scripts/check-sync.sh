@@ -54,11 +54,11 @@ diff_sections() {
   tmp_b=$(mktemp "$TMPDIR_SYNC/tmp.XXXXXX")
 
   if [ -n "$normalize" ]; then
-    extract_section "$file_a" "$section_a" "$end_a" | grep -v '^[[:space:]]*$' | sed "$normalize" > "$tmp_a"
-    extract_section "$file_b" "$section_b" "$end_b" | grep -v '^[[:space:]]*$' | sed "$normalize" > "$tmp_b"
+    extract_section "$file_a" "$section_a" "$end_a" | { grep -v '^[[:space:]]*$' || true; } | sed "$normalize" > "$tmp_a"
+    extract_section "$file_b" "$section_b" "$end_b" | { grep -v '^[[:space:]]*$' || true; } | sed "$normalize" > "$tmp_b"
   else
-    extract_section "$file_a" "$section_a" "$end_a" | grep -v '^[[:space:]]*$' > "$tmp_a"
-    extract_section "$file_b" "$section_b" "$end_b" | grep -v '^[[:space:]]*$' > "$tmp_b"
+    extract_section "$file_a" "$section_a" "$end_a" | { grep -v '^[[:space:]]*$' || true; } > "$tmp_a"
+    extract_section "$file_b" "$section_b" "$end_b" | { grep -v '^[[:space:]]*$' || true; } > "$tmp_b"
   fi
 
   if ! diff -q "$tmp_a" "$tmp_b" > /dev/null 2>&1; then
@@ -92,11 +92,11 @@ diff_rule_file() {
 
   # Strip sync comments, front matter, and normalize headings
   if [ -n "$normalize" ]; then
-    grep -v '^<!-- Sync:' "$rule_file" | grep -v '^[[:space:]]*$' | sed 's/^#\{1,6\} //' | sed "$normalize" > "$tmp_a"
-    sed -n '/^---$/,/^---$/!p' "$cursor_file" | grep -v '^<!-- Sync:' | grep -v '^[[:space:]]*$' | sed 's/^#\{1,6\} //' | sed "$normalize" > "$tmp_b"
+    grep -v '^<!-- Sync:' "$rule_file" | { grep -v '^[[:space:]]*$' || true; } | sed 's/^#\{1,6\} //' | sed "$normalize" > "$tmp_a"
+    sed -n '/^---$/,/^---$/!p' "$cursor_file" | grep -v '^<!-- Sync:' | { grep -v '^[[:space:]]*$' || true; } | sed 's/^#\{1,6\} //' | sed "$normalize" > "$tmp_b"
   else
-    grep -v '^<!-- Sync:' "$rule_file" | grep -v '^[[:space:]]*$' | sed 's/^#\{1,6\} //' > "$tmp_a"
-    sed -n '/^---$/,/^---$/!p' "$cursor_file" | grep -v '^<!-- Sync:' | grep -v '^[[:space:]]*$' | sed 's/^#\{1,6\} //' > "$tmp_b"
+    grep -v '^<!-- Sync:' "$rule_file" | { grep -v '^[[:space:]]*$' || true; } | sed 's/^#\{1,6\} //' > "$tmp_a"
+    sed -n '/^---$/,/^---$/!p' "$cursor_file" | grep -v '^<!-- Sync:' | { grep -v '^[[:space:]]*$' || true; } | sed 's/^#\{1,6\} //' > "$tmp_b"
   fi
 
   if ! diff -q "$tmp_a" "$tmp_b" > /dev/null 2>&1; then
@@ -150,6 +150,32 @@ diff_sections \
   "$CURSOR_DIR/200-planning.mdc" "Agentic Implementation Plan" \
   "^---" "ZZZZZ_SENTINEL_EOF" \
   "s/sub-agents/agents/g;s/agents\/cycles/agents/g"
+
+# Multi-Agent Management: only shared bullets are compared (the sections
+# are intentionally different — CLAUDE.md has full agent/plugin lists,
+# cursor has a simplified version).
+diff_shared_bullets() {
+  local label="$1" file_a="$2" file_b="$3"
+  shift 3
+  for bullet in "$@"; do
+    local line_a line_b
+    line_a=$(grep "^- \*\*${bullet}:\*\*" "$file_a" | head -1 || true)
+    line_b=$(grep "^- \*\*${bullet}:\*\*" "$file_b" | head -1 || true)
+    if [ -z "$line_a" ] && [ -z "$line_b" ]; then
+      continue
+    fi
+    if [ "$line_a" != "$line_b" ]; then
+      echo "DRIFT in [$label — $bullet]"
+      echo "  $file_a: ${line_a:-(missing)}"
+      echo "  $file_b: ${line_b:-(missing)}"
+      DRIFT_FOUND=1
+    fi
+  done
+}
+
+diff_shared_bullets "Multi-Agent (shared bullets)" \
+  "$CLAUDE" "$CURSOR_DIR/000-index.mdc" \
+  "Role" "Parallelism" "Verification"
 
 # Deployed vs repo comparison (--deployed flag)
 if [ "$CHECK_DEPLOYED" -eq 1 ]; then

@@ -14,16 +14,6 @@
       "name": "skill-creator",
       "repo": "https://github.com/anthropics/skills",
       "description": "Skill authoring guide"
-    },
-    {
-      "name": "browser-use",
-      "repo": "https://github.com/anthropics/skills",
-      "description": "Browser automation skill"
-    },
-    {
-      "name": "find-skills",
-      "repo": "https://github.com/anthropics/skills",
-      "description": "Skill discovery tool"
     }
   ],
   "plugins": [

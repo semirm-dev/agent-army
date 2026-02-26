@@ -9,6 +9,8 @@
 #   3. Heading level differences  → ignored, no drift (exit 0)
 #   4. Rule vs cursor file drift  → drift detected (exit 1)
 #   5. Real check-sync on repo    → passes (exit 0)
+#   6. Shared bullet drift        → drift detected (exit 1)
+#   7. Empty extraction resilience → no crash (exit 0)
 #
 # Usage: ./scripts/test-check-sync.sh
 #   Or:  make test
@@ -263,6 +265,91 @@ echo "── Test 5: Real check-sync.sh on repo (should pass) ──"
 
 bash "$SCRIPT_DIR/check-sync.sh" > /dev/null 2>&1 && exit_code=0 || exit_code=$?
 assert_exit "Real check-sync on repo → exit 0" 0 "$exit_code"
+
+# ── Test 6: Shared bullet drift detection ─────────────────────────
+
+echo "── Test 6: Shared bullet drift detection ──"
+
+cat > "$TMPDIR_TEST/claude_bullets.md" <<'EOF'
+## 🤖 Multi-Agent Management (The Manager Workflow)
+- **Role:** You act as a **Lead Product Architect**.
+- **Parallelism:** Split work into parallel subagents.
+- **Agent Definitions:** (claude-only content here)
+- **Verification:** Run the build command.
+EOF
+
+cat > "$TMPDIR_TEST/cursor_bullets.mdc" <<'EOF'
+## 🤖 Multi-Agent Management (The Manager Workflow)
+- **Role:** You act as a **Lead Technical Architect**.
+- **Parallelism:** Split work into parallel subagents.
+- **Verification:** Run the build command.
+EOF
+
+cat > "$TMPDIR_TEST/check_bullets.sh" <<SCRIPT
+#!/bin/bash
+set -euo pipefail
+DRIFT_FOUND=0
+
+diff_shared_bullets() {
+  local label="\$1" file_a="\$2" file_b="\$3"
+  shift 3
+  for bullet in "\$@"; do
+    local line_a line_b
+    line_a=\$(grep "^- \*\*\${bullet}:\*\*" "\$file_a" | head -1 || true)
+    line_b=\$(grep "^- \*\*\${bullet}:\*\*" "\$file_b" | head -1 || true)
+    if [ -z "\$line_a" ] && [ -z "\$line_b" ]; then
+      continue
+    fi
+    if [ "\$line_a" != "\$line_b" ]; then
+      DRIFT_FOUND=1
+    fi
+  done
+}
+
+diff_shared_bullets "Multi-Agent" \\
+  "$TMPDIR_TEST/claude_bullets.md" "$TMPDIR_TEST/cursor_bullets.mdc" \\
+  "Role" "Parallelism" "Verification"
+
+exit \$DRIFT_FOUND
+SCRIPT
+chmod +x "$TMPDIR_TEST/check_bullets.sh"
+
+bash "$TMPDIR_TEST/check_bullets.sh" > /dev/null 2>&1 && exit_code=0 || exit_code=$?
+assert_exit "Shared bullet drift detected → exit 1" 1 "$exit_code"
+
+# ── Test 7: Empty extraction resilience ───────────────────────────
+
+echo "── Test 7: Empty extraction → no crash ──"
+
+cat > "$TMPDIR_TEST/check_empty.sh" <<SCRIPT
+#!/bin/bash
+set -euo pipefail
+DRIFT_FOUND=0
+
+extract_section() {
+  local file="\$1" start_pattern="\$2" end_pattern="\$3"
+  awk "/\$start_pattern/{found=1; next} /\$end_pattern/{found=0} found" "\$file" \\
+    | sed 's/^#\\{1,6\\} //'
+}
+
+tmp_a=\$(mktemp) tmp_b=\$(mktemp)
+
+extract_section "$TMPDIR_TEST/claude.md" "NONEXISTENT_PATTERN" "ALSO_NONEXISTENT" \
+  | { grep -v '^[[:space:]]*\$' || true; } > "\$tmp_a"
+extract_section "$TMPDIR_TEST/cursor.mdc" "NONEXISTENT_PATTERN" "ALSO_NONEXISTENT" \
+  | { grep -v '^[[:space:]]*\$' || true; } > "\$tmp_b"
+
+if ! diff -q "\$tmp_a" "\$tmp_b" > /dev/null 2>&1; then
+  DRIFT_FOUND=1
+fi
+
+rm -f "\$tmp_a" "\$tmp_b"
+exit \$DRIFT_FOUND
+SCRIPT
+chmod +x "$TMPDIR_TEST/check_empty.sh"
+
+bash "$TMPDIR_TEST/check_empty.sh" > /dev/null 2>&1 && exit_code=0 || exit_code=$?
+assert_exit "Empty extraction → exit 0 (no crash)" 0 "$exit_code"
 
 # ── Summary ────────────────────────────────────────────────────────
 

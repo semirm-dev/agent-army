@@ -17,7 +17,7 @@ Bootstrap configures your machine for the agent-rules workflow — it installs s
 | ---- | ------------------------------------------------------------------------ |
 | 1    | Check prerequisites (node, npx, claude CLI, rsync)                       |
 | 2    | Sync rules to `~/.claude/` and `~/.cursor/rules/`                        |
-| 3    | Install Agent Skills (golang-pro, browser-use, etc.)                     |
+| 3    | Install Agent Skills (golang-pro, database-schema-designer, skill-creator) |
 | 4    | Install Claude Plugins (deploy `settings.json`, shows diff if exists)    |
 | 5    | Add `sync-rules`, `check-sync`, and `init-project` aliases to `~/.zshrc` |
 | 6    | Verify installation (list skills, agents, run check-sync)                |
@@ -42,7 +42,7 @@ cursor/*.mdc                    → ~/.cursor/rules/*.mdc
 | Source             | What                                      | Count | Items                                                                                   |
 | ------------------ | ----------------------------------------- | ----- | --------------------------------------------------------------------------------------- |
 | **Plugins**        | Auto-updating, managed by Claude CLI      | 6     | superpowers, context7, frontend-design, code-review, security-guidance, code-simplifier |
-| **npm Skills**     | Installed locally via `npx skills add`    | 5     | golang-pro, browser-use, database-schema-designer, skill-creator, find-skills           |
+| **npm Skills**     | Installed locally via `npx skills add`    | 3     | golang-pro, database-schema-designer, skill-creator                                     |
 | **Custom Skills**  | Built-in, located in `skills/`            | 9     | api-designer, git-conventions, migration-safety, dependency-audit, error-handling, code-architecture, testing-strategy, cli-design, refactoring-patterns |
 | **Agents**         | Reusable prompts for Task tool delegation | 20    | go-{coder,reviewer,tester}, ts-{coder,reviewer,tester}, py-{coder,reviewer,tester}, react-{coder,reviewer,tester}, db-{coder,reviewer,tester}, docker-{builder,reviewer,tester}, arch-{reviewer}, docs-{writer} |
 | **Claude Rules**   | Domain-specific standards                 | 15    | go-patterns, ts-patterns, py-patterns, react-patterns, git-workflow, api-design, database, observability, security, cross-cutting, concurrency, testing-patterns, caching-patterns, messaging-patterns, ai-assisted-development |
