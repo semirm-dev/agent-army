@@ -1,4 +1,4 @@
-# agent-rules
+# agent-army
 This is intended for personal use. Use with caution and adjust as needed.
 
 Portable AI development setup for **Claude Code** and **Cursor**. One repo, one `bootstrap.sh`, consistent rules across devices.
