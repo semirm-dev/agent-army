@@ -199,6 +199,34 @@ else
 fi
 echo ""
 
+# 9. Check CLAUDE.md Custom Skills list matches config.json custom_skills
+echo "--- CLAUDE.md Custom Skills vs config.json ---"
+
+# Extract skill names from CLAUDE.md Custom Skills section only (between "Custom Skills:" and "Plugins (superpowers):")
+CLAUDE_SKILLS=$(sed -n '/\*\*Custom Skills:\*\*/,/\*\*Plugins (superpowers):\*\*/p' "$CLAUDE_MD" | grep -E '^\s+- `[a-z-]+` --' | grep -oE '`[a-z-]+`' | tr -d '`' | sort)
+
+# Extract skill names from config.json
+CONFIG_SKILLS=$(cfg '.custom_skills[]' | sort)
+
+if [ "$CLAUDE_SKILLS" = "$CONFIG_SKILLS" ]; then
+  ok "CLAUDE.md Custom Skills matches config.json ($(echo "$CONFIG_SKILLS" | wc -l | tr -d ' ') skills)"
+else
+  MISSING_FROM_CLAUDE=$(comm -23 <(echo "$CONFIG_SKILLS") <(echo "$CLAUDE_SKILLS"))
+  MISSING_FROM_CONFIG=$(comm -13 <(echo "$CONFIG_SKILLS") <(echo "$CLAUDE_SKILLS"))
+
+  if [ -n "$MISSING_FROM_CLAUDE" ]; then
+    for s in $MISSING_FROM_CLAUDE; do
+      error "config.json has skill '$s' not listed in CLAUDE.md Custom Skills"
+    done
+  fi
+  if [ -n "$MISSING_FROM_CONFIG" ]; then
+    for s in $MISSING_FROM_CONFIG; do
+      error "CLAUDE.md lists skill '$s' not in config.json custom_skills"
+    done
+  fi
+fi
+echo ""
+
 # Summary
 echo "=== Summary ==="
 echo "  Errors:   $ERRORS"

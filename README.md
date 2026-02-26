@@ -135,12 +135,12 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `make sync`            | Sync rules to both Claude and Cursor           |
 | `make sync-claude`     | Sync rules to Claude only                      |
 | `make sync-cursor`     | Sync rules to Cursor only                      |
-| `make check`           | Verify sync parity                             |
-| `make deploy`          | Sync + check (day-to-day loop)                 |
+| `make check-deployed`  | Verify deployed files match repo               |
+| `make deploy`          | Sync + check-deployed (day-to-day loop)        |
 | `make validate`        | Structural validation (agents, rules, triads, skills, sync pairs) |
 | `make test`            | Run check-sync test suite (5 drift-detection tests) |
 
-`make check` exit codes:
+`make check-deployed` exit codes:
 
 | Exit code | Meaning                             |
 | --------- | ----------------------------------- |
@@ -231,7 +231,7 @@ make test
 3. Create 3 agent files: `claude/agents/<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`
 4. Add a `check-sync` entry in `scripts/check-sync.sh` for the new rule ↔ cursor pair
 5. Update the rules table and agent definitions in `claude/CLAUDE.md`
-6. Run `make validate && make check && make deploy`
+6. Run `make validate && make check-deployed && make deploy`
 
 ## Troubleshooting
 
@@ -255,10 +255,10 @@ Cursor caches `.mdc` files. After `make sync-cursor`:
 3. Verify in Cursor settings → Rules that the rules appear
 
 ### Sync drift after editing
-If `make check` shows drift:
+If `make check-deployed` shows drift:
 ```bash
 # 1. See what drifted
-make check
+make check-deployed
 
 # 2. Edit the source file (claude/rules/ or claude/CLAUDE.md)
 # 3. Re-deploy
