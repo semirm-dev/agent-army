@@ -17,10 +17,10 @@
     }
   ],
   "plugins": [
-    { "name": "code-review", "marketplace": "claude-code-plugins" },
-    { "name": "frontend-design", "marketplace": "claude-code-plugins" },
-    { "name": "security-guidance", "marketplace": "claude-code-plugins" },
-    { "name": "pr-review-toolkit", "marketplace": "claude-code-plugins" },
+    { "name": "code-review", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
+    { "name": "frontend-design", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
+    { "name": "security-guidance", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
+    { "name": "code-simplifier", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
     { "name": "superpowers", "marketplace": "superpowers-marketplace", "source": "obra/superpowers-marketplace" },
     { "name": "context7-plugin", "marketplace": "context7-marketplace", "source": "upstash/context7" }
   ],
