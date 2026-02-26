@@ -107,11 +107,10 @@
       ]
     }
   ],
-  "shell_aliases": {
-    "sync-rules": "scripts/rsync-rules.sh",
-    "check-sync": "scripts/check-sync.sh",
-    "init-project": "scripts/init-project.sh"
-  },
+  "shell_aliases": [
+    { "name": "sync-rules", "script": "scripts/rsync-rules.sh", "description": "Sync rules to ~/.claude/ or ~/.cursor/rules/" },
+    { "name": "init-project", "script": "scripts/init-project.sh", "description": "Initialize a new project with agent-rules" }
+  ],
   "sync_pairs": [
     { "label": "Go Patterns", "rule": "go-patterns.md", "cursor": "100-golang.mdc", "description": "Go coding + testing patterns" },
     { "label": "TypeScript Patterns", "rule": "ts-patterns.md", "cursor": "101-typescript.mdc", "description": "TypeScript coding + testing patterns" },

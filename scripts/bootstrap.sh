@@ -129,12 +129,19 @@ fi
 # ── Step 5: Add shell aliases ──────────────────────────────────────
 
 step "Step 5: Add shell aliases"
-if ask "Add aliases to ~/.zshrc?"; then
+ALIAS_COUNT=$(cfg_raw '.shell_aliases' | jq 'length')
+echo "  Aliases to add:"
+while read -r alias_json; do
+  name=$(echo "$alias_json" | jq -r '.name')
+  desc=$(echo "$alias_json" | jq -r '.description')
+  echo "    - $name — $desc"
+done < <(cfg_raw '.shell_aliases[]')
+if ask "Add $ALIAS_COUNT aliases to ~/.zshrc?"; then
   ZSHRC="$HOME/.zshrc"
   touch "$ZSHRC"
-  while read -r entry; do
-    alias_name=$(echo "$entry" | jq -r '.key')
-    alias_script=$(echo "$entry" | jq -r '.value')
+  while read -r alias_json; do
+    alias_name=$(echo "$alias_json" | jq -r '.name')
+    alias_script=$(echo "$alias_json" | jq -r '.script')
     alias_line="alias ${alias_name}='$LIB_DIR/${alias_script}'"
     if grep -qF "$alias_line" "$ZSHRC"; then
       ok "Already present: $alias_line"
@@ -142,7 +149,7 @@ if ask "Add aliases to ~/.zshrc?"; then
       echo "$alias_line" >> "$ZSHRC"
       ok "Added: $alias_line"
     fi
-  done < <(cfg_raw '.shell_aliases | to_entries[]')
+  done < <(cfg_raw '.shell_aliases[]')
 else
   warn "Skipped alias setup"
 fi
@@ -176,4 +183,4 @@ echo -e "    1. source ~/.zshrc            (or open a new terminal to load alias
 echo -e "    2. cd <your-project> && claude (start using Claude Code with the new rules)"
 echo ""
 echo -e "${BOLD}${YELLOW}  Day-to-day after editing rules in this repo:${NC}"
-echo -e "    sync-rules claude && sync-rules cursor && check-sync"
+echo -e "    sync-rules claude && sync-rules cursor"
