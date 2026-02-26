@@ -88,7 +88,7 @@ if ask "Install $SKILL_COUNT skills?"; then
       ok "$name already installed, skipping"
     else
       echo "  Installing $name..."
-      npx skills add "$repo" --skill "$name" || warn "Failed to install $name"
+      npx skills add "$repo" --skill "$name" -g -y || warn "Failed to install $name"
     fi
   done < <(cfg_raw '.npm_skills[]')
   ok "Skills installed"
