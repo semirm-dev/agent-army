@@ -17,6 +17,43 @@ alwaysApply: true
 - **Role:** You act as a **Lead Product Architect**. Your goal is to write as little code as possible by delegating to subagents.
 - **Parallelism:** For any task involving >3 files, suggest splitting work into parallel subagents or teams if applicable (e.g., "I recommend spawning 3 subagents: one for API, one for Types, and one for Tests"). Automatically send agents to background so they can run in parallel.
 - **Reusable guidance:** Use Cursor rules and skills when delegating; keep role-specific instructions in agent-requestable rules or skills so parallel agents get the right context.
+- **Available Subagents:** Use the Task tool with the appropriate `subagent_type` to delegate:
+<!-- BEGIN:agent-definitions -->
+  - **Go:** `go-coder.md` (invokes `golang-pro` plugin), `go-reviewer.md`, `go-tester.md`
+  - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
+  - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
+  - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
+  - **Database:** `db-coder.md` (invokes `database-schema-designer` plugin), `db-reviewer.md` (read-only), `db-tester.md`
+  - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
+  - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
+  - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
+<!-- END:agent-definitions -->
+- **Custom Skills:** Read a skill's SKILL.md file (via the Read tool) when the task matches:
+<!-- BEGIN:custom-skills -->
+  - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
+  - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
+  - `migration-safety` -- Invoke when writing or reviewing database migrations.
+  - `dependency-audit` -- Invoke when auditing dependencies for vulnerabilities or planning updates.
+  - `error-handling` -- Invoke when creating error types, reviewing error propagation, or designing user-facing error messages.
+  - `code-architecture` -- Invoke when starting new modules, deciding package structure, or reviewing dependency injection patterns.
+  - `testing-strategy` -- Invoke when planning test coverage, choosing test types, or diagnosing flaky tests.
+  - `cli-design` -- Invoke when building CLI tools, admin scripts, or migration runners.
+  - `refactoring-patterns` -- Invoke when extracting methods, renaming, moving code, or addressing code smells.
+  - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
+<!-- END:custom-skills -->
+- **Superpowers Workflows:** The `superpowers` plugin provides structured workflows. Use these when applicable:
+  - `brainstorming` -- Before any creative work (features, components, behavior changes).
+  - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.
+  - `test-driven-development` -- When implementing features, write tests first.
+  - `writing-plans` / `executing-plans` -- For multi-step implementation tasks.
+  - `subagent-driven-development` -- When executing plans with independent parallel tasks.
+  - `dispatching-parallel-agents` -- When facing 2+ independent tasks with no shared state.
+  - `verification-before-completion` -- Before claiming work is done, run verification.
+  - `requesting-code-review` / `receiving-code-review` -- When submitting or responding to code review.
+  - `finishing-a-development-branch` -- When implementation is complete, deciding how to integrate.
+  - `using-git-worktrees` -- When starting feature work that needs isolation.
+  - `writing-skills` -- When creating or editing custom skills.
+  - `using-superpowers` -- How to find and use skills (auto-invoked at conversation start).
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
 
 ## 🛠️ Communication Style

@@ -42,6 +42,10 @@ if [ "$FOLDER" = "claude" ]; then
     EXCLUDES+=(--exclude "$exclude")
   done < <(cfg '.rsync_excludes[]')
 fi
+# Cursor agents live in ~/.cursor/agents/, not under rules/ — exclude from rules rsync
+if [ "$FOLDER" = "cursor" ]; then
+  EXCLUDES+=(--exclude "agents/")
+fi
 
 rsync -av ${EXCLUDES[@]+"${EXCLUDES[@]}"} "$LIB_DIR/$FOLDER/" "$TARGET_DIR/" \
   || { echo "rsync failed"; exit 1; }
@@ -53,6 +57,26 @@ if [ "$FOLDER" = "cursor" ]; then
   echo "🔄 Syncing custom skills to: $CURSOR_SKILLS_DIR"
   rsync -av "$LIB_DIR/claude/skills/" "$CURSOR_SKILLS_DIR/" \
     || { echo "skills rsync failed"; exit 1; }
+fi
+
+# 7. Deploy Cursor-native agents + plugin agents
+if [ "$FOLDER" = "cursor" ]; then
+  CURSOR_AGENTS_DIR="$HOME/.cursor/agents"
+  mkdir -p "$CURSOR_AGENTS_DIR"
+
+  # Custom agents (source of truth: cursor/agents/)
+  if [ -d "$LIB_DIR/cursor/agents" ]; then
+    echo "🔄 Syncing Cursor agents to: $CURSOR_AGENTS_DIR"
+    rsync -av "$LIB_DIR/cursor/agents/" "$CURSOR_AGENTS_DIR/" \
+      || { echo "agents rsync failed"; exit 1; }
+  fi
+
+  # Plugin agents from Claude plugin cache (third-party, self-updating)
+  PLUGIN_CACHE="$HOME/.claude/plugins/cache"
+  if [ -d "$PLUGIN_CACHE" ]; then
+    echo "🔄 Syncing plugin agents to: $CURSOR_AGENTS_DIR"
+    find "$PLUGIN_CACHE" -path "*/agents/*.md" -exec cp -v {} "$CURSOR_AGENTS_DIR/" \;
+  fi
 fi
 
 echo "🎉 Done. Rules are now physically mirrored (fixes Cursor indexing bugs)."

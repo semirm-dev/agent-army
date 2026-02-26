@@ -13,6 +13,8 @@ AGENTS_DIR="$LIB_DIR/claude/agents"
 RULES_DIR="$LIB_DIR/claude/rules"
 CURSOR_DIR="$LIB_DIR/cursor"
 
+CURSOR_AGENTS_DIR="$LIB_DIR/cursor/agents"
+
 ERRORS=0
 WARNINGS=0
 
@@ -224,6 +226,27 @@ else
       error "CLAUDE.md lists skill '$s' not in config.json custom_skills"
     done
   fi
+fi
+echo ""
+
+# 10. Check cursor/agents/ parity with claude/agents/
+echo "--- Cursor agent parity ---"
+if [ -d "$CURSOR_AGENTS_DIR" ]; then
+  CLAUDE_AGENT_COUNT=$(find "$AGENTS_DIR" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+  CURSOR_AGENT_COUNT=$(find "$CURSOR_AGENTS_DIR" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+  ok "cursor/agents/ has $CURSOR_AGENT_COUNT agents (claude/agents/ has $CLAUDE_AGENT_COUNT)"
+
+  # Check each Claude agent has a Cursor counterpart
+  for agent_file in "$AGENTS_DIR"/*.md; do
+    AGENT_NAME=$(basename "$agent_file")
+    if [ -f "$CURSOR_AGENTS_DIR/$AGENT_NAME" ]; then
+      ok "cursor/agents/$AGENT_NAME"
+    else
+      error "claude/agents/$AGENT_NAME has no cursor counterpart at cursor/agents/$AGENT_NAME"
+    fi
+  done
+else
+  error "cursor/agents/ directory not found — Cursor subagents will not work"
 fi
 echo ""
 

@@ -89,3 +89,24 @@ replace_between_markers "$TMP_DIR/step2.md" \
 
 cp "$TMP_DIR/step3.md" "$CLAUDE_MD"
 echo "✓ CLAUDE.md sections regenerated from config.json"
+
+# --- Also regenerate cursor/000-index.mdc if it has markers ---
+CURSOR_INDEX="$LIB_DIR/cursor/000-index.mdc"
+if grep -q "BEGIN:agent-definitions" "$CURSOR_INDEX" 2>/dev/null; then
+  cp "$CURSOR_INDEX" "$TMP_DIR/cursor0.mdc"
+
+  replace_between_markers "$TMP_DIR/cursor0.mdc" \
+    "<!-- BEGIN:agent-definitions -->" \
+    "<!-- END:agent-definitions -->" \
+    "$TMP_DIR/agents.txt" \
+    "$TMP_DIR/cursor1.mdc"
+
+  replace_between_markers "$TMP_DIR/cursor1.mdc" \
+    "<!-- BEGIN:custom-skills -->" \
+    "<!-- END:custom-skills -->" \
+    "$TMP_DIR/skills.txt" \
+    "$TMP_DIR/cursor2.mdc"
+
+  cp "$TMP_DIR/cursor2.mdc" "$CURSOR_INDEX"
+  echo "✓ cursor/000-index.mdc sections regenerated from config.json"
+fi
