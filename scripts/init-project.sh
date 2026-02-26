@@ -10,7 +10,9 @@ if [ -f "$PWD/CLAUDE.md" ]; then
 fi
 
 if [ ! -f "$TEMPLATE" ]; then
-  echo "Template not found: $TEMPLATE"
+  echo "ERROR: Template not found: $TEMPLATE"
+  echo "  Expected at: templates/PROJECT-CLAUDE.md (relative to repo root)"
+  echo "  Run this script from the agent-army repository root, or check that the template file exists."
   exit 1
 fi
 

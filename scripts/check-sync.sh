@@ -20,6 +20,16 @@ trap 'rm -rf "$TMPDIR_SYNC"' EXIT
 DEPLOYED_DIR="$HOME/.claude"
 CHECK_DEPLOYED=0
 
+# Portable modification time (works on both BSD/macOS and GNU/Linux)
+portable_mtime() {
+  local file="$1"
+  if [[ "$OSTYPE" == darwin* ]]; then
+    stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$file" 2>/dev/null
+  else
+    date -r "$file" "+%Y-%m-%d %H:%M" 2>/dev/null || stat -c "%y" "$file" 2>/dev/null | cut -d: -f1-2
+  fi
+}
+
 # Parse flags
 for arg in "$@"; do
   case "$arg" in
@@ -69,8 +79,8 @@ diff_sections() {
     # Show file timestamps for sync direction hints
     if [ -f "$file_a" ] && [ -f "$file_b" ]; then
       local mod_a mod_b
-      mod_a=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$file_a" 2>/dev/null || stat -c "%y" "$file_a" 2>/dev/null | cut -d. -f1)
-      mod_b=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$file_b" 2>/dev/null || stat -c "%y" "$file_b" 2>/dev/null | cut -d. -f1)
+      mod_a=$(portable_mtime "$file_a")
+      mod_b=$(portable_mtime "$file_b")
       echo "  $file_a last modified: $mod_a"
       echo "  $file_b last modified: $mod_b"
     fi
@@ -106,8 +116,8 @@ diff_rule_file() {
     echo "  And:     $cursor_file"
     # Show file timestamps for sync direction hints
     local mod_a mod_b
-    mod_a=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$rule_file" 2>/dev/null || stat -c "%y" "$rule_file" 2>/dev/null | cut -d. -f1)
-    mod_b=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$cursor_file" 2>/dev/null || stat -c "%y" "$cursor_file" 2>/dev/null | cut -d. -f1)
+    mod_a=$(portable_mtime "$rule_file")
+    mod_b=$(portable_mtime "$cursor_file")
     echo "  $rule_file last modified: $mod_a"
     echo "  $cursor_file last modified: $mod_b"
     echo "  Hint: update the older file to match the newer one"

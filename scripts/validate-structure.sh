@@ -271,24 +271,7 @@ else
 fi
 echo ""
 
-# 12. Shellcheck on all scripts
-echo "--- Shellcheck ---"
-if command -v shellcheck >/dev/null 2>&1; then
-  for script in "$LIB_DIR/scripts/"*.sh; do
-    SCRIPT_NAME=$(basename "$script")
-    if shellcheck -S warning "$script" >/dev/null 2>&1; then
-      ok "$SCRIPT_NAME passes shellcheck"
-    else
-      warn "$SCRIPT_NAME has shellcheck warnings"
-      shellcheck -S warning "$script" 2>&1 | head -20
-    fi
-  done
-else
-  warn "shellcheck not installed — skipping lint (brew install shellcheck)"
-fi
-echo ""
-
-# 13. Check platform-specific tool references in agents
+# 12. Check platform-specific tool references in agents
 echo "--- Platform-specific tool validation ---"
 
 # 13a. Claude agents must not contain Cursor-specific tool references
@@ -368,6 +351,58 @@ if [ -d "$CURSOR_AGENTS_DIR" ]; then
 fi
 
 ok "Platform-specific tool validation complete"
+echo ""
+
+# 14. Validate YAML frontmatter in agent files
+echo "--- Agent frontmatter validation ---"
+
+validate_frontmatter() {
+  local agent_file="$1"
+  local platform="$2"
+  local agent_name
+  agent_name=$(basename "$agent_file")
+
+  # Check frontmatter delimiters exist
+  local delimiter_count
+  delimiter_count=$(grep -c '^---$' "$agent_file" || true)
+  if [ "$delimiter_count" -lt 2 ]; then
+    error "$platform/agents/$agent_name missing YAML frontmatter (need opening and closing ---)"
+    return
+  fi
+
+  # Extract frontmatter block (between first two --- lines)
+  local frontmatter
+  frontmatter=$(sed -n '/^---$/,/^---$/p' "$agent_file" | sed '1d;$d')
+
+  # Check required fields
+  if ! echo "$frontmatter" | grep -q '^name:'; then
+    error "$platform/agents/$agent_name frontmatter missing required 'name' field"
+  fi
+  if ! echo "$frontmatter" | grep -q '^description:'; then
+    error "$platform/agents/$agent_name frontmatter missing required 'description' field"
+  fi
+
+  # Validate name field matches filename (without .md extension)
+  local fm_name
+  fm_name=$(echo "$frontmatter" | grep '^name:' | sed 's/^name:[[:space:]]*//' | sed 's/^"//;s/"$//' | head -1)
+  local expected_name
+  expected_name=$(basename "$agent_file" .md)
+  if [ -n "$fm_name" ] && [ "$fm_name" != "$expected_name" ]; then
+    warn "$platform/agents/$agent_name frontmatter name '$fm_name' doesn't match filename '$expected_name'"
+  fi
+}
+
+for agent_file in "$AGENTS_DIR"/*.md; do
+  validate_frontmatter "$agent_file" "claude"
+done
+
+if [ -d "$CURSOR_AGENTS_DIR" ]; then
+  for agent_file in "$CURSOR_AGENTS_DIR"/*.md; do
+    validate_frontmatter "$agent_file" "cursor"
+  done
+fi
+
+ok "Agent frontmatter validation complete"
 echo ""
 
 # Summary

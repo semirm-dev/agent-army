@@ -8,7 +8,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
-require_jq
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -48,17 +47,66 @@ echo "Repo: $LIB_DIR"
 step "Step 1: Check prerequisites"
 
 MISSING=()
-command -v node   >/dev/null 2>&1 && ok "node $(node -v)"   || MISSING+=("node")
-command -v npx    >/dev/null 2>&1 && ok "npx found"          || MISSING+=("npx")
-command -v jq     >/dev/null 2>&1 && ok "jq $(jq --version)" || MISSING+=("jq")
-command -v claude >/dev/null 2>&1 && ok "claude CLI found"   || MISSING+=("claude")
-command -v rsync  >/dev/null 2>&1 && ok "rsync found"        || MISSING+=("rsync")
+command -v node   >/dev/null 2>&1 && ok "node $(node -v)"         || { fail "node";   MISSING+=("node"); }
+command -v npx    >/dev/null 2>&1 && ok "npx $(npx --version)"    || { fail "npx";    MISSING+=("npx"); }
+command -v jq     >/dev/null 2>&1 && ok "jq $(jq --version)"      || { fail "jq";     MISSING+=("jq"); }
+command -v claude >/dev/null 2>&1 && ok "claude"                   || { fail "claude"; MISSING+=("claude"); }
+command -v rsync  >/dev/null 2>&1 && ok "rsync"                    || { fail "rsync";  MISSING+=("rsync"); }
 
 if [ ${#MISSING[@]} -gt 0 ]; then
-  fail "Missing: ${MISSING[*]}"
-  echo "Install missing tools before continuing."
-  exit 1
+  echo ""
+  warn "Missing tools: ${MISSING[*]}"
+
+  IS_MAC=false
+  [[ "$(uname)" == "Darwin" ]] && IS_MAC=true
+
+  install_cmd_for() {
+    local tool="$1"
+    case "$tool" in
+      node)   $IS_MAC && echo "brew install node"  || echo "sudo apt-get install -y nodejs" ;;
+      npx)    echo "npm install -g npm" ;;
+      jq)     $IS_MAC && echo "brew install jq"    || echo "sudo apt-get install -y jq" ;;
+      claude) echo "npm install -g @anthropic-ai/claude-code" ;;
+      rsync)  $IS_MAC && echo "brew install rsync" || echo "sudo apt-get install -y rsync" ;;
+      *)      echo "" ;;
+    esac
+  }
+
+  STILL_MISSING=()
+  for tool in "${MISSING[@]}"; do
+    # npx ships with node — skip if node is also being installed
+    if [[ "$tool" == "npx" ]] && printf '%s\n' "${MISSING[@]}" | grep -qx "node"; then
+      echo "  (npx will be installed with node)"
+      continue
+    fi
+
+    cmd=$(install_cmd_for "$tool")
+    if [ -z "$cmd" ]; then
+      STILL_MISSING+=("$tool")
+      continue
+    fi
+
+    if ask "  Install $tool? ($cmd)"; then
+      if eval "$cmd"; then
+        ok "$tool installed"
+      else
+        fail "Failed to install $tool"
+        STILL_MISSING+=("$tool")
+      fi
+    else
+      STILL_MISSING+=("$tool")
+    fi
+  done
+
+  if [ ${#STILL_MISSING[@]} -gt 0 ]; then
+    fail "Still missing: ${STILL_MISSING[*]}"
+    echo "Install missing tools before continuing."
+    exit 1
+  fi
+  ok "All prerequisites satisfied"
 fi
+
+require_jq
 
 # ── Step 2: Sync rules ─────────────────────────────────────────────
 
@@ -84,11 +132,11 @@ if ask "Install $SKILL_COUNT skills?"; then
   while read -r skill_json; do
     name=$(echo "$skill_json" | jq -r '.name')
     repo=$(echo "$skill_json" | jq -r '.repo')
-    if [ -L "$HOME/.claude/skills/$name" ] || [ -d "$HOME/.claude/skills/$name" ]; then
+    if [ -d "$HOME/.agents/skills/$name" ] || [ -d "$HOME/.claude/skills/$name" ]; then
       ok "$name already installed, skipping"
     else
       echo "  Installing $name..."
-      npx skills add "$repo" --skill "$name" -g -y || warn "Failed to install $name"
+      npx --yes skills add "$repo" --skill "$name" -y -g < /dev/null || warn "Failed to install $name"
     fi
   done < <(cfg_raw '.npm_skills[]')
   ok "Skills installed"
@@ -139,8 +187,11 @@ fi
 
 step "Step 5: Verify installation"
 
-echo "Skills installed:"
-ls "$HOME/.claude/skills/" 2>/dev/null || warn "No skills directory"
+echo "Skills installed (npm / global):"
+ls "$HOME/.agents/skills/" 2>/dev/null || warn "No .agents/skills directory"
+echo ""
+echo "Skills installed (custom / claude):"
+ls "$HOME/.claude/skills/" 2>/dev/null || warn "No .claude/skills directory"
 
 echo ""
 echo "Agents available:"
@@ -181,4 +232,4 @@ echo -e "${BOLD}${YELLOW}  Next steps:${NC}"
 echo -e "    cd <your-project> && claude    (start using Claude Code with the new rules)"
 echo ""
 echo -e "${BOLD}${YELLOW}  Day-to-day after editing rules in this repo:${NC}"
-echo -e "    make sync"
+echo -e "    make bootstrap"

@@ -103,7 +103,18 @@ It then scaffolds everything automatically:
 After running, fill in the TODO placeholders with language-specific patterns, then deploy:
 
 ```bash
-make check && make sync
+make check && make bootstrap
 ```
 
 Always edit the repo first (single source of truth), then deploy. Never edit `~/.claude/` or `~/.cursor/rules/` directly.
+
+## Prerequisites
+
+Required tools (bootstrap checks these automatically):
+
+| Tool | Install | Purpose |
+| --- | --- | --- |
+| node / npx | [nodejs.org](https://nodejs.org) | Install npm skills |
+| jq | `brew install jq` / `sudo apt-get install jq` | Parse config.json |
+| claude | [Claude CLI](https://docs.anthropic.com/en/docs/claude-cli) | Plugin management |
+| rsync | Pre-installed on macOS and most Linux | Sync rules to deployment targets |
