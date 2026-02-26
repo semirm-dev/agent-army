@@ -31,7 +31,7 @@ Repo                            → Deployed to
 claude/CLAUDE.md                → ~/.claude/CLAUDE.md
 claude/agents/*.md              → ~/.claude/agents/*.md
 claude/rules/*.md               → ~/.claude/rules/*.md
-claude/skills/*.md              → ~/.claude/skills/*.md
+claude/skills/*/SKILL.md        → ~/.claude/skills/*/SKILL.md
 claude/statusline-command.sh    → ~/.claude/statusline-command.sh
 claude/settings.json            → ~/.claude/settings.json (bootstrap only)
 cursor/*.mdc                    → ~/.cursor/rules/*.mdc
