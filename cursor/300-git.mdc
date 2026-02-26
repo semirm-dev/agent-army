@@ -3,7 +3,7 @@ description: Git workflow conventions for branch naming, commits, and PRs
 alwaysApply: true
 ---
 
-<!-- Sync: Must stay in sync with claude/CLAUDE.md (Git Workflow section) -->
+<!-- Sync: Must stay in sync with claude/rules/git-workflow.md -->
 
 # 🔀 Git Workflow Conventions
 - **Branch Naming:** Use prefixes: `feat/`, `fix/`, `refactor/`, `docs/`, `test/`, `chore/`. Example: `feat/user-auth`, `fix/login-redirect`.

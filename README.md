@@ -6,19 +6,19 @@ Portable AI development setup for **Claude Code** and **Cursor**. One repo, one 
 ## Quick Start
 
 ```bash
-git clone <this-repo> ~/workspace/agent-rules
-cd ~/workspace/agent-rules
+git clone <this-repo> ~/workspace/agent-army
+cd ~/workspace/agent-army
 make bootstrap
 ```
 
-Bootstrap configures your machine for the agent-rules workflow — it installs skills and deploys settings (which enables plugins). Every step lists what will be installed and asks for confirmation.
+Bootstrap configures your machine for the agent-army workflow — it installs skills and deploys settings (which enables plugins). Every step lists what will be installed and asks for confirmation.
 
 | Step | Action                                                                   |
 | ---- | ------------------------------------------------------------------------ |
-| 1    | Check prerequisites (node, npx, claude CLI, rsync)                       |
+| 1    | Check prerequisites (node, npx, jq, claude CLI, rsync)                   |
 | 2    | Sync rules to `~/.claude/` and `~/.cursor/rules/`                        |
 | 3    | Install Agent Skills (golang-pro, database-schema-designer, skill-creator) |
-| 4    | Install Claude Plugins (deploy `settings.json`, shows diff if exists)    |
+| 4    | Install Claude Plugins (deploy `settings.json` + install via CLI)        |
 | 5    | Verify installation (list skills, agents, run check-sync)                |
 
 Idempotent — skips already-installed components on re-run.

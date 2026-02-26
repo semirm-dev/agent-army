@@ -15,78 +15,9 @@ globs: "**/*_test.go,**/*.test.ts,**/*.test.tsx,**/test_*.py"
 
 ## Table-Driven Test Structure
 
-### Go
-
-```go
-func TestParseAmount(t *testing.T) {
-    tests := []struct {
-        name    string
-        input   string
-        want    int64
-        wantErr bool
-    }{
-        {"valid amount", "42.50", 4250, false},
-        {"negative amount", "-10.00", -1000, false},
-        {"invalid format", "abc", 0, true},
-        {"empty string", "", 0, true},
-    }
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            got, err := ParseAmount(tt.input)
-            if (err != nil) != tt.wantErr {
-                t.Errorf("ParseAmount(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
-                return
-            }
-            if got != tt.want {
-                t.Errorf("ParseAmount(%q) = %v, want %v", tt.input, got, tt.want)
-            }
-        })
-    }
-}
-```
-
-### TypeScript
-
-```typescript
-describe("parseAmount", () => {
-  const cases = [
-    { name: "valid amount", input: "42.50", expected: 4250 },
-    { name: "negative amount", input: "-10.00", expected: -1000 },
-    { name: "invalid format", input: "abc", expectedError: ParseError },
-    { name: "empty string", input: "", expectedError: ParseError },
-  ] as const;
-
-  for (const { name, input, expected, expectedError } of cases) {
-    it(name, () => {
-      if (expectedError) {
-        expect(() => parseAmount(input)).toThrow(expectedError);
-      } else {
-        expect(parseAmount(input)).toBe(expected);
-      }
-    });
-  }
-});
-```
-
-### Python
-
-```python
-@pytest.mark.parametrize(
-    "input_val, expected, raises",
-    [
-        ("42.50", 4250, None),
-        ("-10.00", -1000, None),
-        ("abc", None, ParseError),
-        ("", None, ParseError),
-    ],
-)
-def test_parse_amount(input_val: str, expected: int | None, raises: type[Exception] | None) -> None:
-    if raises:
-        with pytest.raises(raises):
-            parse_amount(input_val)
-    else:
-        assert parse_amount(input_val) == expected
-```
+- **Go:** `[]struct` with `t.Run()` subtests (see `go-patterns.md`)
+- **TypeScript:** Array of case objects with `for...of` (see `ts-patterns.md`)
+- **Python:** `@pytest.mark.parametrize` (see `py-patterns.md`)
 
 ## Fixture and Factory Patterns
 
@@ -110,7 +41,7 @@ Prefer factories over raw data construction:
 - **No network calls in unit tests.** Mock at the boundary.
 - **Deterministic test data.** Use factories with fixed values, not `Math.random()` or `time.Now()`.
 - **Isolated test state.** Each test creates its own data. No shared mutable fixtures.
-- **Explicit timeouts.** Set test timeouts to catch hangs: `go test -timeout 30s`, `jest --testTimeout 10000`.
+- **Explicit timeouts.** Set test timeouts to catch hangs: `go test -timeout 30s`, vitest: `testTimeout` in config, jest: `--testTimeout 10000`.
 
 ## CI Parallelization
 

@@ -20,7 +20,7 @@ You are a senior React/frontend engineer. You write production-grade React compo
 
 Project React and TypeScript patterns are automatically loaded via Cursor rules (`103-react.mdc`, `101-typescript.mdc`). Key standards: functional components only, named exports, TanStack Query for server state, Zustand for client state, no `useEffect` for derived state.
 
-Read the `frontend-design` skill from `~/.claude/plugins/cache/claude-code-plugins/frontend-design/1.0.0/skills/frontend-design/SKILL.md` when working on UI layout, design systems, or component structure decisions.
+Read the `frontend-design` skill from `~/.cursor/plugins/cache/claude-code-plugins/frontend-design/*/skills/frontend-design/SKILL.md` when working on UI layout, design systems, or component structure decisions.
 
 Use the `code-simplifier` subagent (via the Task tool) if any function or component exceeds 30 lines. Use the Context7 MCP server (use `resolve-library-id` and `query-docs` tools) to look up library docs for TanStack Query, Zustand, or other React ecosystem libraries.
 

@@ -34,7 +34,8 @@ extract_section() {
   local end_pattern="$3"
   # Print lines between start and end patterns (non-inclusive).
   # Strips leading '#' from heading markers so different heading levels don't cause false drift.
-  awk "/$start_pattern/{found=1; next} /$end_pattern/{found=0} found" "$file" \
+  awk -v begin="$start_pattern" -v finish="$end_pattern" \
+    '$0 ~ begin{found=1; next} $0 ~ finish{found=0} found' "$file" \
     | sed 's/^#\{1,6\} //'
 }
 
@@ -279,9 +280,107 @@ if [ -d "$CURSOR_AGENTS_DIR" ]; then
   done
 fi
 
+# AGENT-GUIDE.md skills matrix vs agent frontmatter (warning-level, non-blocking)
+echo ""
+echo "=== Checking AGENT-GUIDE.md skills matrix vs agent frontmatter (warnings only) ==="
+echo ""
+
+AGENT_GUIDE="$LIB_DIR/docs/AGENT-GUIDE.md"
+WARN_COUNT=0
+
+if [ -f "$AGENT_GUIDE" ]; then
+  # Build list of known custom skill names from config.json
+  CUSTOM_SKILLS_LIST=$(mktemp "$TMPDIR_SYNC/custom_skills.XXXXXX")
+  cfg '.custom_skills[].name' > "$CUSTOM_SKILLS_LIST"
+
+  # Parse the matrix table from AGENT-GUIDE.md
+  # Format: | agent-name | custom-skills | plugins |
+  GUIDE_MATRIX=$(mktemp "$TMPDIR_SYNC/guide_matrix.XXXXXX")
+  awk '/^\| Agent /,/^$/' "$AGENT_GUIDE" \
+    | grep -v '^| Agent ' \
+    | grep -v '^|---' \
+    | grep '|' \
+    > "$GUIDE_MATRIX" || true
+
+  while IFS='|' read -r _ agent_col skills_col plugins_col _; do
+    # Trim whitespace
+    guide_agent=$(echo "$agent_col" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    guide_skills_raw=$(echo "$skills_col" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+    # Skip empty lines
+    [ -z "$guide_agent" ] && continue
+
+    # Resolve agent file
+    agent_file="$CLAUDE_AGENTS_DIR/${guide_agent}.md"
+    if [ ! -f "$agent_file" ]; then
+      echo "WARNING [AGENT-GUIDE skills] Agent '$guide_agent' listed in guide but no file at claude/agents/${guide_agent}.md"
+      WARN_COUNT=$((WARN_COUNT + 1))
+      continue
+    fi
+
+    # Extract skills from agent frontmatter (YAML list: "  - skill-name")
+    FRONTMATTER_SKILLS=$(mktemp "$TMPDIR_SYNC/fm_skills.XXXXXX")
+    sed -n '/^---$/,/^---$/p' "$agent_file" \
+      | awk '/^skills:/{found=1; next} /^[a-z]/{found=0} found && /^[[:space:]]*- /' \
+      | sed 's/^[[:space:]]*- //' \
+      | sort > "$FRONTMATTER_SKILLS"
+
+    # Filter frontmatter skills to only custom skills (exclude npm skills like golang-pro)
+    FRONTMATTER_CUSTOM=$(mktemp "$TMPDIR_SYNC/fm_custom.XXXXXX")
+    while read -r skill; do
+      if grep -qx "$skill" "$CUSTOM_SKILLS_LIST"; then
+        echo "$skill"
+      fi
+    done < "$FRONTMATTER_SKILLS" | sort > "$FRONTMATTER_CUSTOM"
+
+    # Parse guide custom skills column (comma-separated, or em-dash/dash for none)
+    # The guide uses Unicode em dash (U+2014) to mean "no skills"
+    GUIDE_CUSTOM=$(mktemp "$TMPDIR_SYNC/guide_custom.XXXXXX")
+    guide_skills_normalized=$(echo "$guide_skills_raw" | sed $'s/\xe2\x80\x94//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    if [ -n "$guide_skills_normalized" ]; then
+      echo "$guide_skills_normalized" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sort > "$GUIDE_CUSTOM"
+    else
+      : > "$GUIDE_CUSTOM"
+    fi
+
+    # Compare
+    if ! diff -q "$GUIDE_CUSTOM" "$FRONTMATTER_CUSTOM" > /dev/null 2>&1; then
+      guide_list=$(tr '\n' ',' < "$GUIDE_CUSTOM" | sed 's/,$//')
+      frontmatter_list=$(tr '\n' ',' < "$FRONTMATTER_CUSTOM" | sed 's/,$//')
+      [ -z "$guide_list" ] && guide_list="none"
+      [ -z "$frontmatter_list" ] && frontmatter_list="none"
+      echo "WARNING [AGENT-GUIDE skills — $guide_agent]"
+      echo "  guide says:       $guide_list"
+      echo "  frontmatter says: $frontmatter_list"
+      WARN_COUNT=$((WARN_COUNT + 1))
+    fi
+  done < "$GUIDE_MATRIX"
+
+  # Also check for agents that exist as files but are missing from the guide
+  for agent_file in "$CLAUDE_AGENTS_DIR"/*.md; do
+    agent_basename=$(basename "$agent_file" .md)
+    if ! grep -q "| ${agent_basename} " "$GUIDE_MATRIX" 2>/dev/null; then
+      echo "WARNING [AGENT-GUIDE coverage] Agent '$agent_basename' exists in claude/agents/ but is not listed in AGENT-GUIDE.md matrix"
+      WARN_COUNT=$((WARN_COUNT + 1))
+    fi
+  done
+
+  if [ "$WARN_COUNT" -eq 0 ]; then
+    echo "AGENT-GUIDE.md skills matrix matches agent frontmatter."
+  else
+    echo ""
+    echo "Found $WARN_COUNT warning(s) in AGENT-GUIDE.md skills matrix check."
+    echo "These are non-blocking warnings. Update docs/AGENT-GUIDE.md or agent frontmatter to resolve."
+  fi
+else
+  echo "SKIP: docs/AGENT-GUIDE.md not found."
+fi
+
 if [ "$DRIFT_FOUND" -eq 0 ]; then
+  echo ""
   echo "All sections in sync."
 else
+  echo ""
   echo "=== Drift detected. Update the source files to restore parity. ==="
   exit 1
 fi

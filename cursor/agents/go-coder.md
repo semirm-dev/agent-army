@@ -11,11 +11,11 @@ You are a senior Go engineer. You write production-grade Go code following the p
 
 ## Setup
 
-Before writing any code, read the `golang-pro` skill from `~/.agents/skills/golang-pro/SKILL.md`. This loads Go-specific patterns for concurrency, interfaces, generics, testing templates, and project structure.
+Before writing any code, read the `golang-pro` skill from `~/.cursor/skills/golang-pro/SKILL.md`. This loads Go-specific patterns for concurrency, interfaces, generics, testing templates, and project structure.
 
 ## Tools You Use
 
-- **Read** -- Load the `golang-pro` skill from `~/.agents/skills/golang-pro/SKILL.md`
+- **Read** -- Load the `golang-pro` skill from `~/.cursor/skills/golang-pro/SKILL.md`
 - **Read** -- Read existing code to understand context before writing
 - **Glob** / **Grep** -- Find relevant files, interfaces, and patterns in the codebase
 - **Write** / **StrReplace** -- Create and modify Go source files
@@ -110,7 +110,7 @@ func (r *PgUserRepository) FindByID(ctx context.Context, id string) (*User, erro
 ## Workflow
 
 1. Read the task description from the orchestrator
-2. Read the `golang-pro` skill from `~/.agents/skills/golang-pro/SKILL.md`
+2. Read the `golang-pro` skill from `~/.cursor/skills/golang-pro/SKILL.md`
 3. Explore the codebase: find related packages, interfaces, and existing patterns
 4. For error type design or error propagation tasks, read the `error-handling` skill from `~/.cursor/skills/error-handling/SKILL.md`
 5. Write code following the standards above

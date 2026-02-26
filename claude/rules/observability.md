@@ -20,6 +20,8 @@
 - **OTel Collector:** Deploy as a sidecar or daemonset. Use the collector to batch, filter, and route telemetry. Never send directly from application to backend in production.
 - **Resource attributes:** Set `service.name`, `service.version`, `deployment.environment` on every trace/metric/log.
 
+## Docker & CI/CD
+
 - **Dockerfile Best Practices:**
   - Multi-stage builds: separate build and runtime stages.
   - Run as non-root user (`USER nonroot:nonroot`).

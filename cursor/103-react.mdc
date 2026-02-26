@@ -3,6 +3,8 @@ description: React and frontend component patterns and best practices
 globs: "**/*.tsx,**/*.jsx"
 ---
 
+<!-- Sync: Must stay in sync with claude/rules/react-patterns.md -->
+
 # ⚛️ React & Frontend Patterns
 
 ## Component Structure

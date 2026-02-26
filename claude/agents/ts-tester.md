@@ -3,6 +3,8 @@ name: ts-tester
 description: "Senior TypeScript/JS test engineer. Writes and runs tests using vitest/jest with table-driven patterns. Use after code is written to verify correctness."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - testing-strategy
 ---
 
 # TypeScript/JS Tester Agent

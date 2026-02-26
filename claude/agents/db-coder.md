@@ -3,6 +3,9 @@ name: db-coder
 description: "Senior database engineer. Writes migrations, schemas, queries, and repository code. Use when database code needs to be written or modified."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - database-schema-designer
+  - migration-safety
 ---
 
 # Database Coder Agent

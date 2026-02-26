@@ -3,7 +3,7 @@ description: TypeScript/JavaScript standards and best practices
 globs: "**/*.ts,**/*.tsx,**/*.js,**/*.jsx"
 ---
 
-<!-- Sync: Must stay in sync with claude/CLAUDE.md (TypeScript Coding Patterns & TypeScript Testing sections) -->
+<!-- Sync: Must stay in sync with claude/rules/ts-patterns.md -->
 
 ## 💻 TypeScript Coding Patterns
 - **Strict Mode:** All projects must use `strict: true` in tsconfig.json. No exceptions.

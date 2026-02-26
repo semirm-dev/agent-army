@@ -81,7 +81,7 @@ extract_section() {
 diff_sections() {
   local label="\$1" file_a="\$2" section_a="\$3" file_b="\$4" section_b="\$5"
   local end_a="\${6:-^\$}" end_b="\${7:-^\$}"
-  local tmp_a=\$(mktemp) tmp_b=\$(mktemp)
+  local tmp_a=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX") tmp_b=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX")
   extract_section "\$file_a" "\$section_a" "\$end_a" | grep -v '^[[:space:]]*\$' > "\$tmp_a"
   extract_section "\$file_b" "\$section_b" "\$end_b" | grep -v '^[[:space:]]*\$' > "\$tmp_b"
   if ! diff -q "\$tmp_a" "\$tmp_b" > /dev/null 2>&1; then
@@ -133,7 +133,7 @@ extract_section() {
 diff_sections() {
   local label="\$1" file_a="\$2" section_a="\$3" file_b="\$4" section_b="\$5"
   local end_a="\${6:-^\$}" end_b="\${7:-^\$}"
-  local tmp_a=\$(mktemp) tmp_b=\$(mktemp)
+  local tmp_a=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX") tmp_b=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX")
   extract_section "\$file_a" "\$section_a" "\$end_a" | grep -v '^[[:space:]]*\$' > "\$tmp_a"
   extract_section "\$file_b" "\$section_b" "\$end_b" | grep -v '^[[:space:]]*\$' > "\$tmp_b"
   if ! diff -q "\$tmp_a" "\$tmp_b" > /dev/null 2>&1; then
@@ -186,7 +186,7 @@ extract_section() {
 diff_sections() {
   local label="\$1" file_a="\$2" section_a="\$3" file_b="\$4" section_b="\$5"
   local end_a="\${6:-^\$}" end_b="\${7:-^\$}"
-  local tmp_a=\$(mktemp) tmp_b=\$(mktemp)
+  local tmp_a=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX") tmp_b=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX")
   extract_section "\$file_a" "\$section_a" "\$end_a" | grep -v '^[[:space:]]*\$' > "\$tmp_a"
   extract_section "\$file_b" "\$section_b" "\$end_b" | grep -v '^[[:space:]]*\$' > "\$tmp_b"
   if ! diff -q "\$tmp_a" "\$tmp_b" > /dev/null 2>&1; then
@@ -239,7 +239,7 @@ DRIFT_FOUND=0
 
 diff_rule_file() {
   local label="\$1" rule_file="\$2" cursor_file="\$3"
-  local tmp_a=\$(mktemp) tmp_b=\$(mktemp)
+  local tmp_a=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX") tmp_b=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX")
   grep -v '^<!-- Sync:' "\$rule_file" | grep -v '^[[:space:]]*\$' | sed 's/^#\\{1,6\\} //' > "\$tmp_a"
   sed -n '/^---\$/,/^---\$/!p' "\$cursor_file" | grep -v '^<!-- Sync:' | grep -v '^[[:space:]]*\$' | sed 's/^#\\{1,6\\} //' > "\$tmp_b"
   if ! diff -q "\$tmp_a" "\$tmp_b" > /dev/null 2>&1; then
@@ -332,7 +332,7 @@ extract_section() {
     | sed 's/^#\\{1,6\\} //'
 }
 
-tmp_a=\$(mktemp) tmp_b=\$(mktemp)
+tmp_a=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX") tmp_b=\$(mktemp "$TMPDIR_TEST/inner.XXXXXX")
 
 extract_section "$TMPDIR_TEST/claude.md" "NONEXISTENT_PATTERN" "ALSO_NONEXISTENT" \
   | { grep -v '^[[:space:]]*\$' || true; } > "\$tmp_a"

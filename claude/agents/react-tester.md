@@ -3,6 +3,8 @@ name: react-tester
 description: "Senior React/frontend test engineer. Writes component and hook tests using testing-library and MSW. Use after frontend code is written to verify correctness."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - testing-strategy
 ---
 
 # React Tester Agent

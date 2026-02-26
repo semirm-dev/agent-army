@@ -3,6 +3,8 @@ name: docker-tester
 description: "Infrastructure test engineer. Validates Docker images, compose configs, and CI/CD pipelines. Use after infrastructure code is written to verify correctness."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - testing-strategy
 ---
 
 # Docker & Infrastructure Tester Agent

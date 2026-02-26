@@ -1,4 +1,4 @@
-<!-- Sync: React patterns must stay in sync with cursor/103-react.mdc -->
+<!-- Sync: Must stay in sync with cursor/103-react.mdc -->
 
 # ⚛️ React & Frontend Patterns
 

@@ -75,7 +75,7 @@ if [ "$FOLDER" = "cursor" ]; then
   PLUGIN_CACHE="$HOME/.claude/plugins/cache"
   if [ -d "$PLUGIN_CACHE" ]; then
     echo "🔄 Syncing plugin agents to: $CURSOR_AGENTS_DIR"
-    find "$PLUGIN_CACHE" -path "*/agents/*.md" -exec cp -v {} "$CURSOR_AGENTS_DIR/" \;
+    find "$PLUGIN_CACHE" -path "*/agents/*.md" -exec cp {} "$CURSOR_AGENTS_DIR/" \;
   fi
 fi
 

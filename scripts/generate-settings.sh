@@ -37,6 +37,6 @@ jq -n \
     enabledPlugins: $plugins,
     skipDangerousModePermissionPrompt: $skipDangerous,
     _generated: "DO NOT EDIT — generated from config.json by scripts/generate-settings.sh"
-  }' > "$OUTPUT"
+  }' > "${OUTPUT}.tmp" && mv "${OUTPUT}.tmp" "$OUTPUT"
 
-echo "Generated $OUTPUT"
+echo "  Generated $OUTPUT"

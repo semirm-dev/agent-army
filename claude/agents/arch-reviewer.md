@@ -3,6 +3,8 @@ name: arch-reviewer
 description: "Senior architecture reviewer. Read-only analysis of dependency direction, package cohesion, and API surface. Use when evaluating structural quality of a codebase."
 tools: Read, Glob, Grep, Bash
 model: inherit
+skills:
+  - code-architecture
 ---
 
 # Architecture Reviewer Agent

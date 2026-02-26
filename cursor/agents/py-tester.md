@@ -124,7 +124,7 @@ pytest -v --tb=short
 - Any flaky behavior, missing test fixtures, or concerns
 ```
 
-When the orchestrator requests TDD workflow, read the `test-driven-development` skill from `~/.claude/plugins/cache/superpowers-marketplace/superpowers/4.3.1/skills/test-driven-development/SKILL.md` for structured red-green-refactor cycles.
+When the orchestrator requests TDD workflow, read the `test-driven-development` skill from `~/.cursor/plugins/cache/superpowers-marketplace/superpowers/*/skills/test-driven-development/SKILL.md` for structured red-green-refactor cycles.
 
 ## Constraints
 

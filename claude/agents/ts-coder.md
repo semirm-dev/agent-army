@@ -3,6 +3,8 @@ name: ts-coder
 description: "Senior TypeScript/JS engineer. Writes production-grade TypeScript and JavaScript code following project patterns. Use when TS/JS code needs to be written or modified."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - error-handling
 ---
 
 # TypeScript/JS Coder Agent

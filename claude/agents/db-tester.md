@@ -3,6 +3,8 @@ name: db-tester
 description: "Senior database test engineer. Writes tests for migrations, queries, and repository code with proper isolation. Use after database code is written."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - testing-strategy
 ---
 
 # Database Tester Agent

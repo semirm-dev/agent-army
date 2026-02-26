@@ -3,6 +3,8 @@ name: py-coder
 description: "Senior Python engineer. Writes production-grade Python code following project patterns. Use when Python code needs to be written or modified."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - error-handling
 ---
 
 # Python Coder Agent

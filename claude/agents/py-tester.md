@@ -3,6 +3,8 @@ name: py-tester
 description: "Senior Python test engineer. Writes and runs pytest tests with parametrize. Use after code is written to verify correctness."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - testing-strategy
 ---
 
 # Python Tester Agent

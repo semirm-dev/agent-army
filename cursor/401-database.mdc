@@ -38,53 +38,9 @@ globs: "**/*migration*,**/*model*,**/*schema*,**/*repository*,**/*repo*,**/*stor
 
 ## Query Plan Analysis (EXPLAIN ANALYZE)
 
-### Sequential Scan vs Index Scan
-
-```sql
--- BAD: Sequential scan on large table (no index on email)
-EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'alice@example.com';
--- Seq Scan on users  (cost=0.00..25.00 rows=1 width=64)
---   Filter: (email = 'alice@example.com')
---   Rows Removed by Filter: 999
---   Planning Time: 0.1 ms | Execution Time: 2.5 ms
-
--- GOOD: After adding index
-CREATE INDEX idx_users_email ON users (email);
-EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'alice@example.com';
--- Index Scan using idx_users_email on users  (cost=0.28..8.29 rows=1 width=64)
---   Index Cond: (email = 'alice@example.com')
---   Planning Time: 0.1 ms | Execution Time: 0.05 ms
-```
-
-### N+1 Detection in Query Plans
-
-```sql
--- BAD: N+1 — one query per order to fetch user (visible as repeated Index Scan in loops)
--- Application code: for order in orders: fetch_user(order.user_id)
--- Plan shows: Nested Loop with inner Index Scan executing N times
-
--- GOOD: Single JOIN replaces N+1
-EXPLAIN ANALYZE
-SELECT o.*, u.name FROM orders o JOIN users u ON o.user_id = u.id WHERE o.status = 'pending';
--- Hash Join  (cost=10.00..50.00 rows=100 width=128)
---   Hash Cond: (o.user_id = u.id)
---   -> Seq Scan on orders  (Filter: status = 'pending')
---   -> Hash (-> Seq Scan on users)
-```
-
-### Join Strategy Comparison
-
-| Strategy | When Used | Performance |
-|----------|-----------|-------------|
-| **Nested Loop** | Small inner table or indexed lookup | Fast for small result sets, slow for large |
-| **Hash Join** | Large tables, equality joins | Good for large datasets, needs memory |
-| **Merge Join** | Pre-sorted inputs, equality joins | Efficient when both inputs are sorted |
-
-**Red flags in query plans:**
-- `Seq Scan` on large tables (>10k rows) with a filter — add an index
-- `Nested Loop` with high loop count — consider a JOIN or batch query
-- `Sort` with `external merge` — needs more `work_mem` or an index
-- `Rows Removed by Filter` much larger than returned rows — index is missing or wrong
+- Use `EXPLAIN ANALYZE` to verify query plans for new queries
+- **Red flags:** `Seq Scan` on large tables with filter (add index), `Nested Loop` with high loop count (use JOIN), `Sort` with `external merge` (needs `work_mem` or index), `Rows Removed by Filter` >> returned rows (missing index)
+- **Join strategies:** Nested Loop (small/indexed), Hash Join (large equality), Merge Join (pre-sorted)
 
 ## Schema Conventions
 - **Primary keys:** UUID for distributed systems, BIGINT/SERIAL for single-database systems.
@@ -100,45 +56,9 @@ SELECT o.*, u.name FROM orders o JOIN users u ON o.user_id = u.id WHERE o.status
 
 ## Language-Specific ORM Guidance
 
-### Go: sqlc + pgx
-
-- **sqlc** for type-safe query generation from SQL. Write queries in `.sql` files, generate Go code.
-- **pgx** for the connection driver. Use `pgxpool` for connection pooling.
-- **golang-migrate** for migrations. Use `file://` source for migration files.
-- Pattern: Write raw SQL queries → generate with `sqlc generate` → use generated code in repository layer.
-
-```go
-// queries.sql
--- name: GetUser :one
-SELECT id, name, email FROM users WHERE id = $1;
-
-// Generated code is type-safe and parameterized
-user, err := queries.GetUser(ctx, userID)
-```
-
-### TypeScript: Prisma / Drizzle
-
-- **Prisma:** Schema-first ORM. Define models in `schema.prisma`, generate client.
-  - Use `prisma migrate dev` for development, `prisma migrate deploy` for production.
-  - Always use `prisma.$transaction()` for multi-step operations.
-  - Avoid raw queries unless Prisma Query API cannot express the query.
-
-- **Drizzle:** SQL-like TypeScript ORM. Closer to raw SQL with type safety.
-  - Define schemas as TypeScript objects.
-  - Use `drizzle-kit` for migrations.
-  - Preferred when team needs more SQL control than Prisma provides.
-
-### Python: SQLAlchemy / Tortoise
-
-- **SQLAlchemy 2.0+:** Use the new-style API with `select()`, `insert()`, `update()`.
-  - Always use `sessionmaker` with `async_sessionmaker` for async.
-  - Use Alembic for migrations: `alembic revision --autogenerate`.
-  - Prefer Core (SQL Expression Language) for complex queries, ORM for simple CRUD.
-
-- **Tortoise ORM:** Async-first ORM for Python.
-  - Use Aerich for migrations.
-  - Good fit for FastAPI/async applications.
-  - Define models as Tortoise classes, generate schemas with Pydantic integration.
+- **Go:** sqlc (type-safe query gen) + pgx/pgxpool (driver/pooling) + golang-migrate (migrations)
+- **TypeScript:** Prisma (schema-first, `prisma.$transaction()`) or Drizzle (SQL-like, `drizzle-kit`)
+- **Python:** SQLAlchemy 2.0+ (Core for complex queries, ORM for CRUD) + Alembic, or Tortoise ORM (async-first) + Aerich
 
 ## NoSQL Patterns
 

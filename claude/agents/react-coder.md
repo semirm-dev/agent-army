@@ -3,6 +3,8 @@ name: react-coder
 description: "Senior React/frontend engineer. Writes production-grade React components, hooks, and frontend code. Use when React/frontend code needs to be written or modified."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - error-handling
 ---
 
 # React Coder Agent

@@ -1,5 +1,5 @@
 #!/bin/bash
-# bootstrap.sh — Interactive setup for agent-rules on a new device.
+# bootstrap.sh — Interactive setup for agent-army on a new device.
 # Each step asks for confirmation before executing.
 #
 # Usage: ./scripts/bootstrap.sh
@@ -38,7 +38,7 @@ ask() {
 
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BOLD}${CYAN}  agent-rules bootstrap${NC}"
+echo -e "${BOLD}${CYAN}  agent-army bootstrap${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo "Repo: $LIB_DIR"

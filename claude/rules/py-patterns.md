@@ -10,7 +10,7 @@
 - **Naming:** `snake_case` for functions/variables, `PascalCase` for classes, `UPPER_SNAKE_CASE` for constants. Prefix private with `_`.
 - **Project structure:** Package by feature, use `src/` layout for libraries. Keep `__init__.py` minimal -- only re-export public API, no logic.
 - **Virtual Environments:** Always use `venv`, `uv`, or `poetry` for dependency isolation. Never install into system Python.
-- **Dependencies:** Pin versions in `requirements.txt` or use `pyproject.toml` with lock files. Run `pip freeze` or equivalent to capture exact versions.
+- **Dependencies:** Pin versions in `requirements.txt` or use `pyproject.toml` with lock files. Use `uv lock`, `poetry lock`, or `pip-compile` to generate lock files.
 - **Packaging:** Always use `pyproject.toml` for new projects. `setup.py` only for legacy compatibility.
 - **Error Handling:** Use specific exception types. Never bare `except:`. Wrap with context: `raise DomainError("context") from original`.
 - **Docstrings:** All public functions and classes must have docstrings. Use Google or NumPy style consistently per project.

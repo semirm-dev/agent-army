@@ -15,16 +15,6 @@ globs: "**/*.go,**/*.ts,**/*.py"
 - Use `sync.WaitGroup` only when errors aren't needed
 - Every goroutine must have a clear shutdown path — never fire-and-forget
 
-```go
-g, ctx := errgroup.WithContext(ctx)
-g.Go(func() error {
-    return processItems(ctx, items)
-})
-if err := g.Wait(); err != nil {
-    return fmt.Errorf("processing: %w", err)
-}
-```
-
 ### Channel Patterns
 - **Fan-out/fan-in:** Distribute work across N goroutines, merge results into one channel
 - **Pipeline:** Chain stages where each reads from input channel, writes to output channel
@@ -49,6 +39,7 @@ if err := g.Wait(); err != nil {
 - **`Promise.all`:** Fail-fast — rejects if any promise rejects. Use when all must succeed.
 - **`Promise.allSettled`:** Waits for all, returns status for each. Use when partial success is acceptable.
 - **`Promise.race`:** Returns first to settle. Use for timeouts: `Promise.race([work(), timeout(5000)])`
+- **`Promise.any`:** Returns first to fulfill (ignores rejections). Use for redundant requests: first successful health check, fastest mirror.
 
 ### Worker Threads
 - Use `worker_threads` for CPU-intensive operations (image processing, compression)
@@ -65,16 +56,6 @@ if err := g.Wait(); err != nil {
 - Pass signal to `fetch`, custom async functions, and timers
 - Check `signal.aborted` in long-running loops
 
-```typescript
-const controller = new AbortController();
-const { signal } = controller;
-
-await fetch(url, { signal });
-
-// Cancel after timeout
-setTimeout(() => controller.abort(), 5000);
-```
-
 ### Event Loop
 - Never block with `while(true)`, synchronous file I/O, or heavy computation
 - Use `setImmediate()` to yield to the event loop in long loops
@@ -87,16 +68,6 @@ setTimeout(() => controller.abort(), 5000);
 - **`asyncio.TaskGroup`** (3.11+): Structured concurrency — all tasks cancel on first failure
 - **`asyncio.create_task`:** Schedule coroutine execution. Always hold a reference to the task.
 - **`asyncio.to_thread`:** Offload blocking/CPU-bound work to a thread pool
-
-```python
-async with asyncio.TaskGroup() as tg:
-    task1 = tg.create_task(fetch_users())
-    task2 = tg.create_task(fetch_orders())
-# Both complete or both cancel on error
-
-# Offload blocking I/O
-result = await asyncio.to_thread(blocking_function, arg)
-```
 
 ### Sync Primitives
 - **`asyncio.Lock`:** Protect shared async state. Use `async with lock:`.

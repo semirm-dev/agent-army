@@ -5,6 +5,7 @@ tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
 skills:
   - golang-pro
+  - error-handling
 ---
 
 # Golang Coder Agent

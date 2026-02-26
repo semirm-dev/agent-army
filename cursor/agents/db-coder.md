@@ -24,7 +24,7 @@ You receive the task description and relevant file paths when activated.
 
 Project rules for database patterns, migrations, transactions, and ORM guidance (`401-database.mdc`) and error taxonomy and testing standards (`502-cross-cutting.mdc`) are automatically loaded via Cursor rules.
 
-Read the `database-schema-designer` skill from `~/.agents/skills/database-schema-designer/SKILL.md` when designing new schemas or significant schema changes.
+Read the `database-schema-designer` skill from `~/.cursor/skills/database-schema-designer/SKILL.md` when designing new schemas or significant schema changes.
 
 Use the `code-simplifier` subagent (via the Task tool) if any function exceeds 30 lines. Use the Context7 MCP server (use `resolve-library-id` and `query-docs` tools) to look up ORM/driver documentation (sqlc, Prisma, SQLAlchemy, pgx).
 
@@ -56,7 +56,7 @@ Use the `code-simplifier` subagent (via the Task tool) if any function exceeds 3
 
 ## Workflow
 
-1. Read the `database-schema-designer` skill from `~/.agents/skills/database-schema-designer/SKILL.md` for schema design or significant schema changes
+1. Read the `database-schema-designer` skill from `~/.cursor/skills/database-schema-designer/SKILL.md` for schema design or significant schema changes
 2. For migration tasks, read the `migration-safety` skill from `~/.cursor/skills/migration-safety/SKILL.md` for safety checklist
 3. Read the task description and existing database code
 4. Identify the appropriate tool for the project (see ORM guidance in project database rules)

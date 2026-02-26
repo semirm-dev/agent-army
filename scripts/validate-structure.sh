@@ -1,5 +1,5 @@
 #!/bin/bash
-# Validates the structural integrity of the agent-rules repository.
+# Validates the structural integrity of the agent-army repository.
 # Checks: agent files exist, rule files exist, agent triads complete,
 # synced pairs registered, CLAUDE.md references valid.
 
@@ -164,6 +164,9 @@ for agent_file in "$AGENTS_DIR"/*.md; do
   AGENT_NAME=$(basename "$agent_file")
   # Match skill names in backtick-quoted references (pattern built from config.json)
   SKILL_PATTERN=$(cfg '.custom_skills[].name' | paste -sd'|' -)
+  if [ -z "$SKILL_PATTERN" ]; then
+    continue
+  fi
   AGENT_SKILLS=$(grep -oE "\`(${SKILL_PATTERN})\`" "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
   for skill in $AGENT_SKILLS; do
     if [ -f "$LIB_DIR/claude/skills/${skill}/SKILL.md" ]; then
@@ -175,7 +178,25 @@ for agent_file in "$AGENTS_DIR"/*.md; do
 done
 echo ""
 
-# 8. Check CLAUDE.md sync pairs table matches config.json
+# 8. Check skills declared in agent frontmatter exist in config.json
+echo "--- Agent frontmatter skills vs config.json ---"
+# Build list of all known skills (npm + custom)
+ALL_SKILLS=$(cfg '.npm_skills[].name' 2>/dev/null; cfg '.custom_skills[].name' 2>/dev/null)
+for agent_file in "$AGENTS_DIR"/*.md; do
+  AGENT_NAME=$(basename "$agent_file")
+  # Extract skills from YAML frontmatter (lines between --- delimiters starting with "  - ")
+  FRONTMATTER_SKILLS=$(sed -n '/^---$/,/^---$/p' "$agent_file" | sed -n '/^skills:/,/^[^ ]/p' | grep '^ *- ' | sed 's/^ *- //' || true)
+  for skill in $FRONTMATTER_SKILLS; do
+    if echo "$ALL_SKILLS" | grep -qx "$skill"; then
+      ok "$AGENT_NAME frontmatter skill '$skill' exists in config.json"
+    else
+      error "$AGENT_NAME frontmatter declares skill '$skill' not found in config.json npm_skills or custom_skills"
+    fi
+  done
+done
+echo ""
+
+# 9. Check CLAUDE.md sync pairs table matches config.json
 echo "--- CLAUDE.md sync pairs table vs config.json ---"
 
 # Extract rule filenames from CLAUDE.md table rows (lines containing both rules/ and cursor/)
@@ -201,7 +222,7 @@ else
 fi
 echo ""
 
-# 9. Check CLAUDE.md Custom Skills list matches config.json custom_skills
+# 10. Check CLAUDE.md Custom Skills list matches config.json custom_skills
 echo "--- CLAUDE.md Custom Skills vs config.json ---"
 
 # Extract skill names from CLAUDE.md Custom Skills section only (between "Custom Skills:" and "Plugins (superpowers):")
@@ -229,7 +250,7 @@ else
 fi
 echo ""
 
-# 10. Check cursor/agents/ parity with claude/agents/
+# 11. Check cursor/agents/ parity with claude/agents/
 echo "--- Cursor agent parity ---"
 if [ -d "$CURSOR_AGENTS_DIR" ]; then
   CLAUDE_AGENT_COUNT=$(find "$AGENTS_DIR" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
@@ -248,6 +269,105 @@ if [ -d "$CURSOR_AGENTS_DIR" ]; then
 else
   error "cursor/agents/ directory not found — Cursor subagents will not work"
 fi
+echo ""
+
+# 12. Shellcheck on all scripts
+echo "--- Shellcheck ---"
+if command -v shellcheck >/dev/null 2>&1; then
+  for script in "$LIB_DIR/scripts/"*.sh; do
+    SCRIPT_NAME=$(basename "$script")
+    if shellcheck -S warning "$script" >/dev/null 2>&1; then
+      ok "$SCRIPT_NAME passes shellcheck"
+    else
+      warn "$SCRIPT_NAME has shellcheck warnings"
+      shellcheck -S warning "$script" 2>&1 | head -20
+    fi
+  done
+else
+  warn "shellcheck not installed — skipping lint (brew install shellcheck)"
+fi
+echo ""
+
+# 13. Check platform-specific tool references in agents
+echo "--- Platform-specific tool validation ---"
+
+# 13a. Claude agents must not contain Cursor-specific tool references
+for agent_file in "$AGENTS_DIR"/*.md; do
+  AGENT_NAME=$(basename "$agent_file")
+
+  # Extract frontmatter tools: line (between --- delimiters)
+  FM_TOOLS=$(sed -n '/^---$/,/^---$/p' "$agent_file" | grep -E '^tools:' || true)
+
+  # Check frontmatter tools: line for Cursor-specific tools
+  if [ -n "$FM_TOOLS" ]; then
+    if echo "$FM_TOOLS" | grep -qE '\bShell\b'; then
+      error "claude/agents/$AGENT_NAME frontmatter tools: contains Cursor-specific 'Shell' (should be 'Bash')"
+    fi
+    if echo "$FM_TOOLS" | grep -qE '\bStrReplace\b'; then
+      error "claude/agents/$AGENT_NAME frontmatter tools: contains Cursor-specific 'StrReplace' (should be 'Edit')"
+    fi
+  fi
+
+  # Extract body content (everything after the second --- frontmatter delimiter)
+  BODY=$(awk 'BEGIN{n=0} /^---$/{n++; if(n==2){found=1; next}} found{print}' "$agent_file")
+
+  # Check body for Cursor-specific tool references (bold tool names or "the X tool" patterns)
+  if echo "$BODY" | grep -qE '\*\*Shell\*\*|[Tt]he Shell tool|[Uu]se Shell '; then
+    error "claude/agents/$AGENT_NAME body references Cursor-specific 'Shell' tool"
+  fi
+  if echo "$BODY" | grep -qE '\*\*StrReplace\*\*|[Tt]he StrReplace tool|[Uu]se StrReplace '; then
+    error "claude/agents/$AGENT_NAME body references Cursor-specific 'StrReplace' tool"
+  fi
+
+  # Check Claude agents reference ~/.claude/ paths, not ~/.cursor/ or ~/.agents/
+  if echo "$BODY" | grep -qE '~/\.cursor/'; then
+    error "claude/agents/$AGENT_NAME references ~/.cursor/ path (should use ~/.claude/)"
+  fi
+  if echo "$BODY" | grep -qE '~/\.agents/'; then
+    error "claude/agents/$AGENT_NAME references ~/.agents/ path (should use ~/.claude/)"
+  fi
+done
+
+# 13b. Cursor agents must not contain Claude-specific tool references
+if [ -d "$CURSOR_AGENTS_DIR" ]; then
+  for agent_file in "$CURSOR_AGENTS_DIR"/*.md; do
+    AGENT_NAME=$(basename "$agent_file")
+
+    # Extract frontmatter tools: line (between --- delimiters)
+    FM_TOOLS=$(sed -n '/^---$/,/^---$/p' "$agent_file" | grep -E '^tools:' || true)
+
+    # Check frontmatter tools: line for Claude-specific tools
+    if [ -n "$FM_TOOLS" ]; then
+      if echo "$FM_TOOLS" | grep -qE '\bBash\b'; then
+        error "cursor/agents/$AGENT_NAME frontmatter tools: contains Claude-specific 'Bash' (should be 'Shell')"
+      fi
+      if echo "$FM_TOOLS" | grep -qE '\bEdit\b'; then
+        error "cursor/agents/$AGENT_NAME frontmatter tools: contains Claude-specific 'Edit' (should be 'StrReplace')"
+      fi
+    fi
+
+    # Extract body content (everything after the second --- frontmatter delimiter)
+    BODY=$(awk 'BEGIN{n=0} /^---$/{n++; if(n==2){found=1; next}} found{print}' "$agent_file")
+
+    # Check body for Claude-specific tool references (bold tool names or "the X tool" patterns)
+    if echo "$BODY" | grep -qE '\*\*Bash\*\*|[Tt]he Bash tool|[Uu]se Bash '; then
+      error "cursor/agents/$AGENT_NAME body references Claude-specific 'Bash' tool"
+    fi
+    if echo "$BODY" | grep -qE '\*\*Edit\*\*|[Tt]he Edit tool|[Uu]se Edit '; then
+      error "cursor/agents/$AGENT_NAME body references Claude-specific 'Edit' tool"
+    fi
+
+    # Check Cursor agents reference ~/.cursor/ paths, not ~/.claude/ or ~/.agents/
+    if echo "$BODY" | grep -qE '~/\.claude/'; then
+      error "cursor/agents/$AGENT_NAME references ~/.claude/ path (should use ~/.cursor/)"
+    fi
+    if echo "$BODY" | grep -qE '~/\.agents/'; then
+      error "cursor/agents/$AGENT_NAME references ~/.agents/ path (should use ~/.cursor/)"
+    fi
+  done
+fi
+
+ok "Platform-specific tool validation complete"
 echo ""
 
 # Summary

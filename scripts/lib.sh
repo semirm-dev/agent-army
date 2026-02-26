@@ -1,5 +1,5 @@
 #!/bin/bash
-# lib.sh — Shared functions for agent-rules scripts.
+# lib.sh — Shared functions for agent-army scripts.
 # Source this file at the top of any script that reads config.json.
 #
 # Provides:

@@ -3,7 +3,7 @@ description: Idiomatic Golang standards and best practices
 globs: "**/*.go"
 ---
 
-<!-- Sync: Must stay in sync with claude/CLAUDE.md (Coding Patterns & Testing sections) -->
+<!-- Sync: Must stay in sync with claude/rules/go-patterns.md -->
 
 ## 💻 Go Coding Patterns
 - **Simplicity (KISS):** Prefer smaller, focused functions over complex ones. If a function >30 lines, refactor into sub-utilities.
