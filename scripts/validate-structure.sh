@@ -145,14 +145,14 @@ echo ""
 
 # 6. Check skills directory
 echo "--- Skills ---"
-if [ -d "$LIB_DIR/skills" ]; then
-  SKILL_COUNT=$(ls "$LIB_DIR/skills"/*.md 2>/dev/null | wc -l | tr -d ' ')
+if [ -d "$LIB_DIR/claude/skills" ]; then
+  SKILL_COUNT=$(ls "$LIB_DIR/claude/skills"/*.md 2>/dev/null | wc -l | tr -d ' ')
   ok "$SKILL_COUNT custom skill(s) found"
-  for skill_file in "$LIB_DIR/skills"/*.md; do
+  for skill_file in "$LIB_DIR/claude/skills"/*.md; do
     ok "  $(basename "$skill_file")"
   done
 else
-  warn "No skills/ directory found"
+  warn "No claude/skills/ directory found"
 fi
 echo ""
 
@@ -164,10 +164,10 @@ for agent_file in "$AGENTS_DIR"/*.md; do
   SKILL_PATTERN=$(cfg '.custom_skills[].name' | paste -sd'|' -)
   AGENT_SKILLS=$(grep -oE "\`(${SKILL_PATTERN})\`" "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
   for skill in $AGENT_SKILLS; do
-    if [ -f "$LIB_DIR/skills/${skill}.md" ]; then
-      ok "$AGENT_NAME → skills/${skill}.md"
+    if [ -f "$LIB_DIR/claude/skills/${skill}.md" ]; then
+      ok "$AGENT_NAME → claude/skills/${skill}.md"
     else
-      error "$AGENT_NAME references skill '${skill}' but skills/${skill}.md doesn't exist"
+      error "$AGENT_NAME references skill '${skill}' but claude/skills/${skill}.md doesn't exist"
     fi
   done
 done

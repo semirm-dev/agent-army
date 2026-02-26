@@ -1,4 +1,4 @@
-.PHONY: help bootstrap sync sync-claude sync-cursor check generate-settings generate-claude
+.PHONY: help bootstrap sync sync-claude sync-cursor check generate-settings generate-claude new-language
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -10,6 +10,7 @@ help: ## Show available targets
 	@echo "  check              Validate repo structure + check Claude/Cursor rule drift"
 	@echo "  generate-settings  Regenerate claude/settings.json from config.json"
 	@echo "  generate-claude    Regenerate CLAUDE.md sections from config.json"
+	@echo "  new-language       Scaffold a new language (rules, agents, config)"
 
 bootstrap: ## First-time setup
 	bash scripts/bootstrap.sh
@@ -33,3 +34,6 @@ sync-cursor: ## Sync rules to Cursor only
 check: ## Run all checks (structural validation + drift tests)
 	bash scripts/validate-structure.sh
 	bash scripts/test-check-sync.sh
+
+new-language: ## Scaffold a new language (rules, agents, config)
+	bash scripts/new-language.sh
