@@ -13,14 +13,14 @@ make bootstrap
 
 Bootstrap configures your machine for the agent-rules workflow — it installs skills, deploys settings (which enables plugins), and sets up shell aliases. Every step lists what will be installed and asks for confirmation.
 
-| Step | Action                                                                |
-| ---- | --------------------------------------------------------------------- |
-| 1    | Check prerequisites (node, npx, claude CLI, rsync)                    |
-| 2    | Sync rules to `~/.claude/` and `~/.cursor/rules/`                     |
-| 3    | Install 5 npm skills (golang-pro, browser-use, etc.)                  |
-| 4    | Deploy `settings.json` + enable 6 plugins (shows diff if file exists) |
+| Step | Action                                                                   |
+| ---- | ------------------------------------------------------------------------ |
+| 1    | Check prerequisites (node, npx, claude CLI, rsync)                       |
+| 2    | Sync rules to `~/.claude/` and `~/.cursor/rules/`                        |
+| 3    | Install agent skills (golang-pro, browser-use, etc.)                     |
+| 4    | Deploy `settings.json` + enable ai plugins (shows diff if file exists)   |
 | 5    | Add `sync-rules`, `check-sync`, and `init-project` aliases to `~/.zshrc` |
-| 6    | Verify installation (list skills, agents, run check-sync)             |
+| 6    | Verify installation (list skills, agents, run check-sync)                |
 
 Idempotent — skips already-installed components on re-run.
 
@@ -83,6 +83,6 @@ Each agent type has a specific role:
 3. Create 3 agent files: `claude/agents/<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`
 4. Add a `check-sync` entry in `scripts/check-sync.sh` for the new rule ↔ cursor pair
 5. Update the rules table and agent definitions in `claude/CLAUDE.md`
-6. Run `make validate && make check-deployed && make deploy`
+6. Run `make validate && make sync`
 
 Always edit the repo first (single source of truth), then deploy. Never edit `~/.claude/` or `~/.cursor/rules/` directly.
