@@ -107,7 +107,7 @@ echo ""
 # 4. Check synced rule/cursor pairs
 echo "--- Synced rule ↔ cursor pairs ---"
 # Parse the CLAUDE.md table for synced pairs (rules/X.md → cursor/Y.mdc)
-grep -E 'rules/.*cursor/' "$CLAUDE_MD" | while IFS='|' read -r _ rule_col cursor_col _; do
+while IFS='|' read -r _ rule_col cursor_col _; do
   rule=$(echo "$rule_col" | grep -oE 'rules/[a-z-]+\.md' || true)
   cursor=$(echo "$cursor_col" | grep -oE 'cursor/[0-9a-z-]+\.mdc' || true)
   if [ -n "$rule" ] && [ -n "$cursor" ]; then
@@ -118,7 +118,7 @@ grep -E 'rules/.*cursor/' "$CLAUDE_MD" | while IFS='|' read -r _ rule_col cursor
       [ ! -f "$LIB_DIR/$cursor" ] && error "$cursor missing"
     fi
   fi
-done
+done < <(grep -E 'rules/.*cursor/' "$CLAUDE_MD")
 echo ""
 
 # 5. Check every rule file referenced by agent prompts exists

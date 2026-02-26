@@ -1,17 +1,22 @@
-.PHONY: help bootstrap sync sync-claude sync-cursor test validate generate-settings generate-claude
+.PHONY: help bootstrap sync sync-claude sync-cursor check generate-settings generate-claude
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
 	@echo ""
-	@echo "Targets:"
-	@echo "  bootstrap       	First-time setup (interactive)"
-	@echo "  sync            	Sync rules to both Claude and Cursor"
-	@echo "  sync-claude     	Sync rules to Claude only"
-	@echo "  sync-cursor     	Sync rules to Cursor only"
-	@echo "  test            	Run check-sync test suite (5 drift-detection tests)"
-	@echo "  validate        	Structural validation (agents, rules, triads, skills, sync pairs)"
-	@echo "  generate-settings 	Regenerate claude/settings.json from config.json"
-	@echo "  generate-claude   	Regenerate CLAUDE.md sections from config.json"
+	@echo "Setup:"
+	@echo "  bootstrap          First-time interactive setup (symlinks, config)"
+	@echo ""
+	@echo "Sync:"
+	@echo "  sync               Regenerate configs + sync rules to Claude and Cursor"
+	@echo "  sync-claude        Sync rules to Claude Code (~/.claude/) only"
+	@echo "  sync-cursor        Sync rules to Cursor (.cursor/rules/) only"
+	@echo ""
+	@echo "Checks:"
+	@echo "  check              Run all checks (structural validation + drift tests)"
+	@echo ""
+	@echo "Generate:"
+	@echo "  generate-settings  Regenerate claude/settings.json from config.json"
+	@echo "  generate-claude    Regenerate CLAUDE.md sections from config.json"
 
 bootstrap: ## First-time setup
 	bash scripts/bootstrap.sh
@@ -32,8 +37,6 @@ sync-claude: ## Sync rules to Claude only
 sync-cursor: ## Sync rules to Cursor only
 	bash scripts/rsync-rules.sh cursor
 
-validate: ## Structural validation
+check: ## Run all checks (structural validation + drift tests)
 	bash scripts/validate-structure.sh
-
-test: ## Run test suite
 	bash scripts/test-check-sync.sh

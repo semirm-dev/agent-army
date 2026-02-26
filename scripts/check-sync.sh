@@ -212,6 +212,9 @@ if [ "$CHECK_DEPLOYED" -eq 1 ]; then
         echo ""
         DRIFT_FOUND=1
       fi
+    else
+      echo "MISSING: $deployed (not deployed yet)"
+      DRIFT_FOUND=1
     fi
   done
 
@@ -226,6 +229,9 @@ if [ "$CHECK_DEPLOYED" -eq 1 ]; then
         echo ""
         DRIFT_FOUND=1
       fi
+    else
+      echo "MISSING: $deployed (not deployed yet)"
+      DRIFT_FOUND=1
     fi
   done
 fi
