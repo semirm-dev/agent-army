@@ -6,7 +6,10 @@
 
 set -euo pipefail
 
-LIB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib.sh"
+require_jq
+
 CLAUDE="$LIB_DIR/claude/CLAUDE.md"
 RULES_DIR="$LIB_DIR/claude/rules"
 CURSOR_DIR="$LIB_DIR/cursor"
@@ -116,117 +119,37 @@ diff_rule_file() {
 echo "=== Checking sync between rules and Cursor .mdc files ==="
 echo ""
 
-# 1. Go patterns: rules/go-patterns.md vs 100-golang.mdc
-diff_rule_file \
-  "Go Patterns" \
-  "$RULES_DIR/go-patterns.md" \
-  "$CURSOR_DIR/100-golang.mdc"
+# Rule ↔ cursor file pairs (driven by config.json)
+while read -r pair; do
+  label=$(echo "$pair" | jq -r '.label')
+  rule=$(echo "$pair" | jq -r '.rule')
+  cursor=$(echo "$pair" | jq -r '.cursor')
+  diff_rule_file "$label" "$RULES_DIR/$rule" "$CURSOR_DIR/$cursor"
+done < <(cfg_raw '.sync_pairs[]')
 
-# 2. TypeScript patterns: rules/ts-patterns.md vs 101-typescript.mdc
-diff_rule_file \
-  "TypeScript Patterns" \
-  "$RULES_DIR/ts-patterns.md" \
-  "$CURSOR_DIR/101-typescript.mdc"
+# Special section diffs (unique extraction patterns, not config-driven)
 
-# 3. Python patterns: rules/py-patterns.md vs 102-python.mdc
-diff_rule_file \
-  "Python Patterns" \
-  "$RULES_DIR/py-patterns.md" \
-  "$CURSOR_DIR/102-python.mdc"
-
-# 4. Git workflow: rules/git-workflow.md vs 300-git.mdc
-diff_rule_file \
-  "Git Workflow" \
-  "$RULES_DIR/git-workflow.md" \
-  "$CURSOR_DIR/300-git.mdc"
-
-# 5. Safety section: CLAUDE.md vs 000-index.mdc
+# Safety section: CLAUDE.md vs 000-index.mdc
 diff_sections \
   "Deletion & Safety" \
   "$CLAUDE" "🛡️ Deletion & Safety" \
   "$CURSOR_DIR/000-index.mdc" "🛡️ Deletion & Safety" \
   "🤖" "🤖"
 
-# 6. Communication + Conflict Resolution: CLAUDE.md vs 000-index.mdc
+# Communication + Conflict Resolution: CLAUDE.md vs 000-index.mdc
 diff_sections \
   "Communication & Conflict Resolution" \
   "$CLAUDE" "🛠️ Communication Style" \
   "$CURSOR_DIR/000-index.mdc" "🛠️ Communication Style" \
   "^---" "ZZZZZ_SENTINEL_EOF"
 
-# 7. Planning: CLAUDE.md vs 200-planning.mdc
+# Planning: CLAUDE.md vs 200-planning.mdc
 diff_sections \
   "Planning" \
   "$CLAUDE" "Agentic Implementation Plan" \
   "$CURSOR_DIR/200-planning.mdc" "Agentic Implementation Plan" \
   "^---" "ZZZZZ_SENTINEL_EOF" \
   "s/sub-agents/agents/g;s/agents\/cycles/agents/g"
-
-# 8. React patterns: rules/react-patterns.md vs 103-react.mdc
-diff_rule_file \
-  "React Patterns" \
-  "$RULES_DIR/react-patterns.md" \
-  "$CURSOR_DIR/103-react.mdc"
-
-# 9. API design: rules/api-design.md vs 400-api-design.mdc
-diff_rule_file \
-  "API Design" \
-  "$RULES_DIR/api-design.md" \
-  "$CURSOR_DIR/400-api-design.mdc"
-
-# 10. Database: rules/database.md vs 401-database.mdc
-diff_rule_file \
-  "Database Patterns" \
-  "$RULES_DIR/database.md" \
-  "$CURSOR_DIR/401-database.mdc"
-
-# 11. Observability: rules/observability.md vs 500-observability.mdc
-diff_rule_file \
-  "Observability" \
-  "$RULES_DIR/observability.md" \
-  "$CURSOR_DIR/500-observability.mdc"
-
-# 12. Security: rules/security.md vs 501-security.mdc
-diff_rule_file \
-  "Security" \
-  "$RULES_DIR/security.md" \
-  "$CURSOR_DIR/501-security.mdc"
-
-# 13. Cross-Cutting: rules/cross-cutting.md vs 502-cross-cutting.mdc
-diff_rule_file \
-  "Cross-Cutting" \
-  "$RULES_DIR/cross-cutting.md" \
-  "$CURSOR_DIR/502-cross-cutting.mdc"
-
-# 14. Concurrency: rules/concurrency.md vs 503-concurrency.mdc
-diff_rule_file \
-  "Concurrency" \
-  "$RULES_DIR/concurrency.md" \
-  "$CURSOR_DIR/503-concurrency.mdc"
-
-# 15. Testing Patterns: rules/testing-patterns.md vs 504-testing.mdc
-diff_rule_file \
-  "Testing Patterns" \
-  "$RULES_DIR/testing-patterns.md" \
-  "$CURSOR_DIR/504-testing.mdc"
-
-# 16. Caching Patterns: rules/caching-patterns.md vs 505-caching.mdc
-diff_rule_file \
-  "Caching Patterns" \
-  "$RULES_DIR/caching-patterns.md" \
-  "$CURSOR_DIR/505-caching.mdc"
-
-# 17. Messaging Patterns: rules/messaging-patterns.md vs 506-messaging.mdc
-diff_rule_file \
-  "Messaging Patterns" \
-  "$RULES_DIR/messaging-patterns.md" \
-  "$CURSOR_DIR/506-messaging.mdc"
-
-# 18. AI-Assisted Development: rules/ai-assisted-development.md vs 507-ai-dev.mdc
-diff_rule_file \
-  "AI-Assisted Development" \
-  "$RULES_DIR/ai-assisted-development.md" \
-  "$CURSOR_DIR/507-ai-dev.mdc"
 
 # Deployed vs repo comparison (--deployed flag)
 if [ "$CHECK_DEPLOYED" -eq 1 ]; then

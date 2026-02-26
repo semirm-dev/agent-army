@@ -1,4 +1,5 @@
 {
+  "_generated": "DO NOT EDIT — generated from config.json by scripts/generate-settings.sh",
   "permissions": {
     "allow": [
       "Bash(go build:*)",

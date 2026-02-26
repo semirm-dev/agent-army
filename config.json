@@ -1,0 +1,123 @@
+{
+  "npm_skills": [
+    {
+      "name": "golang-pro",
+      "repo": "https://github.com/jeffallan/claude-skills",
+      "description": "Go development skill"
+    },
+    {
+      "name": "database-schema-designer",
+      "repo": "https://github.com/softaworks/agent-toolkit",
+      "description": "Database schema design skill"
+    },
+    {
+      "name": "skill-creator",
+      "repo": "https://github.com/anthropics/skills",
+      "description": "Skill authoring guide"
+    },
+    {
+      "name": "browser-use",
+      "repo": "https://github.com/anthropics/skills",
+      "description": "Browser automation skill"
+    },
+    {
+      "name": "find-skills",
+      "repo": "https://github.com/anthropics/skills",
+      "description": "Skill discovery tool"
+    }
+  ],
+  "plugins": [
+    "context7",
+    "frontend-design",
+    "code-review",
+    "superpowers",
+    "security-guidance",
+    "code-simplifier"
+  ],
+  "custom_skills": [
+    "migration-safety",
+    "error-handling",
+    "testing-strategy",
+    "code-architecture",
+    "api-designer",
+    "git-conventions",
+    "dependency-audit",
+    "cli-design",
+    "refactoring-patterns"
+  ],
+  "shell_aliases": {
+    "sync-rules": "scripts/rsync-rules.sh",
+    "check-sync": "scripts/check-sync.sh",
+    "init-project": "scripts/init-project.sh"
+  },
+  "sync_pairs": [
+    { "label": "Go Patterns", "rule": "go-patterns.md", "cursor": "100-golang.mdc" },
+    { "label": "TypeScript Patterns", "rule": "ts-patterns.md", "cursor": "101-typescript.mdc" },
+    { "label": "Python Patterns", "rule": "py-patterns.md", "cursor": "102-python.mdc" },
+    { "label": "Git Workflow", "rule": "git-workflow.md", "cursor": "300-git.mdc" },
+    { "label": "React Patterns", "rule": "react-patterns.md", "cursor": "103-react.mdc" },
+    { "label": "API Design", "rule": "api-design.md", "cursor": "400-api-design.mdc" },
+    { "label": "Database Patterns", "rule": "database.md", "cursor": "401-database.mdc" },
+    { "label": "Observability", "rule": "observability.md", "cursor": "500-observability.mdc" },
+    { "label": "Security", "rule": "security.md", "cursor": "501-security.mdc" },
+    { "label": "Cross-Cutting", "rule": "cross-cutting.md", "cursor": "502-cross-cutting.mdc" },
+    { "label": "Concurrency", "rule": "concurrency.md", "cursor": "503-concurrency.mdc" },
+    { "label": "Testing Patterns", "rule": "testing-patterns.md", "cursor": "504-testing.mdc" },
+    { "label": "Caching Patterns", "rule": "caching-patterns.md", "cursor": "505-caching.mdc" },
+    { "label": "Messaging Patterns", "rule": "messaging-patterns.md", "cursor": "506-messaging.mdc" },
+    { "label": "AI-Assisted Development", "rule": "ai-assisted-development.md", "cursor": "507-ai-dev.mdc" }
+  ],
+  "rsync_excludes": [
+    "settings.json",
+    "installed_plugins.json",
+    "skills/",
+    "plugins/",
+    "projects/",
+    "todos/"
+  ],
+  "settings": {
+    "defaultMode": "plan",
+    "skipDangerousModePermissionPrompt": true,
+    "statusLine": {
+      "type": "command",
+      "command": "bash ~/.claude/statusline-command.sh"
+    },
+    "permissions_allow": [
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Bash(go vet:*)",
+      "Bash(go mod:*)",
+      "Bash(golangci-lint:*)",
+      "Bash(gofmt:*)",
+      "Bash(tsc:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run dev:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(pip:*)",
+      "Bash(uv:*)",
+      "Bash(make:*)",
+      "Bash(docker build:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker run:*)",
+      "Bash(hadolint:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git stash:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(trash:*)"
+    ]
+  }
+}

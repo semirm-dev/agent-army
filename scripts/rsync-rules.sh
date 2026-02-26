@@ -1,7 +1,10 @@
 #!/bin/bash
 set -euo pipefail
-# 1. Master Library Path
-LIB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# 1. Master Library Path & shared config
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib.sh"
+require_jq
 
 # 2. Check for folder argument
 if [ -z "$1" ]; then
@@ -35,14 +38,9 @@ echo "🔄 Mirroring $FOLDER/ to: $TARGET_DIR"
 # 5. Mirror all files (exclude user-managed files that shouldn't be overwritten)
 EXCLUDES=()
 if [ "$FOLDER" = "claude" ]; then
-  EXCLUDES=(
-    --exclude settings.json
-    --exclude installed_plugins.json
-    --exclude skills/
-    --exclude plugins/
-    --exclude projects/
-    --exclude todos/
-  )
+  while read -r exclude; do
+    EXCLUDES+=(--exclude "$exclude")
+  done < <(cfg '.rsync_excludes[]')
 fi
 
 rsync -av ${EXCLUDES[@]+"${EXCLUDES[@]}"} "$LIB_DIR/$FOLDER/" "$TARGET_DIR/" \

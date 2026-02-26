@@ -6,7 +6,9 @@
 
 set -euo pipefail
 
-LIB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib.sh"
+require_jq
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -48,6 +50,7 @@ step "Step 1: Check prerequisites"
 MISSING=()
 command -v node   >/dev/null 2>&1 && ok "node $(node -v)"   || MISSING+=("node")
 command -v npx    >/dev/null 2>&1 && ok "npx found"          || MISSING+=("npx")
+command -v jq     >/dev/null 2>&1 && ok "jq $(jq --version)" || MISSING+=("jq")
 command -v claude >/dev/null 2>&1 && ok "claude CLI found"   || MISSING+=("claude")
 command -v rsync  >/dev/null 2>&1 && ok "rsync found"        || MISSING+=("rsync")
 
@@ -71,29 +74,23 @@ fi
 # ── Step 3: Install npm skills ─────────────────────────────────────
 
 step "Step 3: Install npm skills"
+SKILL_COUNT=$(cfg_raw '.npm_skills' | jq 'length')
 echo "  Skills to install:"
-echo "    - golang-pro"
-echo "    - database-schema-designer"
-echo "    - skill-creator"
-echo "    - browser-use"
-echo "    - find-skills"
-if ask "Install 5 skills?"; then
-  SKILLS=(
-    "https://github.com/jeffallan/claude-skills --skill golang-pro"
-    "https://github.com/softaworks/agent-toolkit --skill database-schema-designer"
-    "https://github.com/anthropics/skills --skill skill-creator"
-    "https://github.com/anthropics/skills --skill browser-use"
-    "https://github.com/anthropics/skills --skill find-skills"
-  )
-  for skill_cmd in "${SKILLS[@]}"; do
-    skill_name="${skill_cmd##*--skill }"
-    if [ -L "$HOME/.claude/skills/$skill_name" ] || [ -d "$HOME/.claude/skills/$skill_name" ]; then
-      ok "$skill_name already installed, skipping"
+while read -r skill_json; do
+  name=$(echo "$skill_json" | jq -r '.name')
+  echo "    - $name"
+done < <(cfg_raw '.npm_skills[]')
+if ask "Install $SKILL_COUNT skills?"; then
+  while read -r skill_json; do
+    name=$(echo "$skill_json" | jq -r '.name')
+    repo=$(echo "$skill_json" | jq -r '.repo')
+    if [ -L "$HOME/.claude/skills/$name" ] || [ -d "$HOME/.claude/skills/$name" ]; then
+      ok "$name already installed, skipping"
     else
-      echo "  Installing $skill_name..."
-      npx skills add $skill_cmd || warn "Failed to install $skill_name"
+      echo "  Installing $name..."
+      npx skills add "$repo" --skill "$name" || warn "Failed to install $name"
     fi
-  done
+  done < <(cfg_raw '.npm_skills[]')
   ok "Skills installed"
 else
   warn "Skipped skill installation"
@@ -101,17 +98,15 @@ fi
 
 # ── Step 4: Deploy settings.json (enables plugins) ────────────────
 
+step "Step 4: Deploy settings.json"
+echo "  Generating settings.json from config.json..."
+bash "$LIB_DIR/scripts/generate-settings.sh"
 SETTINGS_SRC="$LIB_DIR/claude/settings.json"
 SETTINGS_DST="$HOME/.claude/settings.json"
-
-step "Step 4: Deploy settings.json"
 echo "  Plugins enabled via settings.json:"
-echo "    - context7"
-echo "    - frontend-design"
-echo "    - code-review"
-echo "    - superpowers"
-echo "    - security-guidance"
-echo "    - code-simplifier"
+while read -r plugin; do
+  echo "    - $plugin"
+done < <(cfg '.plugins[]')
 if ask "Deploy settings.json to $SETTINGS_DST?"; then
   if [ -f "$SETTINGS_DST" ]; then
     echo "  Current diff:"
@@ -135,21 +130,19 @@ fi
 
 step "Step 5: Add shell aliases"
 if ask "Add aliases to ~/.zshrc?"; then
-  ALIASES=(
-    "alias sync-rules='$LIB_DIR/scripts/rsync-rules.sh'"
-    "alias check-sync='$LIB_DIR/scripts/check-sync.sh'"
-    "alias init-project='$LIB_DIR/scripts/init-project.sh'"
-  )
   ZSHRC="$HOME/.zshrc"
   touch "$ZSHRC"
-  for alias_line in "${ALIASES[@]}"; do
+  while read -r entry; do
+    alias_name=$(echo "$entry" | jq -r '.key')
+    alias_script=$(echo "$entry" | jq -r '.value')
+    alias_line="alias ${alias_name}='$LIB_DIR/${alias_script}'"
     if grep -qF "$alias_line" "$ZSHRC"; then
       ok "Already present: $alias_line"
     else
       echo "$alias_line" >> "$ZSHRC"
       ok "Added: $alias_line"
     fi
-  done
+  done < <(cfg_raw '.shell_aliases | to_entries[]')
 else
   warn "Skipped alias setup"
 fi

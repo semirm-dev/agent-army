@@ -5,7 +5,9 @@
 
 set -euo pipefail
 
-LIB_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib.sh"
+require_jq
 CLAUDE_MD="$LIB_DIR/claude/CLAUDE.md"
 AGENTS_DIR="$LIB_DIR/claude/agents"
 RULES_DIR="$LIB_DIR/claude/rules"
@@ -158,8 +160,9 @@ echo ""
 echo "--- Skill references in agents ---"
 for agent_file in "$AGENTS_DIR"/*.md; do
   AGENT_NAME=$(basename "$agent_file")
-  # Match skill names in backtick-quoted references that match known skill patterns
-  AGENT_SKILLS=$(grep -oE '`(migration-safety|error-handling|testing-strategy|code-architecture|api-designer|git-conventions|dependency-audit|cli-design|refactoring-patterns)`' "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
+  # Match skill names in backtick-quoted references (pattern built from config.json)
+  SKILL_PATTERN=$(cfg '.custom_skills[]' | paste -sd'|' -)
+  AGENT_SKILLS=$(grep -oE "\`(${SKILL_PATTERN})\`" "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
   for skill in $AGENT_SKILLS; do
     if [ -f "$LIB_DIR/skills/${skill}.md" ]; then
       ok "$AGENT_NAME → skills/${skill}.md"
@@ -168,6 +171,32 @@ for agent_file in "$AGENTS_DIR"/*.md; do
     fi
   done
 done
+echo ""
+
+# 8. Check CLAUDE.md sync pairs table matches config.json
+echo "--- CLAUDE.md sync pairs table vs config.json ---"
+
+# Extract rule filenames from CLAUDE.md table rows (lines containing both rules/ and cursor/)
+CLAUDE_RULES=$(grep -E 'rules/.*cursor/' "$CLAUDE_MD" | grep -v '^\s*<!--' | grep -oE 'rules/[a-z-]+\.md' | sort)
+
+# Extract rule filenames from config.json
+CONFIG_RULES=$(cfg '.sync_pairs[].rule' | sed 's/^/rules\//' | sort)
+
+if [ "$CLAUDE_RULES" = "$CONFIG_RULES" ]; then
+  ok "CLAUDE.md table matches config.json sync_pairs ($(echo "$CONFIG_RULES" | wc -l | tr -d ' ') pairs)"
+else
+  # Find entries in config but missing from CLAUDE.md
+  MISSING_FROM_CLAUDE=$(comm -23 <(echo "$CONFIG_RULES") <(echo "$CLAUDE_RULES"))
+  # Find entries in CLAUDE.md but missing from config
+  MISSING_FROM_CONFIG=$(comm -13 <(echo "$CONFIG_RULES") <(echo "$CLAUDE_RULES"))
+
+  if [ -n "$MISSING_FROM_CLAUDE" ]; then
+    error "config.json has sync pairs not in CLAUDE.md table: $MISSING_FROM_CLAUDE"
+  fi
+  if [ -n "$MISSING_FROM_CONFIG" ]; then
+    error "CLAUDE.md table has sync pairs not in config.json: $MISSING_FROM_CONFIG"
+  fi
+fi
 echo ""
 
 # Summary
