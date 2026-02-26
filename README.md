@@ -24,94 +24,6 @@ Bootstrap configures your machine for the agent-rules workflow — it installs s
 
 Idempotent — skips already-installed components on re-run.
 
-## Directory Structure
-
-```
-agent-rules/
-├── claude/
-│   ├── CLAUDE.md              # Main instructions (safety, patterns, planning)
-│   ├── settings.json          # Reference settings template
-│   ├── SKILLS.md              # What to install (plugins vs npm skills)
-│   ├── statusline-command.sh  # Status line script (deployed to ~/.claude/)
-│   ├── agents/                # 20 reusable agent prompts
-│   │   ├── go-coder.md        # Go code writer (uses golang-pro skill)
-│   │   ├── go-reviewer.md     # Go code reviewer (read-only)
-│   │   ├── go-tester.md       # Go test writer
-│   │   ├── ts-coder.md        # TypeScript/JS code writer
-│   │   ├── ts-reviewer.md     # TypeScript/JS code reviewer (read-only)
-│   │   ├── ts-tester.md       # TypeScript/JS test writer
-│   │   ├── py-coder.md        # Python code writer
-│   │   ├── py-reviewer.md     # Python code reviewer (read-only)
-│   │   ├── py-tester.md       # Python test writer
-│   │   ├── react-coder.md     # React/frontend component writer
-│   │   ├── react-reviewer.md  # React/frontend code reviewer (read-only)
-│   │   ├── react-tester.md    # React component test writer
-│   │   ├── db-coder.md        # Database engineer (migrations, queries)
-│   │   ├── db-reviewer.md     # Database reviewer (read-only)
-│   │   ├── db-tester.md       # Database test writer
-│   │   ├── docker-builder.md  # Dockerfile, compose, CI/CD writer
-│   │   ├── docker-reviewer.md # Docker/infra reviewer (read-only)
-│   │   ├── docker-tester.md   # Docker/infra test validator
-│   │   ├── arch-reviewer.md   # Architecture reviewer (read-only)
-│   │   └── docs-writer.md     # Technical documentation writer
-│   └── rules/                 # 15 domain-specific rule files
-│       ├── go-patterns.md     # Go coding + testing standards
-│       ├── ts-patterns.md     # TypeScript coding + testing standards
-│       ├── py-patterns.md     # Python coding + testing standards
-│       ├── react-patterns.md  # React component, accessibility, error boundaries
-│       ├── git-workflow.md    # Git conventions (branch, commit, PR)
-│       ├── api-design.md      # REST/gRPC API patterns
-│       ├── database.md        # Migrations, pooling, transactions, ORMs
-│       ├── observability.md   # Logging, metrics, health checks, Docker, CI/CD
-│       ├── security.md        # Auth, CORS, rate limiting, secrets
-│       ├── cross-cutting.md   # Error taxonomy, coverage targets, deps
-│       ├── concurrency.md     # Concurrency (goroutines, promises, asyncio)
-│       ├── testing-patterns.md # Testing patterns (naming, fixtures, CI)
-│       ├── caching-patterns.md # Caching (cache-aside, invalidation, key design)
-│       ├── messaging-patterns.md # Messaging (queues, DLQ, idempotency, events)
-│       └── ai-assisted-development.md # AI-friendly code patterns
-├── cursor/                    # 17 Cursor IDE rules
-│   ├── 000-index.mdc          # Safety & communication (alwaysApply)
-│   ├── 100-golang.mdc         # Go coding patterns (globs: **/*.go)
-│   ├── 101-typescript.mdc     # TypeScript patterns (globs: **/*.ts,tsx,js,jsx)
-│   ├── 102-python.mdc         # Python patterns (globs: **/*.py)
-│   ├── 103-react.mdc          # React patterns (globs: **/*.tsx,jsx)
-│   ├── 200-planning.mdc       # Planning template (alwaysApply)
-│   ├── 300-git.mdc            # Git workflow conventions (alwaysApply)
-│   ├── 400-api-design.mdc     # API design patterns
-│   ├── 401-database.mdc       # Database patterns
-│   ├── 500-observability.mdc  # Observability & infrastructure
-│   ├── 501-security.mdc       # Security patterns
-│   ├── 502-cross-cutting.mdc  # Error taxonomy, coverage, deps (alwaysApply)
-│   ├── 503-concurrency.mdc    # Concurrency patterns
-│   ├── 504-testing.mdc        # Testing patterns
-│   ├── 505-caching.mdc        # Caching patterns
-│   ├── 506-messaging.mdc      # Messaging patterns
-│   └── 507-ai-dev.mdc        # AI-assisted development patterns (alwaysApply)
-├── skills/                    # 9 custom skills
-│   ├── api-designer.md        # API design checklist and scaffolding
-│   ├── dependency-audit.md    # Dependency audit and update workflow
-│   ├── git-conventions.md     # Branch naming, commit format, PR templates
-│   ├── migration-safety.md    # Database migration safety checklist
-│   ├── error-handling.md      # Error taxonomy and propagation patterns
-│   ├── code-architecture.md   # Architecture decisions and DI patterns
-│   ├── testing-strategy.md    # Test pyramid and strategy guidance
-│   ├── cli-design.md          # CLI tool design patterns
-│   └── refactoring-patterns.md # Safe refactoring workflow and patterns
-├── scripts/
-│   ├── bootstrap.sh           # Interactive new-device setup
-│   ├── rsync-rules.sh         # Sync repo → ~/.claude/ or ~/.cursor/rules/
-│   ├── check-sync.sh          # Verify CLAUDE.md ↔ Cursor .mdc parity
-│   ├── validate-structure.sh  # Structural validation (agents, rules, triads)
-│   ├── test-check-sync.sh     # Tests for check-sync drift detection
-│   └── init-project.sh        # Scaffold a project-level CLAUDE.md (runs from any dir)
-├── docs/
-│   └── AGENT-GUIDE.md         # Agent decision tree and mapping reference
-├── templates/
-│   └── PROJECT-CLAUDE.md      # Project-level CLAUDE.md starter template
-└── README.md
-```
-
 ## What Gets Deployed Where
 
 ```
@@ -124,30 +36,6 @@ claude/statusline-command.sh    → ~/.claude/statusline-command.sh
 claude/settings.json            → ~/.claude/settings.json (bootstrap only)
 cursor/*.mdc                    → ~/.cursor/rules/*.mdc
 ```
-
-Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugins/`, `projects/`, `todos/`.
-
-## Commands
-
-| Command                | Purpose                                        |
-|------------------------|------------------------------------------------|
-| `make bootstrap`       | First-time setup (interactive)                 |
-| `make sync`            | Sync rules to both Claude and Cursor           |
-| `make sync-claude`     | Sync rules to Claude only                      |
-| `make sync-cursor`     | Sync rules to Cursor only                      |
-| `make check-deployed`  | Verify deployed files match repo               |
-| `make deploy`          | Sync + check-deployed (day-to-day loop)        |
-| `make validate`        | Structural validation (agents, rules, triads, skills, sync pairs) |
-| `make test`            | Run check-sync test suite (5 drift-detection tests) |
-
-`make check-deployed` exit codes:
-
-| Exit code | Meaning                             |
-| --------- | ----------------------------------- |
-| `0`       | All sections in sync                |
-| `1`       | Drift detected — shows unified diff |
-
-Sections checked: Go, TypeScript, Python, React, Git Workflow, Safety, Communication, Planning, API Design, Database, Observability, Security, Cross-Cutting, Concurrency, Testing Patterns, Caching Patterns, Messaging Patterns, AI-Assisted Development. Structural validation (`make validate`) checks agent triads, rule references, skill references, and sync pairs.
 
 ## Capabilities
 
@@ -187,42 +75,6 @@ Each agent type has a specific role:
 | `*-builder`  | Write infrastructure    | Read, Write, Edit, Bash, Glob, Grep | Config only  |
 | `*-writer`   | Write documentation     | Read, Write, Edit, Glob, Grep       | Docs only    |
 
-## Day-to-Day Workflow
-
-```bash
-# 1. Edit rules in this repo (single source of truth)
-nano claude/CLAUDE.md
-
-# 2. Deploy + verify
-make deploy
-
-# 3. Structural validation (agents, rules, triads)
-make validate
-
-# 4. Run tests (if you changed check-sync.sh)
-make test
-```
-
-## How Sync Works
-
-- CLAUDE.md and Cursor `.mdc` files share sections (safety, coding patterns, planning)
-- `<!-- Sync: ... -->` comments mark what must stay in sync
-- `check-sync.sh` extracts matching sections, strips heading levels, normalizes platform terms, and diffs
-- If drift is found, edit the repo (single source of truth) and re-deploy
-
-## Testing
-
-`make test` runs `scripts/test-check-sync.sh`, which validates that the drift detection logic in `check-sync.sh` works correctly. It creates temporary files with known content and asserts the expected exit codes.
-
-| Test | Scenario | Expected |
-|------|----------|----------|
-| 1 | Identical sections in both files | No drift (exit 0) |
-| 2 | Extra content in cursor file | Drift detected (exit 1) |
-| 3 | Different heading levels (`##` vs `###`) | Ignored — no drift (exit 0) |
-| 4 | Rule file content differs from cursor file | Drift detected (exit 1) |
-| 5 | Real `check-sync.sh` against the repo | Passes (exit 0) |
-
-**When to run:** After modifying `check-sync.sh`, `validate-structure.sh`, or any sync-related logic. Also run as a sanity check after adding new rule↔cursor pairs.
 
 ## Adding a New Language
 
@@ -233,47 +85,4 @@ make test
 5. Update the rules table and agent definitions in `claude/CLAUDE.md`
 6. Run `make validate && make check-deployed && make deploy`
 
-## Troubleshooting
-
-### `npx: command not found`
-Node.js is not installed or not in your PATH. Install via:
-```bash
-brew install node   # macOS
-```
-
-### `EACCES: permission denied` during bootstrap
-Don't use `sudo` with npm. Fix npm permissions:
-```bash
-mkdir -p ~/.npm-global && npm config set prefix '~/.npm-global'
-export PATH="$HOME/.npm-global/bin:$PATH"  # add to ~/.zshrc
-```
-
-### Cursor not picking up rule changes
-Cursor caches `.mdc` files. After `make sync-cursor`:
-1. Close all Cursor windows
-2. Reopen the project
-3. Verify in Cursor settings → Rules that the rules appear
-
-### Sync drift after editing
-If `make check-deployed` shows drift:
-```bash
-# 1. See what drifted
-make check-deployed
-
-# 2. Edit the source file (claude/rules/ or claude/CLAUDE.md)
-# 3. Re-deploy
-make deploy
-```
-
 Always edit the repo first (single source of truth), then deploy. Never edit `~/.claude/` or `~/.cursor/rules/` directly.
-
-### Plugin not available in Claude Code
-Plugins require Claude Code CLI and the `settings.json` to be deployed:
-```bash
-# Re-deploy settings
-make bootstrap
-# Or manually copy
-cp claude/settings.json ~/.claude/settings.json
-```
-
-Then restart Claude Code for plugins to load.

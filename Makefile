@@ -1,4 +1,4 @@
-.PHONY: help bootstrap sync sync-claude sync-cursor check-deployed deploy test validate generate-settings
+.PHONY: help bootstrap sync sync-claude sync-cursor check-deployed deploy test validate generate-settings generate-claude
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -13,6 +13,7 @@ help: ## Show available targets
 	@echo "  test            	Run check-sync test suite (5 drift-detection tests)"
 	@echo "  validate        	Structural validation (agents, rules, triads, skills, sync pairs)"
 	@echo "  generate-settings 	Regenerate claude/settings.json from config.json"
+	@echo "  generate-claude   	Regenerate CLAUDE.md sections from config.json"
 
 bootstrap: ## First-time setup
 	bash scripts/bootstrap.sh
@@ -20,7 +21,10 @@ bootstrap: ## First-time setup
 generate-settings: ## Regenerate settings.json from config.json
 	bash scripts/generate-settings.sh
 
-sync: generate-settings ## Sync rules to both platforms
+generate-claude: ## Regenerate CLAUDE.md sections from config.json
+	bash scripts/generate-claude.sh
+
+sync: generate-settings generate-claude ## Sync rules to both platforms
 	bash scripts/rsync-rules.sh claude
 	bash scripts/rsync-rules.sh cursor
 

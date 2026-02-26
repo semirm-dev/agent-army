@@ -14,6 +14,7 @@
 - **Role:** You act as a **Lead Product Architect**. Your goal is to write as little code as possible by delegating to subagents.
 - **Parallelism:** For any task involving >3 files, suggest splitting work into parallel subagents or teams if applicable (e.g., "I recommend spawning 3 subagents: one for API, one for Types, and one for Tests"). Automatically send agents to background so they can run in parallel.
 - **Agent Definitions:** Reusable agent prompts live in `~/.claude/agents/`. Use these when delegating via the Task tool:
+<!-- BEGIN:agent-definitions -->
   - **Go:** `go-coder.md` (invokes `golang-pro` plugin), `go-reviewer.md`, `go-tester.md`
   - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
   - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
@@ -22,8 +23,10 @@
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
   - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
+<!-- END:agent-definitions -->
 - **Plugins vs Skills:** Plugins (e.g., `context7`, `frontend-design`, `code-review`) are managed by `enabledPlugins` in settings.json. npm skills (e.g., `golang-pro`, `database-schema-designer`) are installed via `npx skills add`. Custom skills (below) are markdown files in `~/.claude/skills/` that define structured workflows. Both are invoked via the Skill tool, but plugins receive automatic updates while custom skills are version-controlled in this repo.
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
+<!-- BEGIN:custom-skills -->
   - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
   - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
   - `migration-safety` -- Invoke when writing or reviewing database migrations.
@@ -34,6 +37,7 @@
   - `cli-design` -- Invoke when building CLI tools, admin scripts, or migration runners.
   - `refactoring-patterns` -- Invoke when extracting methods, renaming, moving code, or addressing code smells.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
+<!-- END:custom-skills -->
 - **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
   - `brainstorming` -- Before any creative work (features, components, behavior changes).
   - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.
@@ -116,22 +120,24 @@ Sub-agents: go-coder (endpoint), go-tester (tests), go-reviewer (review).
 
 Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 
+<!-- BEGIN:sync-pairs-table -->
 | Rule File | Synced With | Content |
 |-----------|-------------|---------|
 | `rules/go-patterns.md` | `cursor/100-golang.mdc` | Go coding + testing patterns |
 | `rules/ts-patterns.md` | `cursor/101-typescript.mdc` | TypeScript coding + testing patterns |
 | `rules/py-patterns.md` | `cursor/102-python.mdc` | Python coding + testing patterns |
 | `rules/git-workflow.md` | `cursor/300-git.mdc` | Git conventions |
-| `rules/api-design.md` | `cursor/400-api-design.mdc` | API design patterns |
-| `rules/observability.md` | `cursor/500-observability.mdc` | Logging, metrics, health checks, Docker, CI/CD |
-| `rules/cross-cutting.md` | `cursor/502-cross-cutting.mdc` | Error taxonomy, coverage targets, dependency policy |
-| `rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
 | `rules/react-patterns.md` | `cursor/103-react.mdc` | React component and frontend patterns |
+| `rules/api-design.md` | `cursor/400-api-design.mdc` | API design patterns |
+| `rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
+| `rules/observability.md` | `cursor/500-observability.mdc` | Logging, metrics, health checks, Docker, CI/CD |
 | `rules/security.md` | `cursor/501-security.mdc` | Auth, CORS, rate limiting, secrets management |
+| `rules/cross-cutting.md` | `cursor/502-cross-cutting.mdc` | Error taxonomy, coverage targets, dependency policy |
 | `rules/concurrency.md` | `cursor/503-concurrency.mdc` | Concurrency patterns (goroutines, promises, asyncio) |
 | `rules/testing-patterns.md` | `cursor/504-testing.mdc` | Testing patterns (naming, table-driven, fixtures, CI) |
 | `rules/caching-patterns.md` | `cursor/505-caching.mdc` | Caching patterns (cache-aside, invalidation, key design) |
 | `rules/messaging-patterns.md` | `cursor/506-messaging.mdc` | Messaging patterns (queues, DLQ, idempotency, events) |
 | `rules/ai-assisted-development.md` | `cursor/507-ai-dev.mdc` | AI-assisted development patterns |
+<!-- END:sync-pairs-table -->
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.

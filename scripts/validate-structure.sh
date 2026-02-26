@@ -161,7 +161,7 @@ echo "--- Skill references in agents ---"
 for agent_file in "$AGENTS_DIR"/*.md; do
   AGENT_NAME=$(basename "$agent_file")
   # Match skill names in backtick-quoted references (pattern built from config.json)
-  SKILL_PATTERN=$(cfg '.custom_skills[]' | paste -sd'|' -)
+  SKILL_PATTERN=$(cfg '.custom_skills[].name' | paste -sd'|' -)
   AGENT_SKILLS=$(grep -oE "\`(${SKILL_PATTERN})\`" "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
   for skill in $AGENT_SKILLS; do
     if [ -f "$LIB_DIR/skills/${skill}.md" ]; then
@@ -206,7 +206,7 @@ echo "--- CLAUDE.md Custom Skills vs config.json ---"
 CLAUDE_SKILLS=$(sed -n '/\*\*Custom Skills:\*\*/,/\*\*Plugins (superpowers):\*\*/p' "$CLAUDE_MD" | grep -E '^\s+- `[a-z-]+` --' | grep -oE '`[a-z-]+`' | tr -d '`' | sort)
 
 # Extract skill names from config.json
-CONFIG_SKILLS=$(cfg '.custom_skills[]' | sort)
+CONFIG_SKILLS=$(cfg '.custom_skills[].name' | sort)
 
 if [ "$CLAUDE_SKILLS" = "$CONFIG_SKILLS" ]; then
   ok "CLAUDE.md Custom Skills matches config.json ($(echo "$CONFIG_SKILLS" | wc -l | tr -d ' ') skills)"
