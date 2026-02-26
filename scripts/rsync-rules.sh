@@ -46,4 +46,13 @@ fi
 rsync -av ${EXCLUDES[@]+"${EXCLUDES[@]}"} "$LIB_DIR/$FOLDER/" "$TARGET_DIR/" \
   || { echo "rsync failed"; exit 1; }
 
+# 6. Deploy shared skills to Cursor (source of truth is claude/skills/)
+if [ "$FOLDER" = "cursor" ]; then
+  CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
+  mkdir -p "$CURSOR_SKILLS_DIR"
+  echo "🔄 Syncing custom skills to: $CURSOR_SKILLS_DIR"
+  rsync -av "$LIB_DIR/claude/skills/" "$CURSOR_SKILLS_DIR/" \
+    || { echo "skills rsync failed"; exit 1; }
+fi
+
 echo "🎉 Done. Rules are now physically mirrored (fixes Cursor indexing bugs)."

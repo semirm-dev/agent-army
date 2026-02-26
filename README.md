@@ -32,6 +32,7 @@ claude/CLAUDE.md                → ~/.claude/CLAUDE.md
 claude/agents/*.md              → ~/.claude/agents/*.md
 claude/rules/*.md               → ~/.claude/rules/*.md
 claude/skills/*/SKILL.md        → ~/.claude/skills/*/SKILL.md
+claude/skills/*/SKILL.md        → ~/.cursor/skills/*/SKILL.md
 claude/statusline-command.sh    → ~/.claude/statusline-command.sh
 claude/settings.json            → ~/.claude/settings.json (bootstrap only)
 cursor/*.mdc                    → ~/.cursor/rules/*.mdc
@@ -43,7 +44,7 @@ cursor/*.mdc                    → ~/.cursor/rules/*.mdc
 | ------------------ | ----------------------------------------- | ----- | --------------------------------------------------------------------------------------- |
 | **Plugins**        | Auto-updating, managed by Claude CLI      | 6     | superpowers, context7, frontend-design, code-review, security-guidance, code-simplifier |
 | **npm Skills**     | Installed locally via `npx skills add`    | 3     | golang-pro, database-schema-designer, skill-creator                                     |
-| **Custom Skills**  | Built-in, located in `claude/skills/`     | 9     | api-designer, git-conventions, migration-safety, dependency-audit, error-handling, code-architecture, testing-strategy, cli-design, refactoring-patterns |
+| **Custom Skills**  | Deployed to both Claude and Cursor        | 9     | api-designer, git-conventions, migration-safety, dependency-audit, error-handling, code-architecture, testing-strategy, cli-design, refactoring-patterns |
 | **Agents**         | Reusable prompts for Task tool delegation | 20    | go-{coder,reviewer,tester}, ts-{coder,reviewer,tester}, py-{coder,reviewer,tester}, react-{coder,reviewer,tester}, db-{coder,reviewer,tester}, docker-{builder,reviewer,tester}, arch-{reviewer}, docs-{writer} |
 | **Claude Rules**   | Domain-specific standards                 | 15    | go-patterns, ts-patterns, py-patterns, react-patterns, git-workflow, api-design, database, observability, security, cross-cutting, concurrency, testing-patterns, caching-patterns, messaging-patterns, ai-assisted-development |
 | **Cursor Rules**   | Glob-matched coding standards             | 17    | 000-index, 100-golang, 101-typescript, 102-python, 103-react, 200-planning, 300-git, 400-api-design, 401-database, 500-observability, 501-security, 502-cross-cutting, 503-concurrency, 504-testing, 505-caching, 506-messaging, 507-ai-dev |
