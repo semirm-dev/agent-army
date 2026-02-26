@@ -135,12 +135,9 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `make sync-cursor`     | Sync rules to Cursor only                      |
 | `make check`           | Verify nothing drifted                         |
 | `make deploy`          | Sync + check (day-to-day loop)                 |
-| `make validate`        | Structural validation (agents, rules, triads)  |
-| `make verify-deployed` | Verify deployed state matches repo             |
+| `make validate`        | Structural validation (agents, rules, triads, skills, sync pairs) |
 | `make test`            | Run test suite                                 |
-| `make install-hooks`   | Install git pre-commit hook                    |
 | `make init-project`    | Scaffold a project-level CLAUDE.md             |
-| `make watch`           | Watch for changes and auto-sync                |
 
 `make check` exit codes:
 
@@ -181,11 +178,13 @@ The orchestrator writes no code itself — it plans, delegates, and verifies bui
 
 Each agent type has a specific role:
 
-| Agent        | Role                  | Tools                               | Writes Code? |
-| ------------ | --------------------- | ----------------------------------- | ------------ |
-| `*-coder`    | Write production code | Read, Write, Edit, Bash, Glob, Grep | Yes          |
-| `*-reviewer` | Read-only critique    | Read, Glob, Grep, Bash              | No           |
-| `*-tester`   | Write and run tests   | Read, Write, Edit, Bash, Glob, Grep | Tests only   |
+| Agent        | Role                    | Tools                               | Writes Code? |
+| ------------ | ----------------------- | ----------------------------------- | ------------ |
+| `*-coder`    | Write production code   | Read, Write, Edit, Bash, Glob, Grep | Yes          |
+| `*-reviewer` | Read-only critique      | Read, Glob, Grep, Bash              | No           |
+| `*-tester`   | Write and run tests     | Read, Write, Edit, Bash, Glob, Grep | Tests only   |
+| `*-builder`  | Write infrastructure    | Read, Write, Edit, Bash, Glob, Grep | Config only  |
+| `*-writer`   | Write documentation     | Read, Write, Edit, Glob, Grep       | Docs only    |
 
 ## Day-to-Day Workflow
 
@@ -212,12 +211,12 @@ make test
 
 ## Adding a New Language
 
-1. Create 3 agent files: `claude/agents/<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`
-2. Create a Cursor rule: `cursor/1XX-<lang>.mdc` with appropriate globs
-3. Add the language's coding patterns to `claude/CLAUDE.md` (with sync comments)
-4. Add a `check-sync` section in `scripts/check-sync.sh` for the new rule
-5. Update the agent definitions list in `claude/CLAUDE.md`
-6. Run `make deploy`
+1. Create a rule file: `claude/rules/<lang>-patterns.md` with coding + testing standards
+2. Create a Cursor rule: `cursor/1XX-<lang>.mdc` with appropriate globs and synced content
+3. Create 3 agent files: `claude/agents/<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`
+4. Add a `check-sync` entry in `scripts/check-sync.sh` for the new rule ↔ cursor pair
+5. Update the rules table and agent definitions in `claude/CLAUDE.md`
+6. Run `make validate && make check && make deploy`
 
 ## Troubleshooting
 
@@ -263,9 +262,3 @@ cp claude/settings.json ~/.claude/settings.json
 ```
 
 Then restart Claude Code for plugins to load.
-
-### `make watch` says `fswatch not found`
-Install fswatch:
-```bash
-brew install fswatch   # macOS
-```
