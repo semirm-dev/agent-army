@@ -102,6 +102,8 @@ When testing list operations, verify query count:
 - Any concerns or suggestions for the orchestrator
 ```
 
+**Plugins:** When the orchestrator requests TDD workflow, use the `test-driven-development` plugin for structured red-green-refactor cycles.
+
 ## Constraints
 
 - Do NOT write production code. Only test code.

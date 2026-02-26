@@ -51,7 +51,7 @@ echo "--- Agent triad completeness ---"
 # Extract language prefixes from agent filenames
 PREFIXES=$(ls "$AGENTS_DIR"/*.md 2>/dev/null | xargs -I{} basename {} .md | sed 's/-[a-z]*$//' | sort -u)
 for prefix in $PREFIXES; do
-  # Skip docker (has builder+reviewer, not coder/reviewer/tester)
+  # Skip docker (builder+reviewer) and arch (reviewer only)
   if [ "$prefix" = "docker" ]; then
     HAS_BUILDER=false
     HAS_REVIEWER=false
@@ -62,6 +62,12 @@ for prefix in $PREFIXES; do
     else
       warn "docker: missing builder or reviewer"
     fi
+    continue
+  fi
+
+  # arch-reviewer is a standalone agent (no triad)
+  if [ "$prefix" = "arch" ]; then
+    [ -f "$AGENTS_DIR/arch-reviewer.md" ] && ok "arch: reviewer present (standalone)" || warn "arch: reviewer missing"
     continue
   fi
 

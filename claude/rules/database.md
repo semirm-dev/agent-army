@@ -31,6 +31,56 @@
 - **Partial indexes:** Use for filtered queries on large tables (e.g., `WHERE status = 'active'`).
 - **Monitor:** Watch for unused indexes (bloat) and missing indexes (slow queries).
 
+## Query Plan Analysis (EXPLAIN ANALYZE)
+
+### Sequential Scan vs Index Scan
+
+```sql
+-- BAD: Sequential scan on large table (no index on email)
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'alice@example.com';
+-- Seq Scan on users  (cost=0.00..25.00 rows=1 width=64)
+--   Filter: (email = 'alice@example.com')
+--   Rows Removed by Filter: 999
+--   Planning Time: 0.1 ms | Execution Time: 2.5 ms
+
+-- GOOD: After adding index
+CREATE INDEX idx_users_email ON users (email);
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'alice@example.com';
+-- Index Scan using idx_users_email on users  (cost=0.28..8.29 rows=1 width=64)
+--   Index Cond: (email = 'alice@example.com')
+--   Planning Time: 0.1 ms | Execution Time: 0.05 ms
+```
+
+### N+1 Detection in Query Plans
+
+```sql
+-- BAD: N+1 — one query per order to fetch user (visible as repeated Index Scan in loops)
+-- Application code: for order in orders: fetch_user(order.user_id)
+-- Plan shows: Nested Loop with inner Index Scan executing N times
+
+-- GOOD: Single JOIN replaces N+1
+EXPLAIN ANALYZE
+SELECT o.*, u.name FROM orders o JOIN users u ON o.user_id = u.id WHERE o.status = 'pending';
+-- Hash Join  (cost=10.00..50.00 rows=100 width=128)
+--   Hash Cond: (o.user_id = u.id)
+--   -> Seq Scan on orders  (Filter: status = 'pending')
+--   -> Hash (-> Seq Scan on users)
+```
+
+### Join Strategy Comparison
+
+| Strategy | When Used | Performance |
+|----------|-----------|-------------|
+| **Nested Loop** | Small inner table or indexed lookup | Fast for small result sets, slow for large |
+| **Hash Join** | Large tables, equality joins | Good for large datasets, needs memory |
+| **Merge Join** | Pre-sorted inputs, equality joins | Efficient when both inputs are sorted |
+
+**Red flags in query plans:**
+- `Seq Scan` on large tables (>10k rows) with a filter — add an index
+- `Nested Loop` with high loop count — consider a JOIN or batch query
+- `Sort` with `external merge` — needs more `work_mem` or an index
+- `Rows Removed by Filter` much larger than returned rows — index is missing or wrong
+
 ## Schema Conventions
 - **Primary keys:** UUID for distributed systems, BIGINT/SERIAL for single-database systems.
 - **Timestamps:** Use `timestamptz` for all date/time columns. Never `timestamp` without timezone.

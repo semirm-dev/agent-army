@@ -36,3 +36,34 @@ globs: "**/*.py"
 - **Mocks:** Use `unittest.mock.patch` sparingly. Prefer dependency injection and fake implementations.
 - **Test Organization:** Test files live next to code: `service.py` → `test_service.py` (or in a `tests/` directory mirroring the source structure).
 - **Coverage:** Run with `pytest --cov`. See coverage targets in Cross-Cutting Standards below.
+
+## 🧪 Async Testing
+- **Plugin:** Use `pytest-asyncio` for async test support. Install: `pip install pytest-asyncio`.
+- **Marker:** Decorate async tests with `@pytest.mark.asyncio`:
+
+```python
+import pytest
+
+@pytest.mark.asyncio
+async def test_fetch_user() -> None:
+    user = await fetch_user("user-123")
+    assert user.name == "Alice"
+```
+
+- **Auto mode:** Set `asyncio_mode = "auto"` in `pyproject.toml` to avoid marking every test:
+
+```toml
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+```
+
+- **Async fixtures:** Use `async with` in fixtures for async resource management:
+
+```python
+@pytest.fixture
+async def db_session():
+    async with async_session_factory() as session:
+        yield session
+```
+
+- **Timeout:** Use `pytest-timeout` to catch hung async tests: `pytest --timeout=10`.

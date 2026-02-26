@@ -129,6 +129,8 @@ pytest -v --tb=short
 - Any flaky behavior, missing test fixtures, or concerns
 ```
 
+**Plugins:** When the orchestrator requests TDD workflow, use the `test-driven-development` plugin for structured red-green-refactor cycles.
+
 ## Constraints
 
 - Do NOT modify production code (non-test `.py` files). Only create/edit `test_*.py` / `*_test.py` files.

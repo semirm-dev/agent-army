@@ -20,11 +20,15 @@
   - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
   - **Database:** `db-coder.md` (invokes `database-schema-designer` skill), `db-reviewer.md` (read-only), `db-tester.md`
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only)
+  - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
   - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
   - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
   - `migration-safety` -- Invoke when writing or reviewing database migrations.
   - `dependency-audit` -- Invoke when auditing dependencies for vulnerabilities or planning updates.
+  - `error-handling` -- Invoke when creating error types, reviewing error propagation, or designing user-facing error messages.
+  - `code-architecture` -- Invoke when starting new modules, deciding package structure, or reviewing dependency injection patterns.
+  - `testing-strategy` -- Invoke when planning test coverage, choosing test types, or diagnosing flaky tests.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 - **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
   - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.
@@ -100,5 +104,7 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 | `rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
 | `rules/react-patterns.md` | `cursor/103-react.mdc` | React component and frontend patterns |
 | `rules/security.md` | `cursor/501-security.mdc` | Auth, CORS, rate limiting, secrets management |
+| `rules/concurrency.md` | `cursor/503-concurrency.mdc` | Concurrency patterns (goroutines, promises, asyncio) |
+| `rules/testing-patterns.md` | `cursor/504-testing.mdc` | Testing patterns (naming, table-driven, fixtures, CI) |
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.

@@ -1,4 +1,4 @@
-.PHONY: help bootstrap sync sync-claude sync-cursor check deploy test init-project validate verify-deployed install-hooks
+.PHONY: help bootstrap sync sync-claude sync-cursor check deploy test init-project validate verify-deployed install-hooks watch
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -14,6 +14,7 @@ help: ## Show available targets
 	@echo "  validate        Structural validation (agents, rules, triads)"
 	@echo "  verify-deployed Verify deployed state matches repo"
 	@echo "  install-hooks   Install git hooks"
+	@echo "  watch           Watch for changes and auto-sync"
 	@echo "  init-project    Scaffold a project-level CLAUDE.md in current dir"
 
 bootstrap: ## First-time setup
@@ -57,3 +58,16 @@ init-project: ## Scaffold a project-level CLAUDE.md
 	@TEMPLATE_DIR="$(shell cd "$(dir $(lastword $(MAKEFILE_LIST)))" && pwd)/templates"; \
 	cp "$$TEMPLATE_DIR/PROJECT-CLAUDE.md" "$(PWD)/CLAUDE.md"; \
 	echo "Created CLAUDE.md in $(PWD). Edit it to match your project."
+
+watch: ## Watch for changes and auto-sync
+	@if ! command -v fswatch > /dev/null 2>&1; then \
+		echo "fswatch not found. Install with: brew install fswatch"; \
+		exit 1; \
+	fi
+	@echo "Watching claude/ and cursor/ for changes... (Ctrl+C to stop)"
+	@fswatch -o claude/ cursor/ skills/ | while read; do \
+		echo ""; \
+		echo "=== Change detected. Running sync + check... ==="; \
+		$(MAKE) deploy; \
+		echo "=== Done. Watching... ==="; \
+	done

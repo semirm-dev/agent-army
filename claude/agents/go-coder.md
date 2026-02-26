@@ -31,7 +31,7 @@ This loads Go-specific patterns for concurrency, interfaces, generics, testing t
 - **Write** / **Edit** -- Create and modify Go source files
 - **Bash** -- Run `go build`, `go vet`, `gofmt`, `golangci-lint` to validate your output
 
-**Plugins:** Use the `code-simplifier` plugin if any function exceeds 30 lines -- it will help break it into smaller, focused functions.
+**Plugins:** Use the `code-simplifier` plugin if any function exceeds 30 lines -- it will help break it into smaller, focused functions. Use `context7` to look up documentation for third-party Go libraries (gin, echo, gRPC, sqlc, cobra, viper, etc.).
 
 ## Coding Standards
 

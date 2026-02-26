@@ -198,6 +198,18 @@ diff_rule_file \
   "$RULES_DIR/cross-cutting.md" \
   "$CURSOR_DIR/502-cross-cutting.mdc"
 
+# 14. Concurrency: rules/concurrency.md vs 503-concurrency.mdc
+diff_rule_file \
+  "Concurrency" \
+  "$RULES_DIR/concurrency.md" \
+  "$CURSOR_DIR/503-concurrency.mdc"
+
+# 15. Testing Patterns: rules/testing-patterns.md vs 504-testing.mdc
+diff_rule_file \
+  "Testing Patterns" \
+  "$RULES_DIR/testing-patterns.md" \
+  "$CURSOR_DIR/504-testing.mdc"
+
 # Deployed vs repo comparison (--deployed flag)
 if [ "$CHECK_DEPLOYED" -eq 1 ]; then
   echo ""
