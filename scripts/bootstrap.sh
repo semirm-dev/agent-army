@@ -147,9 +147,19 @@ echo "Agents available:"
 ls "$HOME/.claude/agents/" 2>/dev/null || warn "No agents directory"
 
 echo ""
-echo "Plugins installed:"
+echo "Plugins configured:"
 if command -v claude >/dev/null 2>&1; then
-  claude plugin list --scope user 2>/dev/null || warn "No plugins installed"
+  plugin_list=$(claude plugin list --scope user 2>/dev/null || true)
+  if [ -n "$plugin_list" ]; then
+    echo "$plugin_list"
+  else
+    while read -r pjson; do
+      pname=$(echo "$pjson" | jq -r '.name')
+      pmkt=$(echo "$pjson" | jq -r '.marketplace')
+      echo "  - ${pname}@${pmkt}"
+    done < <(cfg_raw '.plugins[]')
+    echo "  (listed from config.json — 'claude plugin list' returned nothing)"
+  fi
 else
   warn "claude CLI not found — cannot list plugins"
 fi
