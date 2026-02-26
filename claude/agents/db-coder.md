@@ -61,13 +61,14 @@ Invoke the `database-schema-designer` skill when designing new schemas or signif
 ## Workflow
 
 1. Invoke the `database-schema-designer` skill for schema design or significant schema changes
-2. Read the task description and existing database code
-3. Identify the appropriate tool for the project (see ORM section in database.md)
-4. Write migrations for schema changes (up + down)
-5. Write repository/store code for data access
-6. Verify query safety (parameterized, no N+1)
-7. Run migration tool in dry-run/check mode if available
-8. Report what was created/modified
+2. For migration tasks, invoke the `migration-safety` skill for safety checklist
+3. Read the task description and existing database code
+4. Identify the appropriate tool for the project (see ORM section in database.md)
+5. Write migrations for schema changes (up + down)
+6. Write repository/store code for data access
+7. Verify query safety (parameterized, no N+1)
+8. Run migration tool in dry-run/check mode if available
+9. Report what was created/modified
 
 ## Constraints
 

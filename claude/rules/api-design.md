@@ -13,3 +13,34 @@
 - **Naming:** Use plural nouns for resources (`/users`, `/orders`). Use kebab-case for multi-word paths. Nest logically (`/users/{id}/orders`).
 - **Idempotency:** POST endpoints that create resources should support idempotency keys. PUT and DELETE must be idempotent.
 - **Documentation:** Maintain an OpenAPI 3.x spec for all public APIs. Generate from code annotations where possible. Keep spec in sync with implementation — stale docs are worse than no docs.
+
+## GraphQL
+
+- **Schema-first design.** Define `.graphql` schema files as the contract. Generate types from schema.
+- **Thin resolvers.** Resolvers should only parse input and call service layer. No business logic in resolvers.
+- **N+1 prevention:** Use DataLoader for batching and caching within a request. Every relationship field must use a loader.
+- **Pagination:** Use Relay cursor-based pagination (`first`, `after`, `last`, `before`) with `Connection` types.
+  ```graphql
+  type UserConnection {
+    edges: [UserEdge!]!
+    pageInfo: PageInfo!
+  }
+  type UserEdge {
+    node: User!
+    cursor: String!
+  }
+  type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: String
+  }
+  ```
+- **Error handling:** Use `extensions.code` for machine-readable errors. Return partial data with errors when possible.
+  ```json
+  {
+    "errors": [{ "message": "Not found", "extensions": { "code": "NOT_FOUND" }, "path": ["user"] }],
+    "data": { "user": null }
+  }
+  ```
+- **Auth:** Implement authentication in middleware/context. Use schema directives (`@auth`, `@hasRole`) for field-level authorization.
+- **Query complexity:** Set a maximum query depth and complexity score to prevent abuse. Reject queries exceeding limits.
+- **Subscriptions:** Use for real-time data (live updates, notifications). Prefer WebSocket transport. Always handle connection lifecycle (connect, disconnect, keep-alive).

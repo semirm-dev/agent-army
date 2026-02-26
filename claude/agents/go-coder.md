@@ -42,15 +42,91 @@ Before writing code, read `~/.claude/rules/go-patterns.md` for full Go coding pa
 - Vertical-slice architecture, package by feature
 - Structured logging, no hardcoded config
 
+### Code Examples
+
+#### HTTP Handler with Error Wrapping
+
+```go
+// HandleGetUser returns a user by ID.
+func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
+    id := chi.URLParam(r, "id")
+    if id == "" {
+        http.Error(w, `{"error":{"code":"VALIDATION_FAILED","message":"missing user ID"}}`, http.StatusBadRequest)
+        return
+    }
+
+    user, err := h.userService.GetByID(r.Context(), id)
+    if err != nil {
+        slog.Error("user: get", "id", id, "error", err)
+        http.Error(w, `{"error":{"code":"INTERNAL","message":"failed to fetch user"}}`, http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
+}
+```
+
+#### Service with Constructor Injection
+
+```go
+// UserService handles user business logic.
+type UserService struct {
+    repo   UserRepository
+    cache  Cache
+    logger *slog.Logger
+}
+
+// NewUserService creates a UserService with injected dependencies.
+func NewUserService(repo UserRepository, cache Cache, logger *slog.Logger) *UserService {
+    return &UserService{repo: repo, cache: cache, logger: logger}
+}
+
+// GetByID retrieves a user, checking cache first.
+func (s *UserService) GetByID(ctx context.Context, id string) (*User, error) {
+    if cached, err := s.cache.Get(ctx, "user:"+id); err == nil {
+        return cached.(*User), nil
+    }
+
+    user, err := s.repo.FindByID(ctx, id)
+    if err != nil {
+        return nil, fmt.Errorf("user: get by id: %w", err)
+    }
+
+    s.cache.Set(ctx, "user:"+id, user, 15*time.Minute)
+    return user, nil
+}
+```
+
+#### Repository with Context-First Query
+
+```go
+// FindByID retrieves a user by ID from the database.
+func (r *PgUserRepository) FindByID(ctx context.Context, id string) (*User, error) {
+    var user User
+    err := r.pool.QueryRow(ctx,
+        "SELECT id, name, email, created_at FROM users WHERE id = $1", id,
+    ).Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt)
+    if err != nil {
+        if errors.Is(err, pgx.ErrNoRows) {
+            return nil, ErrUserNotFound
+        }
+        return nil, fmt.Errorf("user: find by id: %w", err)
+    }
+    return &user, nil
+}
+```
+
 ## Workflow
 
 1. Read the task description from the orchestrator
 2. Invoke the `golang-pro` skill
 3. Explore the codebase: find related packages, interfaces, and existing patterns
-4. Write code following the standards above
-5. Run `go build ./...` to confirm compilation
-6. Run `go vet ./...` to catch common issues
-7. Report back: list of files created/modified, any concerns or open questions
+4. For error type design or error propagation tasks, invoke the `error-handling` skill
+5. Write code following the standards above
+6. Run `go build ./...` to confirm compilation
+7. Run `go vet ./...` to catch common issues
+8. Report back: list of files created/modified, any concerns or open questions
 
 ## Output Format
 

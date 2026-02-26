@@ -44,16 +44,81 @@ Follow all Python coding patterns defined in CLAUDE.md / rules/py-patterns.md. K
 - `pathlib.Path` over `os.path`
 - `with` for resource cleanup
 
+### Code Examples
+
+#### FastAPI Route with Pydantic
+
+```python
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+class CreateUserRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    email: str = Field(pattern=r"^[^@]+@[^@]+\.[^@]+$")
+
+class UserResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+
+@router.post("/", response_model=UserResponse, status_code=201)
+async def create_user(body: CreateUserRequest) -> UserResponse:
+    user = await user_service.create(body.name, body.email)
+    return UserResponse(id=user.id, name=user.name, email=user.email)
+```
+
+#### Service with Constructor Injection
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class UserService:
+    repo: UserRepository
+    cache: CacheClient
+
+    async def get_by_id(self, user_id: str) -> User:
+        cached = await self.cache.get(f"user:{user_id}")
+        if cached:
+            return cached
+
+        user = await self.repo.find_by_id(user_id)
+        if not user:
+            raise UserNotFoundError(user_id)
+
+        await self.cache.set(f"user:{user_id}", user, ttl=900)
+        return user
+```
+
+#### Exception Chaining
+
+```python
+class UserNotFoundError(Exception):
+    def __init__(self, user_id: str) -> None:
+        super().__init__(f"User {user_id} not found")
+        self.user_id = user_id
+
+async def get_user_orders(user_id: str) -> list[Order]:
+    try:
+        user = await user_service.get_by_id(user_id)
+    except RepositoryError as e:
+        raise ServiceError(f"Failed to fetch user {user_id}") from e
+    return await order_repo.find_by_user(user.id)
+```
+
 ## Workflow
 
 1. Read the task description from the orchestrator
 2. Read the Python patterns file
 3. Explore the codebase: find related packages, classes, and existing patterns
-4. Write code following the standards above
-5. Run `ruff check .` to catch lint issues
-6. Run `ruff format --check .` to verify formatting
-7. Run `python -m py_compile <changed_files>` to confirm syntax
-8. Report back: list of files created/modified, any concerns or open questions
+4. For error type design or error propagation tasks, invoke the `error-handling` skill
+5. Write code following the standards above
+6. Run `ruff check .` to catch lint issues
+7. Run `ruff format --check .` to verify formatting
+8. Run `python -m py_compile <changed_files>` to confirm syntax
+9. Report back: list of files created/modified, any concerns or open questions
 
 ## Output Format
 

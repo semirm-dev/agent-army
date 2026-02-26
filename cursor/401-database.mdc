@@ -139,3 +139,38 @@ user, err := queries.GetUser(ctx, userID)
   - Use Aerich for migrations.
   - Good fit for FastAPI/async applications.
   - Define models as Tortoise classes, generate schemas with Pydantic integration.
+
+## NoSQL Patterns
+
+### Document Stores (MongoDB, DynamoDB)
+
+- **Denormalize for reads.** Embed related data in the document when it's always read together.
+- **Reference for writes.** Use references (foreign keys) when related data changes independently.
+- **Pagination:** Use cursor-based pagination (`_id > last_id`). Never use skip/offset on large collections.
+- **Transactions:** Use sparingly. Multi-document transactions are expensive. Design schemas to minimize cross-document updates.
+- **Indexes:** Index all query fields. Use compound indexes for multi-field queries. Monitor with `explain()`.
+- **Schema validation:** Enforce schema at the application layer (Mongoose, Pydantic) even though the DB is schemaless.
+
+### Key-Value / Redis
+
+- **Right data structure:** Use the correct Redis type for the access pattern:
+  - `STRING` for simple cache, counters, locks
+  - `HASH` for object fields (`HSET user:123 name "Alice" email "alice@example.com"`)
+  - `SET` for unique collections, tags, memberships
+  - `SORTED SET` for leaderboards, time-series, priority queues
+  - `LIST` for queues, recent items
+- **Always set TTL.** Every key must expire. Use `EXPIRE` or `SET ... EX`.
+- **Key naming:** `{service}:{entity}:{id}:{field}` (e.g., `auth:session:abc123`).
+- **Atomic operations:** Use `MULTI`/`EXEC` or Lua scripts for multi-step operations that must be atomic.
+
+### When to Choose NoSQL vs PostgreSQL
+
+| Factor | PostgreSQL | Document Store | Key-Value |
+|--------|-----------|----------------|-----------|
+| **Data model** | Relational, normalized | Nested, denormalized | Flat key-value |
+| **Query complexity** | Complex joins, aggregations | Single-document queries, simple aggregations | Key lookup only |
+| **Consistency** | Strong (ACID) | Tunable (eventual to strong) | Eventual |
+| **Scale** | Vertical + read replicas | Horizontal sharding | Horizontal sharding |
+| **Best for** | Business data, transactions | Content, catalogs, user profiles | Cache, sessions, real-time |
+
+**Default to PostgreSQL** unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).

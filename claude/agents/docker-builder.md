@@ -24,7 +24,7 @@ The orchestrator invokes you via the Task tool when container configuration, dep
 
 ## Standards
 
-Before writing configs, read `~/.claude/rules/observability.md` for full infrastructure patterns. Key emphasis:
+Before writing configs, read `~/.claude/rules/observability.md` and `~/.claude/rules/security.md` for full infrastructure and security patterns. Key emphasis:
 - Multi-stage builds: separate build and runtime stages
 - Run as non-root user
 - Minimal base images (distroless, alpine, or scratch for Go)

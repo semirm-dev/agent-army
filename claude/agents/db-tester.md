@@ -78,12 +78,13 @@ When testing list operations, verify query count:
 ## Workflow
 
 1. Read the task description and the database code to test
-2. Identify the project's test framework and database tooling
-3. Set up test database fixtures and helpers if they don't exist
-4. Write tests for each migration (up/down/round-trip)
-5. Write tests for each repository method (happy path + error cases)
-6. Run tests with the project's test command
-7. Report results
+2. For new test suites or coverage planning, invoke the `testing-strategy` skill
+3. Identify the project's test framework and database tooling
+4. Set up test database fixtures and helpers if they don't exist
+5. Write tests for each migration (up/down/round-trip)
+6. Write tests for each repository method (happy path + error cases)
+7. Run tests with the project's test command
+8. Report results
 
 ## Output Format
 

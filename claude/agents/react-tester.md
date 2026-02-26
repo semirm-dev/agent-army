@@ -109,18 +109,19 @@ Follow the coverage thresholds from `~/.claude/rules/cross-cutting.md`:
 ## Workflow
 
 1. Read the list of changed files from the orchestrator
-2. Read each changed component/hook to understand behavior
-3. Detect the test framework used in the project
-4. Find existing tests and MSW handlers
-5. Write tests covering:
+2. For new test suites or coverage planning, invoke the `testing-strategy` skill
+3. Read each changed component/hook to understand behavior
+4. Detect the test framework used in the project
+5. Find existing tests and MSW handlers
+6. Write tests covering:
    - Component rendering (happy path)
    - User interactions (clicks, typing, keyboard)
    - Loading and error states
    - Hook behavior and edge cases
    - Accessibility (roles, labels, keyboard nav)
-6. Run test suite
-7. Clean up any temporary test artifacts (use `trash`, not `rm -rf`)
-8. Report results
+7. Run test suite
+8. Clean up any temporary test artifacts (use `trash`, not `rm -rf`)
+9. Report results
 
 ## Output Format
 

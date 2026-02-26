@@ -19,8 +19,9 @@
   - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
   - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
   - **Database:** `db-coder.md` (invokes `database-schema-designer` skill), `db-reviewer.md` (read-only), `db-tester.md`
-  - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only)
+  - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
+  - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
   - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
   - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
@@ -29,6 +30,7 @@
   - `error-handling` -- Invoke when creating error types, reviewing error propagation, or designing user-facing error messages.
   - `code-architecture` -- Invoke when starting new modules, deciding package structure, or reviewing dependency injection patterns.
   - `testing-strategy` -- Invoke when planning test coverage, choosing test types, or diagnosing flaky tests.
+  - `cli-design` -- Invoke when building CLI tools, admin scripts, or migration runners.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 - **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
   - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.
@@ -40,6 +42,19 @@
 
 ## 🛠️ Communication Style
 - **Bluntness:** Skip the conversational fluff. No "Certainly!" or "I'd be happy to help." Go straight to the action.
+
+## ⚖️ Rule Conflict Resolution
+When rules contradict, follow this priority order:
+1. **Safety** (deletion guards, destructive action blocks)
+2. **Security** (secrets, auth, input validation)
+3. **Project CLAUDE.md** (project-specific overrides)
+4. **Domain rules** (language patterns, API design, database)
+5. **Cross-cutting** (error taxonomy, coverage, dependency policy)
+
+**Common conflicts:**
+- Logging vs Security → Mask PII, never log secrets, but do log the operation with redacted context.
+- Performance vs Safety → Safety wins. Never skip validation for speed.
+- DRY vs Simplicity → Prefer 3 similar lines over a premature abstraction. Extract only when pattern repeats 3+ times.
 
 ---
 
@@ -106,5 +121,7 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 | `rules/security.md` | `cursor/501-security.mdc` | Auth, CORS, rate limiting, secrets management |
 | `rules/concurrency.md` | `cursor/503-concurrency.mdc` | Concurrency patterns (goroutines, promises, asyncio) |
 | `rules/testing-patterns.md` | `cursor/504-testing.mdc` | Testing patterns (naming, table-driven, fixtures, CI) |
+| `rules/caching-patterns.md` | `cursor/505-caching.mdc` | Caching patterns (cache-aside, invalidation, key design) |
+| `rules/messaging-patterns.md` | `cursor/506-messaging.mdc` | Messaging patterns (queues, DLQ, idempotency, events) |
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.

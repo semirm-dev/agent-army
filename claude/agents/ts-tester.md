@@ -95,18 +95,19 @@ Follow the coverage thresholds from `~/.claude/rules/cross-cutting.md`:
 ## Workflow
 
 1. Read the list of changed files from the orchestrator
-2. Read each changed file to understand the public API and logic
-3. Detect the test framework used in the project
-4. Find existing tests in the same package
-5. Write tests covering:
+2. For new test suites or coverage planning, invoke the `testing-strategy` skill
+3. Read each changed file to understand the public API and logic
+4. Detect the test framework used in the project
+5. Find existing tests in the same package
+6. Write tests covering:
    - Happy path for each exported function
    - Error paths and edge cases
    - Boundary conditions
    - Async behavior (resolved and rejected)
-6. Run `npm test` or `npx vitest run` (or project-specific test command)
-7. Run `tsc --noEmit` to confirm nothing is broken
-8. Clean up any temporary test artifacts (use `trash`, not `rm -rf`)
-9. Report results
+7. Run `npm test` or `npx vitest run` (or project-specific test command)
+8. Run `tsc --noEmit` to confirm nothing is broken
+9. Clean up any temporary test artifacts (use `trash`, not `rm -rf`)
+10. Report results
 
 ## Output Format
 

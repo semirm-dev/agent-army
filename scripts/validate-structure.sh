@@ -51,16 +51,22 @@ echo "--- Agent triad completeness ---"
 # Extract language prefixes from agent filenames
 PREFIXES=$(ls "$AGENTS_DIR"/*.md 2>/dev/null | xargs -I{} basename {} .md | sed 's/-[a-z]*$//' | sort -u)
 for prefix in $PREFIXES; do
-  # Skip docker (builder+reviewer) and arch (reviewer only)
+  # Skip docker (builder+reviewer+tester triad), arch (reviewer only), docs (writer only)
   if [ "$prefix" = "docker" ]; then
     HAS_BUILDER=false
     HAS_REVIEWER=false
+    HAS_TESTER=false
     [ -f "$AGENTS_DIR/docker-builder.md" ] && HAS_BUILDER=true
     [ -f "$AGENTS_DIR/docker-reviewer.md" ] && HAS_REVIEWER=true
-    if $HAS_BUILDER && $HAS_REVIEWER; then
-      ok "docker: builder + reviewer present"
+    [ -f "$AGENTS_DIR/docker-tester.md" ] && HAS_TESTER=true
+    if $HAS_BUILDER && $HAS_REVIEWER && $HAS_TESTER; then
+      ok "docker: builder + reviewer + tester present"
     else
-      warn "docker: missing builder or reviewer"
+      MISSING=""
+      $HAS_BUILDER || MISSING="$MISSING builder"
+      $HAS_REVIEWER || MISSING="$MISSING reviewer"
+      $HAS_TESTER || MISSING="$MISSING tester"
+      warn "docker: missing$MISSING"
     fi
     continue
   fi
@@ -68,6 +74,12 @@ for prefix in $PREFIXES; do
   # arch-reviewer is a standalone agent (no triad)
   if [ "$prefix" = "arch" ]; then
     [ -f "$AGENTS_DIR/arch-reviewer.md" ] && ok "arch: reviewer present (standalone)" || warn "arch: reviewer missing"
+    continue
+  fi
+
+  # docs-writer is a standalone agent (no triad)
+  if [ "$prefix" = "docs" ]; then
+    [ -f "$AGENTS_DIR/docs-writer.md" ] && ok "docs: writer present (standalone)" || warn "docs: writer missing"
     continue
   fi
 
@@ -140,6 +152,22 @@ if [ -d "$LIB_DIR/skills" ]; then
 else
   warn "No skills/ directory found"
 fi
+echo ""
+
+# 7. Check skill files referenced by agents
+echo "--- Skill references in agents ---"
+for agent_file in "$AGENTS_DIR"/*.md; do
+  AGENT_NAME=$(basename "$agent_file")
+  # Match skill names in backtick-quoted references that match known skill patterns
+  AGENT_SKILLS=$(grep -oE '`(migration-safety|error-handling|testing-strategy|code-architecture|api-designer|git-conventions|dependency-audit|cli-design)`' "$agent_file" 2>/dev/null | tr -d '`' | sort -u || true)
+  for skill in $AGENT_SKILLS; do
+    if [ -f "$LIB_DIR/skills/${skill}.md" ]; then
+      ok "$AGENT_NAME → skills/${skill}.md"
+    else
+      error "$AGENT_NAME references skill '${skill}' but skills/${skill}.md doesn't exist"
+    fi
+  done
+done
 echo ""
 
 # Summary

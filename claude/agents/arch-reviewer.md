@@ -31,6 +31,8 @@ Before reviewing, read:
 - `~/.claude/rules/cross-cutting.md` for error taxonomy and structural standards
 - `~/.claude/rules/concurrency.md` for concurrency patterns (if applicable)
 
+Invoke the `code-architecture` skill when reviewing module structure, dependency injection patterns, or package boundaries.
+
 **Plugins:** Use the `code-review` plugin for structured review feedback. Use `security-guidance` plugin when reviewing service boundaries or data flow.
 
 ## Review Checklist

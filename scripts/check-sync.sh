@@ -147,12 +147,12 @@ diff_sections \
   "$CURSOR_DIR/000-index.mdc" "🛡️ Deletion & Safety" \
   "🤖" "🤖"
 
-# 6. Communication: CLAUDE.md vs 000-index.mdc
+# 6. Communication + Conflict Resolution: CLAUDE.md vs 000-index.mdc
 diff_sections \
-  "Communication Style" \
+  "Communication & Conflict Resolution" \
   "$CLAUDE" "🛠️ Communication Style" \
   "$CURSOR_DIR/000-index.mdc" "🛠️ Communication Style" \
-  "^---" "^$"
+  "^---" "ZZZZZ_SENTINEL_EOF"
 
 # 7. Planning: CLAUDE.md vs 200-planning.mdc
 diff_sections \
@@ -209,6 +209,18 @@ diff_rule_file \
   "Testing Patterns" \
   "$RULES_DIR/testing-patterns.md" \
   "$CURSOR_DIR/504-testing.mdc"
+
+# 16. Caching Patterns: rules/caching-patterns.md vs 505-caching.mdc
+diff_rule_file \
+  "Caching Patterns" \
+  "$RULES_DIR/caching-patterns.md" \
+  "$CURSOR_DIR/505-caching.mdc"
+
+# 17. Messaging Patterns: rules/messaging-patterns.md vs 506-messaging.mdc
+diff_rule_file \
+  "Messaging Patterns" \
+  "$RULES_DIR/messaging-patterns.md" \
+  "$CURSOR_DIR/506-messaging.mdc"
 
 # Deployed vs repo comparison (--deployed flag)
 if [ "$CHECK_DEPLOYED" -eq 1 ]; then

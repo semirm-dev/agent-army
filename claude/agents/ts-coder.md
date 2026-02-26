@@ -35,15 +35,87 @@ Before writing code, read `~/.claude/rules/ts-patterns.md` for full TypeScript c
 - Async/await only, validate at boundaries
 - React: functional components, custom hooks with `use` prefix
 
+### Code Examples
+
+#### Typed Error Class
+
+```typescript
+export class AppError extends Error {
+  constructor(
+    public readonly code: string,
+    message: string,
+    public readonly statusCode: number = 500,
+    public readonly details: unknown[] = [],
+  ) {
+    super(message);
+    this.name = "AppError";
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(entity: string, id: string) {
+    super("NOT_FOUND", `${entity} with id ${id} not found`, 404);
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(details: unknown[]) {
+    super("VALIDATION_FAILED", "Request validation failed", 400, details);
+  }
+}
+```
+
+#### Service with Dependency Injection
+
+```typescript
+interface UserRepository {
+  findById(id: string): Promise<User | null>;
+  save(user: User): Promise<User>;
+}
+
+export class UserService {
+  constructor(private readonly repo: UserRepository) {}
+
+  async getById(id: string): Promise<User> {
+    const user = await this.repo.findById(id);
+    if (!user) {
+      throw new NotFoundError("User", id);
+    }
+    return user;
+  }
+}
+```
+
+#### Async Handler with Validation
+
+```typescript
+export async function handleCreateUser(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const parsed = CreateUserSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({
+      error: { code: "VALIDATION_FAILED", message: "Invalid input", details: parsed.error.issues },
+    });
+    return;
+  }
+
+  const user = await userService.create(parsed.data);
+  res.status(201).json(user);
+}
+```
+
 ## Workflow
 
 1. Read the task description from the orchestrator
 2. Explore the codebase: find related modules, types, and existing patterns
-3. Check `tsconfig.json` and `package.json` for project configuration
-4. Write code following the standards above
-5. Run `tsc --noEmit` (or the project's build command) to confirm type checking passes
-6. Run lint if configured (`npx eslint` or project-specific)
-7. Report back: list of files created/modified, any concerns or open questions
+3. For error type design or error propagation tasks, invoke the `error-handling` skill
+4. Check `tsconfig.json` and `package.json` for project configuration
+5. Write code following the standards above
+6. Run `tsc --noEmit` (or the project's build command) to confirm type checking passes
+7. Run lint if configured (`npx eslint` or project-specific)
+8. Report back: list of files created/modified, any concerns or open questions
 
 ## Output Format
 

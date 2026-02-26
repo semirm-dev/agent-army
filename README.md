@@ -1,4 +1,5 @@
 # agent-rules
+This is intended for personal use. Use with caution and adjust as needed.
 
 Portable AI development setup for **Claude Code** and **Cursor**. One repo, one `bootstrap.sh`, consistent rules across devices.
 
@@ -32,7 +33,7 @@ agent-rules/
 │   ├── settings.json          # Reference settings template
 │   ├── SKILLS.md              # What to install (plugins vs npm skills)
 │   ├── statusline-command.sh  # Status line script (deployed to ~/.claude/)
-│   ├── agents/                # 18 reusable agent prompts
+│   ├── agents/                # 20 reusable agent prompts
 │   │   ├── go-coder.md        # Go code writer (uses golang-pro skill)
 │   │   ├── go-reviewer.md     # Go code reviewer (read-only)
 │   │   ├── go-tester.md       # Go test writer
@@ -50,8 +51,10 @@ agent-rules/
 │   │   ├── db-tester.md       # Database test writer
 │   │   ├── docker-builder.md  # Dockerfile, compose, CI/CD writer
 │   │   ├── docker-reviewer.md # Docker/infra reviewer (read-only)
-│   │   └── arch-reviewer.md   # Architecture reviewer (read-only)
-│   └── rules/                 # 12 domain-specific rule files
+│   │   ├── docker-tester.md   # Docker/infra test validator
+│   │   ├── arch-reviewer.md   # Architecture reviewer (read-only)
+│   │   └── docs-writer.md     # Technical documentation writer
+│   └── rules/                 # 14 domain-specific rule files
 │       ├── go-patterns.md     # Go coding + testing standards
 │       ├── ts-patterns.md     # TypeScript coding + testing standards
 │       ├── py-patterns.md     # Python coding + testing standards
@@ -63,8 +66,10 @@ agent-rules/
 │       ├── security.md        # Auth, CORS, rate limiting, secrets
 │       ├── cross-cutting.md   # Error taxonomy, coverage targets, deps
 │       ├── concurrency.md     # Concurrency (goroutines, promises, asyncio)
-│       └── testing-patterns.md # Testing patterns (naming, fixtures, CI)
-├── cursor/                    # 14 Cursor IDE rules
+│       ├── testing-patterns.md # Testing patterns (naming, fixtures, CI)
+│       ├── caching-patterns.md # Caching (cache-aside, invalidation, key design)
+│       └── messaging-patterns.md # Messaging (queues, DLQ, idempotency, events)
+├── cursor/                    # 16 Cursor IDE rules
 │   ├── 000-index.mdc          # Safety & communication (alwaysApply)
 │   ├── 100-golang.mdc         # Go coding patterns (globs: **/*.go)
 │   ├── 101-typescript.mdc     # TypeScript patterns (globs: **/*.ts,tsx,js,jsx)
@@ -78,15 +83,18 @@ agent-rules/
 │   ├── 501-security.mdc       # Security patterns
 │   ├── 502-cross-cutting.mdc  # Error taxonomy, coverage, deps (alwaysApply)
 │   ├── 503-concurrency.mdc    # Concurrency patterns
-│   └── 504-testing.mdc        # Testing patterns
-├── skills/                    # 7 custom skills
+│   ├── 504-testing.mdc        # Testing patterns
+│   ├── 505-caching.mdc        # Caching patterns
+│   └── 506-messaging.mdc      # Messaging patterns
+├── skills/                    # 8 custom skills
 │   ├── api-designer.md        # API design checklist and scaffolding
 │   ├── dependency-audit.md    # Dependency audit and update workflow
 │   ├── git-conventions.md     # Branch naming, commit format, PR templates
 │   ├── migration-safety.md    # Database migration safety checklist
 │   ├── error-handling.md      # Error taxonomy and propagation patterns
 │   ├── code-architecture.md   # Architecture decisions and DI patterns
-│   └── testing-strategy.md    # Test pyramid and strategy guidance
+│   ├── testing-strategy.md    # Test pyramid and strategy guidance
+│   └── cli-design.md          # CLI tool design patterns
 ├── scripts/
 │   ├── bootstrap.sh           # Interactive new-device setup
 │   ├── rsync-rules.sh         # Sync repo → ~/.claude/ or ~/.cursor/rules/
@@ -141,7 +149,7 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `0`       | All sections in sync                |
 | `1`       | Drift detected — shows unified diff |
 
-Sections checked: Go, TypeScript, Python, React, Git Workflow, Safety, Communication, Planning, API Design, Database, Observability, Security, Cross-Cutting, Concurrency, Testing Patterns. Structural validation (`make validate`) checks agent triads, rule references, and sync pairs.
+Sections checked: Go, TypeScript, Python, React, Git Workflow, Safety, Communication, Planning, API Design, Database, Observability, Security, Cross-Cutting, Concurrency, Testing Patterns, Caching Patterns, Messaging Patterns. Structural validation (`make validate`) checks agent triads, rule references, skill references, and sync pairs.
 
 ## Capabilities
 
@@ -149,10 +157,10 @@ Sections checked: Go, TypeScript, Python, React, Git Workflow, Safety, Communica
 | ------------------ | ----------------------------------------- | ----- | --------------------------------------------------------------------------------------- |
 | **Plugins**        | Auto-updating, managed by Claude CLI      | 6     | superpowers, context7, frontend-design, code-review, security-guidance, code-simplifier |
 | **npm Skills**     | Installed locally via `npx skills add`    | 5     | golang-pro, browser-use, database-schema-designer, skill-creator, find-skills           |
-| **Custom Skills**  | Built-in, located in `skills/`            | 7     | api-designer, git-conventions, migration-safety, dependency-audit, error-handling, code-architecture, testing-strategy |
-| **Agents**         | Reusable prompts for Task tool delegation | 18    | go-{coder,reviewer,tester}, ts-{coder,reviewer,tester}, py-{coder,reviewer,tester}, react-{coder,reviewer,tester}, db-{coder,reviewer,tester}, docker-{builder,reviewer}, arch-{reviewer} |
-| **Claude Rules**   | Domain-specific standards                 | 12    | go-patterns, ts-patterns, py-patterns, react-patterns, git-workflow, api-design, database, observability, security, cross-cutting, concurrency, testing-patterns |
-| **Cursor Rules**   | Glob-matched coding standards             | 14    | 000-index, 100-golang, 101-typescript, 102-python, 103-react, 200-planning, 300-git, 400-api-design, 401-database, 500-observability, 501-security, 502-cross-cutting, 503-concurrency, 504-testing |
+| **Custom Skills**  | Built-in, located in `skills/`            | 8     | api-designer, git-conventions, migration-safety, dependency-audit, error-handling, code-architecture, testing-strategy, cli-design |
+| **Agents**         | Reusable prompts for Task tool delegation | 20    | go-{coder,reviewer,tester}, ts-{coder,reviewer,tester}, py-{coder,reviewer,tester}, react-{coder,reviewer,tester}, db-{coder,reviewer,tester}, docker-{builder,reviewer,tester}, arch-{reviewer}, docs-{writer} |
+| **Claude Rules**   | Domain-specific standards                 | 14    | go-patterns, ts-patterns, py-patterns, react-patterns, git-workflow, api-design, database, observability, security, cross-cutting, concurrency, testing-patterns, caching-patterns, messaging-patterns |
+| **Cursor Rules**   | Glob-matched coding standards             | 16    | 000-index, 100-golang, 101-typescript, 102-python, 103-react, 200-planning, 300-git, 400-api-design, 401-database, 500-observability, 501-security, 502-cross-cutting, 503-concurrency, 504-testing, 505-caching, 506-messaging |
 
 ## How Agents Work
 

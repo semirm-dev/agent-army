@@ -14,6 +14,22 @@
 - **Claims:** Include `sub`, `iat`, `exp`, `iss`. Never store sensitive data (passwords, PII) in JWT payload.
 - **Validation:** Always verify signature, expiry, issuer, and audience. Reject tokens with `alg: none`.
 
+## OAuth 2.0 / OIDC
+
+- **Authorization Code + PKCE:** Default flow for all clients (web, mobile, SPA). Never use Implicit flow.
+- **Client Credentials:** Service-to-service authentication only. Scope tokens to minimum required permissions.
+- **OIDC Discovery:** Use `/.well-known/openid-configuration` to fetch provider endpoints. Never hardcode provider URLs.
+- **Token storage:**
+  - **Server-rendered web:** Store tokens in HTTP-only, Secure cookies.
+  - **SPA:** Use Backend-for-Frontend (BFF) pattern — tokens stay server-side, session cookie to browser.
+  - **Mobile:** Store in platform keychain (iOS Keychain, Android Keystore).
+  - **Never store tokens in localStorage or sessionStorage.**
+- **State parameter:** Always include `state` parameter to prevent CSRF. Validate on callback.
+- **PKCE:** Use `S256` code challenge method. Never use `plain`.
+- **Scopes:** Request minimum scopes needed. Use incremental consent for additional permissions.
+- **ID token validation:** Verify `iss`, `aud`, `exp`, `nonce` (if used). Check `at_hash` when ID token accompanies access token.
+- **Logout:** Implement both local session cleanup and provider logout (`end_session_endpoint`).
+
 ## Authorization
 - **RBAC/ABAC at service layer.** Check permissions after authentication, never skip.
 - **Never rely on client-side role checks.** Server must validate every request.

@@ -11,6 +11,20 @@ globs: "*health*,*log*,*metric*,*trace*,Dockerfile,.github/**,*docker*,*ci*,*cd*
 - **Log Levels:** `DEBUG` (dev only), `INFO` (normal operations), `WARN` (recoverable issues), `ERROR` (failures requiring attention). Never log at ERROR for expected conditions.
 - **Metrics Naming:** Use `<namespace>_<subsystem>_<name>_<unit>` pattern. Examples: `app_http_requests_total`, `app_db_query_duration_seconds`.
 - **Tracing:** Propagate trace context (`traceparent` header) across service boundaries. Log the `trace_id` in all log entries for correlation.
+
+## OpenTelemetry (OTel)
+
+- **SDK initialization:** Initialize OTel SDK early in application startup. Configure exporter (OTLP gRPC to collector, or direct to backend).
+- **Auto-instrumentation:** Use language-specific auto-instrumentation for common libraries:
+  - **Go:** `go.opentelemetry.io/contrib/instrumentation/` packages (net/http, gRPC, database/sql)
+  - **TypeScript:** `@opentelemetry/auto-instrumentations-node` for Express, Fastify, pg, redis
+  - **Python:** `opentelemetry-instrumentation` packages for Flask, FastAPI, SQLAlchemy, requests
+- **Custom spans:** Name spans as `{service}.{operation}` in verb form (e.g., `auth.validateToken`, `orders.processPayment`).
+- **Span attributes:** Add business context (`user.id`, `order.id`, `tenant.id`). Never add PII (email, name, IP) as span attributes.
+- **Context propagation:** Use W3C TraceContext (`traceparent`, `tracestate` headers). Propagate context across HTTP, gRPC, and message queue boundaries.
+- **OTel Collector:** Deploy as a sidecar or daemonset. Use the collector to batch, filter, and route telemetry. Never send directly from application to backend in production.
+- **Resource attributes:** Set `service.name`, `service.version`, `deployment.environment` on every trace/metric/log.
+
 - **Dockerfile Best Practices:**
   - Multi-stage builds: separate build and runtime stages.
   - Run as non-root user (`USER nonroot:nonroot`).

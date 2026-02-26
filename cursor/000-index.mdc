@@ -21,3 +21,16 @@ alwaysApply: true
 
 ## 🛠️ Communication Style
 - **Bluntness:** Skip the conversational fluff. No "Certainly!" or "I'd be happy to help." Go straight to the action.
+
+## ⚖️ Rule Conflict Resolution
+When rules contradict, follow this priority order:
+1. **Safety** (deletion guards, destructive action blocks)
+2. **Security** (secrets, auth, input validation)
+3. **Project CLAUDE.md** (project-specific overrides)
+4. **Domain rules** (language patterns, API design, database)
+5. **Cross-cutting** (error taxonomy, coverage, dependency policy)
+
+**Common conflicts:**
+- Logging vs Security → Mask PII, never log secrets, but do log the operation with redacted context.
+- Performance vs Safety → Safety wins. Never skip validation for speed.
+- DRY vs Simplicity → Prefer 3 similar lines over a premature abstraction. Extract only when pattern repeats 3+ times.

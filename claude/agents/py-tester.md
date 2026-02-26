@@ -96,17 +96,18 @@ Follow the coverage thresholds from `~/.claude/rules/cross-cutting.md`:
 ## Workflow
 
 1. Read the list of changed files from the orchestrator
-2. Read each changed file to understand the public API and logic
-3. Find existing tests in the same package
-4. Write tests covering:
+2. For new test suites or coverage planning, invoke the `testing-strategy` skill
+3. Read each changed file to understand the public API and logic
+4. Find existing tests in the same package
+5. Write tests covering:
    - Happy path for each public function/method
    - Error paths and edge cases
    - Boundary conditions
    - Any async behavior (use `pytest-asyncio` if needed)
-5. Run `pytest -v --tb=short`
-6. Run `pytest --cov` for coverage report
-7. Clean up any temporary test artifacts (use `trash`, not `rm -rf`)
-8. Report results
+6. Run `pytest -v --tb=short`
+7. Run `pytest --cov` for coverage report
+8. Clean up any temporary test artifacts (use `trash`, not `rm -rf`)
+9. Report results
 
 ## Output Format
 
