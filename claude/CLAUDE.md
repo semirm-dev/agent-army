@@ -22,7 +22,7 @@
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
   - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
-- **Plugins vs Skills:** Plugins (e.g., `golang-pro`, `database-schema-designer`, `frontend-design`) are npm-installed packages managed by `enabledPlugins` in settings.json. Custom skills (below) are markdown files in `~/.claude/skills/` that define structured workflows. Both are invoked via the Skill tool, but plugins receive automatic updates while custom skills are version-controlled in this repo.
+- **Plugins vs Skills:** Plugins (e.g., `context7`, `frontend-design`, `code-review`) are managed by `enabledPlugins` in settings.json. npm skills (e.g., `golang-pro`, `database-schema-designer`) are installed via `npx skills add`. Custom skills (below) are markdown files in `~/.claude/skills/` that define structured workflows. Both are invoked via the Skill tool, but plugins receive automatic updates while custom skills are version-controlled in this repo.
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
   - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.
   - `api-designer` -- Invoke when designing new API endpoints, scaffolding error formats, or reviewing API consistency.
@@ -35,11 +35,18 @@
   - `refactoring-patterns` -- Invoke when extracting methods, renaming, moving code, or addressing code smells.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 - **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
+  - `brainstorming` -- Before any creative work (features, components, behavior changes).
   - `systematic-debugging` -- When encountering bugs or test failures, before proposing fixes.
   - `test-driven-development` -- When implementing features, write tests first.
-  - `dispatching-parallel-agents` -- When facing 2+ independent tasks with no shared state.
   - `writing-plans` / `executing-plans` -- For multi-step implementation tasks.
+  - `subagent-driven-development` -- When executing plans with independent parallel tasks.
+  - `dispatching-parallel-agents` -- When facing 2+ independent tasks with no shared state.
   - `verification-before-completion` -- Before claiming work is done, run verification.
+  - `requesting-code-review` / `receiving-code-review` -- When submitting or responding to code review.
+  - `finishing-a-development-branch` -- When implementation is complete, deciding how to integrate.
+  - `using-git-worktrees` -- When starting feature work that needs isolation.
+  - `writing-skills` -- When creating or editing custom skills.
+  - `using-superpowers` -- How to find and use skills (auto-invoked at conversation start).
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
 
 ## 🛠️ Communication Style

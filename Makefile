@@ -10,7 +10,7 @@ help: ## Show available targets
 	@echo "  sync-cursor     Sync rules to Cursor only"
 	@echo "  check           Verify sync parity"
 	@echo "  deploy          Sync + check (day-to-day loop)"
-	@echo "  test            Run test suite"
+	@echo "  test            Run check-sync test suite (5 drift-detection tests)"
 	@echo "  validate        Structural validation (agents, rules, triads, skills, sync pairs)"
 
 bootstrap: ## First-time setup

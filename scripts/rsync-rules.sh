@@ -45,7 +45,7 @@ if [ "$FOLDER" = "claude" ]; then
   )
 fi
 
-rsync -av "${EXCLUDES[@]}" "$LIB_DIR/$FOLDER/" "$TARGET_DIR/" \
+rsync -av ${EXCLUDES[@]+"${EXCLUDES[@]}"} "$LIB_DIR/$FOLDER/" "$TARGET_DIR/" \
   || { echo "rsync failed"; exit 1; }
 
 echo "🎉 Done. Rules are now physically mirrored (fixes Cursor indexing bugs)."

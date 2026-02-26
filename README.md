@@ -138,7 +138,7 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `make check`           | Verify sync parity                             |
 | `make deploy`          | Sync + check (day-to-day loop)                 |
 | `make validate`        | Structural validation (agents, rules, triads, skills, sync pairs) |
-| `make test`            | Run test suite                                 |
+| `make test`            | Run check-sync test suite (5 drift-detection tests) |
 
 `make check` exit codes:
 
@@ -209,6 +209,20 @@ make test
 - `<!-- Sync: ... -->` comments mark what must stay in sync
 - `check-sync.sh` extracts matching sections, strips heading levels, normalizes platform terms, and diffs
 - If drift is found, edit the repo (single source of truth) and re-deploy
+
+## Testing
+
+`make test` runs `scripts/test-check-sync.sh`, which validates that the drift detection logic in `check-sync.sh` works correctly. It creates temporary files with known content and asserts the expected exit codes.
+
+| Test | Scenario | Expected |
+|------|----------|----------|
+| 1 | Identical sections in both files | No drift (exit 0) |
+| 2 | Extra content in cursor file | Drift detected (exit 1) |
+| 3 | Different heading levels (`##` vs `###`) | Ignored — no drift (exit 0) |
+| 4 | Rule file content differs from cursor file | Drift detected (exit 1) |
+| 5 | Real `check-sync.sh` against the repo | Passes (exit 0) |
+
+**When to run:** After modifying `check-sync.sh`, `validate-structure.sh`, or any sync-related logic. Also run as a sanity check after adding new rule↔cursor pairs.
 
 ## Adding a New Language
 

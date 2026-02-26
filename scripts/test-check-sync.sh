@@ -2,7 +2,16 @@
 # Tests for check-sync.sh — verifies drift detection works correctly.
 #
 # Creates temp files with known content, runs check-sync logic, asserts results.
+#
+# Tests:
+#   1. Identical sections         → no drift (exit 0)
+#   2. Extra content in cursor    → drift detected (exit 1)
+#   3. Heading level differences  → ignored, no drift (exit 0)
+#   4. Rule vs cursor file drift  → drift detected (exit 1)
+#   5. Real check-sync on repo    → passes (exit 0)
+#
 # Usage: ./scripts/test-check-sync.sh
+#   Or:  make test
 
 set -euo pipefail
 
