@@ -1,4 +1,4 @@
-.PHONY: help bootstrap sync sync-claude sync-cursor check deploy test init-project validate
+.PHONY: help bootstrap sync sync-claude sync-cursor check deploy test validate
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -12,7 +12,6 @@ help: ## Show available targets
 	@echo "  deploy          Sync + check (day-to-day loop)"
 	@echo "  test            Run test suite"
 	@echo "  validate        Structural validation (agents, rules, triads, skills, sync pairs)"
-	@echo "  init-project    Scaffold a project-level CLAUDE.md in current dir"
 
 bootstrap: ## First-time setup
 	bash scripts/bootstrap.sh
@@ -37,12 +36,3 @@ validate: ## Structural validation
 
 test: ## Run test suite
 	bash scripts/test-check-sync.sh
-
-init-project: ## Scaffold a project-level CLAUDE.md
-	@if [ -f "$(PWD)/CLAUDE.md" ]; then \
-		echo "CLAUDE.md already exists in $(PWD). Aborting."; \
-		exit 1; \
-	fi
-	@TEMPLATE_DIR="$(shell cd "$(dir $(lastword $(MAKEFILE_LIST)))" && pwd)/templates"; \
-	cp "$$TEMPLATE_DIR/PROJECT-CLAUDE.md" "$(PWD)/CLAUDE.md"; \
-	echo "Created CLAUDE.md in $(PWD). Edit it to match your project."

@@ -19,7 +19,7 @@ Bootstrap configures your machine for the agent-rules workflow — it installs s
 | 2    | Sync rules to `~/.claude/` and `~/.cursor/rules/`                     |
 | 3    | Install 5 npm skills (golang-pro, browser-use, etc.)                  |
 | 4    | Deploy `settings.json` + enable 6 plugins (shows diff if file exists) |
-| 5    | Add `sync-rules` and `check-sync` aliases to `~/.zshrc`               |
+| 5    | Add `sync-rules`, `check-sync`, and `init-project` aliases to `~/.zshrc` |
 | 6    | Verify installation (list skills, agents, run check-sync)             |
 
 Idempotent — skips already-installed components on re-run.
@@ -100,8 +100,8 @@ agent-rules/
 │   ├── rsync-rules.sh         # Sync repo → ~/.claude/ or ~/.cursor/rules/
 │   ├── check-sync.sh          # Verify CLAUDE.md ↔ Cursor .mdc parity
 │   ├── validate-structure.sh  # Structural validation (agents, rules, triads)
-│   ├── verify-deployed.sh     # Verify deployed state matches repo
-│   └── test-check-sync.sh     # Tests for check-sync drift detection
+│   ├── test-check-sync.sh     # Tests for check-sync drift detection
+│   └── init-project.sh        # Scaffold a project-level CLAUDE.md (runs from any dir)
 ├── .githooks/
 │   └── pre-commit             # Sync check before commit
 ├── templates/
@@ -137,7 +137,7 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 | `make deploy`          | Sync + check (day-to-day loop)                 |
 | `make validate`        | Structural validation (agents, rules, triads, skills, sync pairs) |
 | `make test`            | Run test suite                                 |
-| `make init-project`    | Scaffold a project-level CLAUDE.md             |
+| `init-project`         | Scaffold a project-level CLAUDE.md (shell alias) |
 
 `make check` exit codes:
 

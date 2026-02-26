@@ -138,6 +138,7 @@ if ask "Add aliases to ~/.zshrc?"; then
   ALIASES=(
     "alias sync-rules='$LIB_DIR/scripts/rsync-rules.sh'"
     "alias check-sync='$LIB_DIR/scripts/check-sync.sh'"
+    "alias init-project='$LIB_DIR/scripts/init-project.sh'"
   )
   ZSHRC="$HOME/.zshrc"
   touch "$ZSHRC"
