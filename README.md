@@ -79,11 +79,31 @@ Each agent type has a specific role:
 
 ## Adding a New Language
 
-1. Create a rule file: `claude/rules/<lang>-patterns.md` with coding + testing standards
-2. Create a Cursor rule: `cursor/1XX-<lang>.mdc` with appropriate globs and synced content
-3. Create 3 agent files: `claude/agents/<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`
-4. Add a `sync_pairs` entry in `config.json` for the new rule ↔ cursor pair
-5. Add agent entries in `config.json` and run `make generate-claude` to update `CLAUDE.md`
-6. Run `make validate && make sync`
+```bash
+make new-language
+```
+
+The script prompts for four inputs:
+
+| Prompt | Example | Default |
+| --- | --- | --- |
+| Language short name | `rust`, `java`, `elixir` | — |
+| Display name | `Rust`, `Java`, `Elixir` | Capitalized short name |
+| File extension glob | `**/*.rs`, `**/*.java` | — |
+| Cursor rule number | `104` | Next available in 1XX range |
+
+It then scaffolds everything automatically:
+
+- `claude/rules/<lang>-patterns.md` — coding + testing standards (with sync header)
+- `cursor/<num>-<lang>.mdc` — glob-matched Cursor rule (synced content)
+- `claude/agents/<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md` — agent files
+- `config.json` — agent group and sync pair entries
+- `CLAUDE.md` — regenerated to include the new agents
+
+After running, fill in the TODO placeholders with language-specific patterns, then deploy:
+
+```bash
+make check && make sync
+```
 
 Always edit the repo first (single source of truth), then deploy. Never edit `~/.claude/` or `~/.cursor/rules/` directly.

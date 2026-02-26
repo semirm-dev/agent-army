@@ -42,7 +42,21 @@ DEFAULT_DISPLAY=$(echo "${LANG:0:1}" | tr '[:lower:]' '[:upper:]')${LANG:1}
 read -rp "Display name (e.g. Rust, Java, Elixir) [$DEFAULT_DISPLAY]: " DISPLAY_NAME
 DISPLAY_NAME=${DISPLAY_NAME:-$DEFAULT_DISPLAY}
 
-read -rp "File extension glob (e.g. **/*.rs, **/*.java): " GLOB
+# Map language names to file extensions where they differ
+case "$LANG" in
+  python)     DEFAULT_EXT="py" ;;
+  javascript) DEFAULT_EXT="js" ;;
+  typescript) DEFAULT_EXT="ts" ;;
+  ruby)       DEFAULT_EXT="rb" ;;
+  elixir)     DEFAULT_EXT="ex" ;;
+  csharp)     DEFAULT_EXT="cs" ;;
+  cplusplus)  DEFAULT_EXT="cpp" ;;
+  *)          DEFAULT_EXT="$LANG" ;;
+esac
+DEFAULT_GLOB="**/*.${DEFAULT_EXT}"
+
+read -rp "File extension glob [$DEFAULT_GLOB]: " GLOB
+GLOB=${GLOB:-$DEFAULT_GLOB}
 
 if [ -z "$GLOB" ]; then
   echo "ERROR: File extension glob cannot be empty."
