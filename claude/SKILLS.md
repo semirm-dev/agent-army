@@ -35,3 +35,7 @@ These skills are built and available in `skills/`:
 | `api-designer` | `skills/api-designer.md` | REST/gRPC API design patterns, error formats, pagination. Uses rules from rules/api-design.md |
 | `migration-safety` | `skills/migration-safety.md` | Database migration safety checklist: backward compatibility, lock time, data preservation |
 | `dependency-audit` | `skills/dependency-audit.md` | Dependency audit workflow: vulnerability triage, update policy, per-language audit commands |
+| `error-handling` | `skills/error-handling.md` | Error taxonomy, per-language error creation patterns, propagation decision tree, user-facing error guidelines |
+| `code-architecture` | `skills/code-architecture.md` | Architecture decisions: vertical slices, package-by-feature, dependency injection, interface boundaries |
+| `testing-strategy` | `skills/testing-strategy.md` | Testing pyramid guidance, test type selection, flaky test prevention, test data patterns |
+| `cli-design` | `skills/cli-design.md` | CLI tool design patterns: flags, help text, exit codes, output formatting for CLI tools and scripts |

@@ -102,8 +102,6 @@ agent-rules/
 │   ├── validate-structure.sh  # Structural validation (agents, rules, triads)
 │   ├── test-check-sync.sh     # Tests for check-sync drift detection
 │   └── init-project.sh        # Scaffold a project-level CLAUDE.md (runs from any dir)
-├── .githooks/
-│   └── pre-commit             # Sync check before commit
 ├── templates/
 │   └── PROJECT-CLAUDE.md      # Project-level CLAUDE.md starter template
 └── README.md
