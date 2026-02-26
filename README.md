@@ -126,16 +126,14 @@ Excluded from sync (user-managed): `~/.claude/settings.json`, `skills/`, `plugin
 
 | Command                | Purpose                                        |
 |------------------------|------------------------------------------------|
-| `make`                 | Show all available targets                     |
-| `make bootstrap`       | First-time interactive setup                   |
-| `make sync`            | Sync rules to Claude and Cursor                |
+| `make bootstrap`       | First-time setup (interactive)                 |
+| `make sync`            | Sync rules to both Claude and Cursor           |
 | `make sync-claude`     | Sync rules to Claude only                      |
 | `make sync-cursor`     | Sync rules to Cursor only                      |
-| `make check`           | Verify nothing drifted                         |
+| `make check`           | Verify sync parity                             |
 | `make deploy`          | Sync + check (day-to-day loop)                 |
 | `make validate`        | Structural validation (agents, rules, triads, skills, sync pairs) |
 | `make test`            | Run test suite                                 |
-| `init-project`         | Scaffold a project-level CLAUDE.md (shell alias) |
 
 `make check` exit codes:
 
