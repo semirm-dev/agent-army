@@ -236,6 +236,49 @@ if [ "$CHECK_DEPLOYED" -eq 1 ]; then
   done
 fi
 
+# Agent frontmatter parity: name + description must match between platforms
+echo ""
+echo "=== Checking agent frontmatter parity (claude ↔ cursor) ==="
+echo ""
+
+CLAUDE_AGENTS_DIR="$LIB_DIR/claude/agents"
+CURSOR_AGENTS_DIR="$LIB_DIR/cursor/agents"
+
+extract_frontmatter_field() {
+  local file="$1" field="$2"
+  sed -n '/^---$/,/^---$/p' "$file" | grep "^${field}:" | sed "s/^${field}:[[:space:]]*//" | sed 's/^"//;s/"$//'
+}
+
+if [ -d "$CURSOR_AGENTS_DIR" ]; then
+  for claude_agent in "$CLAUDE_AGENTS_DIR"/*.md; do
+    agent_name=$(basename "$claude_agent")
+    cursor_agent="$CURSOR_AGENTS_DIR/$agent_name"
+
+    if [ ! -f "$cursor_agent" ]; then
+      continue
+    fi
+
+    claude_name=$(extract_frontmatter_field "$claude_agent" "name")
+    cursor_name=$(extract_frontmatter_field "$cursor_agent" "name")
+    claude_desc=$(extract_frontmatter_field "$claude_agent" "description")
+    cursor_desc=$(extract_frontmatter_field "$cursor_agent" "description")
+
+    if [ "$claude_name" != "$cursor_name" ]; then
+      echo "DRIFT in [agent $agent_name — name]"
+      echo "  claude: $claude_name"
+      echo "  cursor: $cursor_name"
+      DRIFT_FOUND=1
+    fi
+
+    if [ "$claude_desc" != "$cursor_desc" ]; then
+      echo "DRIFT in [agent $agent_name — description]"
+      echo "  claude: $claude_desc"
+      echo "  cursor: $cursor_desc"
+      DRIFT_FOUND=1
+    fi
+  done
+fi
+
 if [ "$DRIFT_FOUND" -eq 0 ]; then
   echo "All sections in sync."
 else
