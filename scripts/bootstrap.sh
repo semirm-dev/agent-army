@@ -71,9 +71,9 @@ else
   warn "Skipped rule sync"
 fi
 
-# ── Step 3: Install npm skills ─────────────────────────────────────
+# ── Step 3: Install Agent Skills ──────────────────────────────────
 
-step "Step 3: Install npm skills"
+step "Step 3: Install Agent Skills"
 SKILL_COUNT=$(cfg_raw '.npm_skills' | jq 'length')
 echo "  Skills to install:"
 while read -r skill_json; do
@@ -96,9 +96,9 @@ else
   warn "Skipped skill installation"
 fi
 
-# ── Step 4: Deploy settings.json (enables plugins) ────────────────
+# ── Step 4: Install Claude Plugins ────────────────────────────────
 
-step "Step 4: Deploy settings.json"
+step "Step 4: Install Claude Plugins"
 echo "  Generating settings.json from config.json..."
 bash "$LIB_DIR/scripts/generate-settings.sh"
 SETTINGS_SRC="$LIB_DIR/claude/settings.json"

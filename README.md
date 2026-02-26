@@ -17,8 +17,8 @@ Bootstrap configures your machine for the agent-rules workflow — it installs s
 | ---- | ------------------------------------------------------------------------ |
 | 1    | Check prerequisites (node, npx, claude CLI, rsync)                       |
 | 2    | Sync rules to `~/.claude/` and `~/.cursor/rules/`                        |
-| 3    | Install agent skills (golang-pro, browser-use, etc.)                     |
-| 4    | Deploy `settings.json` + enable ai plugins (shows diff if file exists)   |
+| 3    | Install Agent Skills (golang-pro, browser-use, etc.)                     |
+| 4    | Install Claude Plugins (deploy `settings.json`, shows diff if exists)    |
 | 5    | Add `sync-rules`, `check-sync`, and `init-project` aliases to `~/.zshrc` |
 | 6    | Verify installation (list skills, agents, run check-sync)                |
 
