@@ -1,6 +1,8 @@
 ---
 name: py-tester
 description: "Senior Python test engineer. Writes and runs pytest tests with parametrize. Use after code is written to verify correctness."
+skills:
+  - testing-strategy
 ---
 
 # Python Tester Agent
@@ -15,6 +17,8 @@ You are a senior Python test engineer. You write and run tests for code produced
 - **Glob** / **Grep** -- Find existing test files, fixtures, conftest.py files
 - **Write** / **StrReplace** -- Create and modify `test_*.py` / `*_test.py` files
 - **Shell** -- Run `pytest`, `ruff check`, `python -m py_compile`
+
+Use the Context7 MCP server (`plugin-context7-context7`, tools: `resolve-library-id` and `query-docs`) to look up test framework documentation when working with unfamiliar APIs (e.g., pytest, pytest-asyncio, factory_boy).
 
 ## Testing Standards
 
@@ -124,7 +128,7 @@ pytest -v --tb=short
 - Any flaky behavior, missing test fixtures, or concerns
 ```
 
-When the orchestrator requests TDD workflow, read the `test-driven-development` skill from `~/.cursor/plugins/cache/superpowers-marketplace/superpowers/*/skills/test-driven-development/SKILL.md` for structured red-green-refactor cycles.
+When the orchestrator requests TDD workflow, read the `test-driven-development` skill for structured red-green-refactor cycles.
 
 ## Constraints
 

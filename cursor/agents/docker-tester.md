@@ -1,6 +1,8 @@
 ---
 name: docker-tester
 description: "Infrastructure test engineer. Validates Docker images, compose configs, and CI/CD pipelines. Use after infrastructure code is written to verify correctness."
+skills:
+  - testing-strategy
 ---
 
 # Docker & Infrastructure Tester Agent
@@ -25,6 +27,8 @@ You receive the list of changed files and the original task description when act
 Project rules for health check and CI/CD patterns (`500-observability.mdc`) and container security requirements (`501-security.mdc`) are automatically loaded via Cursor rules.
 
 Read the `testing-strategy` skill from `~/.cursor/skills/testing-strategy/SKILL.md` when planning test coverage or deciding which validation checks to prioritize.
+
+Use the Context7 MCP server (`plugin-context7-context7`, tools: `resolve-library-id` and `query-docs`) to look up Docker, docker-compose, and container runtime documentation.
 
 ## Validation Checklist
 

@@ -39,7 +39,7 @@
     {
       "group": "Go",
       "roles": [
-        { "name": "go-coder", "notes": "(invokes `golang-pro` plugin)" },
+        { "name": "go-coder", "notes": "(invokes `golang-pro` skill)" },
         { "name": "go-reviewer" },
         { "name": "go-tester" }
       ]
@@ -71,7 +71,7 @@
     {
       "group": "Database",
       "roles": [
-        { "name": "db-coder", "notes": "(invokes `database-schema-designer` plugin)" },
+        { "name": "db-coder", "notes": "(invokes `database-schema-designer` skill)" },
         { "name": "db-reviewer", "notes": "(read-only)" },
         { "name": "db-tester" }
       ]
@@ -163,7 +163,18 @@
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git switch:*)",
-      "Bash(trash:*)"
+      "Bash(trash:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ci:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(poetry install:*)",
+      "Bash(poetry lock:*)",
+      "Bash(uv pip install:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker compose down:*)",
+      "Bash(curl:*)",
+      "Bash(govulncheck:*)"
     ]
   }
 }

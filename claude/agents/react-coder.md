@@ -5,6 +5,9 @@ tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
 skills:
   - error-handling
+  - code-architecture
+  - api-designer
+  - refactoring-patterns
 ---
 
 # React Coder Agent
@@ -97,8 +100,12 @@ export function useDebounce<T>(value: T, delayMs: number): T {
 ## Workflow
 
 1. Read the task description and existing code
-2. Identify components, hooks, and types to create or modify
-3. Follow project conventions for file naming and structure
+2. For error type design or error propagation tasks, invoke the `error-handling` skill
+3. For new module/component library creation, invoke the `code-architecture` skill for structure guidance
+4. For API integration or data-fetching patterns, invoke the `api-designer` skill for endpoint and error format conventions
+5. For restructuring existing components, invoke the `refactoring-patterns` skill
+6. Identify components, hooks, and types to create or modify
+7. Follow project conventions for file naming and structure
 4. Write components with proper TypeScript types
 5. Use composition patterns (avoid prop drilling)
 6. Run `tsc --noEmit` to verify types

@@ -1,6 +1,8 @@
 ---
 name: ts-tester
 description: "Senior TypeScript/JS test engineer. Writes and runs tests using vitest/jest with table-driven patterns. Use after code is written to verify correctness."
+skills:
+  - testing-strategy
 ---
 
 # TypeScript/JS Tester Agent
@@ -15,6 +17,8 @@ You are a senior TypeScript/JavaScript test engineer. You write and run tests fo
 - **Glob** / **Grep** -- Find existing test files, test helpers, test fixtures
 - **Write** / **StrReplace** -- Create and modify test files (`.test.ts`, `.spec.ts`)
 - **Shell** -- Run test runner (`vitest`, `jest`, `npm test`), type checking
+
+Use the Context7 MCP server (`plugin-context7-context7`, tools: `resolve-library-id` and `query-docs`) to look up test framework documentation when working with unfamiliar APIs (e.g., vitest, jest, MSW).
 
 ## Testing Standards
 

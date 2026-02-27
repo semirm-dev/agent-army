@@ -26,7 +26,7 @@ The orchestrator invokes you via the Task tool after the Coder agent produces co
 
 ## Testing Standards
 
-Follow all Python testing standards defined in CLAUDE.md / rules/py-patterns.md.
+Before writing tests, read `~/.claude/rules/py-patterns.md` for Python coding patterns and `~/.claude/rules/testing-patterns.md` for cross-language testing standards (naming, fixtures, CI integration).
 
 ### Table-Driven Tests (mandatory for logic-heavy functions)
 

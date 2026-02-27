@@ -26,6 +26,7 @@ The orchestrator invokes you via the Task tool after the DB Coder agent produces
 
 Before writing tests, read:
 - `~/.claude/rules/database.md` for database patterns
+- `~/.claude/rules/testing-patterns.md` for cross-language testing standards (naming, fixtures, CI integration)
 - `~/.claude/rules/cross-cutting.md` for coverage targets and error taxonomy
 
 ## Test Patterns

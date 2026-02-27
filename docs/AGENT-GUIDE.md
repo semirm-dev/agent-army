@@ -17,8 +17,8 @@ What do you need to do?
 │
 ├── Review code
 │   ├── Language-specific review → {lang}-reviewer (plugin: code-review, security-guidance)
-│   ├── Architecture/structure → arch-reviewer (skill: code-architecture)
-│   └── Database review → db-reviewer (plugin: code-review)
+│   ├── Architecture/structure → arch-reviewer (skill: code-architecture, api-designer)
+│   └── Database review → db-reviewer (skill: migration-safety, plugin: code-review)
 │
 ├── Write tests
 │   ├── Go tests → go-tester (skill: testing-strategy)
@@ -28,7 +28,7 @@ What do you need to do?
 │   ├── Database tests → db-tester (skill: testing-strategy)
 │   └── Docker validation → docker-tester (skill: testing-strategy)
 │
-├── Write documentation → docs-writer
+├── Write documentation → docs-writer (skill: api-designer, git-conventions)
 │
 ├── Design API → invoke api-designer skill
 ├── Audit dependencies → invoke dependency-audit skill
@@ -42,28 +42,30 @@ What do you need to do?
 
 ## Agent → Skill → Plugin Matrix
 
-| Agent | Custom Skills Used | Plugins Used |
-|-------|-------------------|--------------|
-| go-coder | error-handling | golang-pro, context7, code-simplifier |
-| go-reviewer | — | code-review, security-guidance |
-| go-tester | testing-strategy | superpowers (TDD) |
-| ts-coder | error-handling | context7, code-simplifier |
-| ts-reviewer | — | code-review, security-guidance |
-| ts-tester | testing-strategy | superpowers (TDD) |
-| py-coder | error-handling | context7, code-simplifier |
-| py-reviewer | — | code-review, security-guidance |
-| py-tester | testing-strategy | superpowers (TDD) |
-| react-coder | error-handling | frontend-design, context7, code-simplifier |
-| react-reviewer | — | code-review, security-guidance |
-| react-tester | testing-strategy | superpowers (TDD) |
-| db-coder | migration-safety | database-schema-designer, context7, code-simplifier |
-| db-reviewer | — | code-review, security-guidance |
-| db-tester | testing-strategy | superpowers (TDD) |
-| docker-builder | — | code-simplifier |
-| docker-reviewer | — | code-review, security-guidance |
-| docker-tester | testing-strategy | — |
-| arch-reviewer | code-architecture | code-review, security-guidance |
-| docs-writer | — | — |
+> **Terminology:** *Custom skills* are markdown files in `~/.claude/skills/` (Claude Code) or `~/.cursor/skills/` (Cursor). *npm skills* (golang-pro, database-schema-designer) are installed via `npx skills add`. *Subagents/MCP* lists Cursor built-in subagents (code-reviewer, code-simplifier, etc.) and MCP servers (context7) referenced in the agent body.
+
+| Agent | Custom Skills | npm Skills | Subagents / MCP |
+|-------|--------------|------------|-----------------|
+| go-coder | error-handling, code-architecture, api-designer, refactoring-patterns | golang-pro | context7, code-simplifier, type-design-analyzer |
+| go-reviewer | error-handling, api-designer, code-architecture | — | code-reviewer, silent-failure-hunter |
+| go-tester | testing-strategy | — | context7, superpowers (TDD) |
+| ts-coder | error-handling, code-architecture, api-designer, refactoring-patterns | — | context7, code-simplifier, type-design-analyzer |
+| ts-reviewer | error-handling, api-designer, code-architecture | — | code-reviewer, silent-failure-hunter |
+| ts-tester | testing-strategy | — | context7, superpowers (TDD) |
+| py-coder | error-handling, code-architecture, api-designer, refactoring-patterns | — | context7, code-simplifier, type-design-analyzer |
+| py-reviewer | error-handling, api-designer, code-architecture | — | code-reviewer, silent-failure-hunter |
+| py-tester | testing-strategy | — | context7, superpowers (TDD) |
+| react-coder | error-handling, code-architecture, api-designer, refactoring-patterns | — | frontend-design, context7, code-simplifier, type-design-analyzer |
+| react-reviewer | error-handling, api-designer, code-architecture | — | code-reviewer, silent-failure-hunter |
+| react-tester | testing-strategy | — | context7, superpowers (TDD) |
+| db-coder | migration-safety, error-handling, code-architecture, refactoring-patterns | database-schema-designer | context7, code-simplifier, type-design-analyzer |
+| db-reviewer | migration-safety | database-schema-designer | code-reviewer, silent-failure-hunter |
+| db-tester | testing-strategy, migration-safety | — | context7, superpowers (TDD) |
+| docker-builder | cli-design, error-handling | — | context7, code-simplifier |
+| docker-reviewer | error-handling, cli-design | — | code-reviewer, silent-failure-hunter |
+| docker-tester | testing-strategy | — | context7 |
+| arch-reviewer | code-architecture, api-designer, dependency-audit | — | code-reviewer |
+| docs-writer | api-designer, git-conventions | — | comment-analyzer |
 
 ## Common Workflows
 
@@ -98,6 +100,20 @@ What do you need to do?
 2. Run audit commands per language
 3. Triage and update dependencies
 4. `{lang}-tester` → verify nothing broke
+
+## Cursor Built-in Agents
+
+These additional `subagent_type` values are provided by Cursor and complement the custom agents above. Use them via the Task tool:
+
+| Agent | When to Use |
+|-------|-------------|
+| `code-reviewer` | Cross-language code review against project guidelines. Use after writing or modifying code, before commits or PRs. |
+| `code-simplifier` | Simplify recently modified code for clarity and maintainability. Use after completing a coding task. |
+| `comment-analyzer` | Analyze code comments for accuracy and long-term maintainability. Use after generating docstrings or before finalizing PRs. |
+| `docs-researcher` | Fetch library documentation without cluttering main context. Use when looking up unfamiliar APIs. |
+| `pr-test-analyzer` | Review PR test coverage quality and completeness. Use after creating or updating a PR. |
+| `silent-failure-hunter` | Identify silent failures and inadequate error handling. Use after work involving error handling or catch blocks. |
+| `type-design-analyzer` | Analyze type design for encapsulation and invariant expression. Use when introducing or refactoring types. |
 
 ## Rules Reference
 

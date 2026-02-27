@@ -26,7 +26,7 @@ The orchestrator invokes you via the Task tool after the React Coder agent produ
 
 ## Testing Standards
 
-Before writing tests, read `~/.claude/rules/react-patterns.md` and `~/.claude/rules/ts-patterns.md` for full patterns.
+Before writing tests, read `~/.claude/rules/react-patterns.md`, `~/.claude/rules/ts-patterns.md`, and `~/.claude/rules/testing-patterns.md` for cross-language testing standards (naming, fixtures, CI integration).
 
 ### Component Testing with Testing Library
 

@@ -6,6 +6,9 @@ model: inherit
 skills:
   - database-schema-designer
   - migration-safety
+  - error-handling
+  - code-architecture
+  - refactoring-patterns
 ---
 
 # Database Coder Agent
@@ -65,7 +68,10 @@ Invoke the `database-schema-designer` skill when designing new schemas or signif
 
 1. Invoke the `database-schema-designer` skill for schema design or significant schema changes
 2. For migration tasks, invoke the `migration-safety` skill for safety checklist
-3. Read the task description and existing database code
+3. For error type design or error propagation in repository code, invoke the `error-handling` skill
+4. For new repository/store module creation, invoke the `code-architecture` skill for structure guidance
+5. For restructuring existing data access code, invoke the `refactoring-patterns` skill
+6. Read the task description and existing database code
 4. Identify the appropriate tool for the project (see ORM section in database.md)
 5. Write migrations for schema changes (up + down)
 6. Write repository/store code for data access

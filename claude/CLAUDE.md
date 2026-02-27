@@ -24,6 +24,14 @@
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
   - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
 <!-- END:agent-definitions -->
+- **Cursor Built-in Agents:** When running in Cursor, these additional `subagent_type` values are available and complement the custom agents above:
+  - `code-reviewer` -- Cross-language code review against project guidelines and style. Use after writing or modifying code, especially before commits or PRs.
+  - `code-simplifier` -- Simplifies recently modified code for clarity and maintainability while preserving functionality. Use after completing a coding task.
+  - `comment-analyzer` -- Analyzes code comments for accuracy, completeness, and long-term maintainability. Use after generating documentation comments or before finalizing PRs.
+  - `docs-researcher` -- Lightweight agent for fetching library documentation without cluttering main conversation context. Use when looking up unfamiliar APIs.
+  - `pr-test-analyzer` -- Reviews PR test coverage quality and completeness. Use after creating or updating a PR to ensure tests cover new functionality.
+  - `silent-failure-hunter` -- Identifies silent failures, inadequate error handling, and inappropriate fallback behavior. Use after completing work involving error handling or catch blocks.
+  - `type-design-analyzer` -- Expert analysis of type design for encapsulation, invariant expression, and enforcement. Use when introducing or refactoring types.
 - **Plugins vs Skills:** Plugins (e.g., `context7-plugin`, `frontend-design`, `code-review`, `superpowers`) are installed via `claude plugin install` from their respective marketplaces and enabled via `enabledPlugins` in settings.json. Plugin config (names, marketplaces, sources) lives in `config.json` under the `plugins` array. npm skills (e.g., `golang-pro`, `database-schema-designer`) are installed via `npx skills add`. Custom skills (below) are markdown files in `~/.claude/skills/` that define structured workflows. Both are invoked via the Skill tool, but plugins receive automatic updates while custom skills are version-controlled in this repo.
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
 <!-- BEGIN:custom-skills -->

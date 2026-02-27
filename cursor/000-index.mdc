@@ -19,15 +19,23 @@ alwaysApply: true
 - **Reusable guidance:** Use Cursor rules and skills when delegating; keep role-specific instructions in agent-requestable rules or skills so parallel agents get the right context.
 - **Available Subagents:** Use the Task tool with the appropriate `subagent_type` to delegate:
 <!-- BEGIN:agent-definitions -->
-  - **Go:** `go-coder.md` (invokes `golang-pro` plugin), `go-reviewer.md`, `go-tester.md`
+  - **Go:** `go-coder.md` (invokes `golang-pro` skill), `go-reviewer.md`, `go-tester.md`
   - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
   - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
   - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
-  - **Database:** `db-coder.md` (invokes `database-schema-designer` plugin), `db-reviewer.md` (read-only), `db-tester.md`
+  - **Database:** `db-coder.md` (invokes `database-schema-designer` skill), `db-reviewer.md` (read-only), `db-tester.md`
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
   - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
 <!-- END:agent-definitions -->
+- **Cursor Built-in Agents:** These additional `subagent_type` values are provided by Cursor and complement the custom agents above:
+  - `code-reviewer` -- Cross-language code review against project guidelines and style. Use after writing or modifying code, especially before commits or PRs.
+  - `code-simplifier` -- Simplifies recently modified code for clarity and maintainability while preserving functionality. Use after completing a coding task.
+  - `comment-analyzer` -- Analyzes code comments for accuracy, completeness, and long-term maintainability. Use after generating documentation comments or before finalizing PRs.
+  - `docs-researcher` -- Lightweight agent for fetching library documentation without cluttering main conversation context. Use when looking up unfamiliar APIs.
+  - `pr-test-analyzer` -- Reviews PR test coverage quality and completeness. Use after creating or updating a PR to ensure tests cover new functionality.
+  - `silent-failure-hunter` -- Identifies silent failures, inadequate error handling, and inappropriate fallback behavior. Use after completing work involving error handling or catch blocks.
+  - `type-design-analyzer` -- Expert analysis of type design for encapsulation, invariant expression, and enforcement. Use when introducing or refactoring types.
 - **Custom Skills:** Read a skill's SKILL.md file (via the Read tool) when the task matches:
 <!-- BEGIN:custom-skills -->
   - `git-conventions` -- Invoke when creating branches, writing commit messages, or creating PRs.

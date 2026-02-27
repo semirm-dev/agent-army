@@ -3,6 +3,9 @@ name: docs-writer
 description: "Technical documentation writer. Creates READMEs, API docs, ADRs, changelogs, and onboarding guides. Use when documentation needs to be written or updated."
 tools: Read, Write, Edit, Glob, Grep
 model: inherit
+skills:
+  - api-designer
+  - git-conventions
 ---
 
 # Documentation Writer Agent
@@ -74,9 +77,10 @@ Before writing documentation, read:
 1. Read the task description from the orchestrator
 2. Read source code, configs, and existing docs to understand the subject
 3. Identify the right document type (README, ADR, API docs, etc.)
-4. Write the documentation following the patterns above
-5. Cross-reference with existing docs to avoid duplication
-6. Report what was created/modified
+4. For API documentation, invoke the `api-designer` skill for canonical error formats, pagination patterns, and endpoint naming conventions
+5. Write the documentation following the patterns above
+6. Cross-reference with existing docs to avoid duplication
+7. Report what was created/modified
 
 ## Output Format
 

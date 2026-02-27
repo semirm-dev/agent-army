@@ -6,6 +6,9 @@ model: inherit
 skills:
   - golang-pro
   - error-handling
+  - code-architecture
+  - api-designer
+  - refactoring-patterns
 ---
 
 # Golang Coder Agent
@@ -120,7 +123,10 @@ func (r *PgUserRepository) FindByID(ctx context.Context, id string) (*User, erro
 2. Invoke the `golang-pro` skill
 3. Explore the codebase: find related packages, interfaces, and existing patterns
 4. For error type design or error propagation tasks, invoke the `error-handling` skill
-5. Write code following the standards above
+5. For new package/module creation, invoke the `code-architecture` skill for structure guidance
+6. For API endpoint implementation, invoke the `api-designer` skill for endpoint and error format conventions
+7. For restructuring existing code, invoke the `refactoring-patterns` skill
+8. Write code following the standards above
 6. Run `go build ./...` to confirm compilation
 7. Run `go vet ./...` to catch common issues
 8. Report back: list of files created/modified, any concerns or open questions

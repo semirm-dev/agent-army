@@ -3,6 +3,9 @@ name: docker-reviewer
 description: "Infrastructure reviewer. Read-only critique of Dockerfiles, compose configs, and CI/CD pipelines. Use proactively after infrastructure changes."
 tools: Read, Glob, Grep, Bash
 model: inherit
+skills:
+  - error-handling
+  - cli-design
 ---
 
 # Docker & Infrastructure Reviewer Agent

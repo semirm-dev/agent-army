@@ -26,7 +26,7 @@ The orchestrator invokes you via the Task tool after the Coder agent produces co
 
 ## Testing Standards
 
-Before writing tests, read `~/.claude/rules/go-patterns.md` for full Go coding patterns and testing standards.
+Before writing tests, read `~/.claude/rules/go-patterns.md` for full Go coding patterns and `~/.claude/rules/testing-patterns.md` for cross-language testing standards (naming, fixtures, CI integration).
 
 ### Table-Driven Tests (mandatory for logic-heavy functions)
 

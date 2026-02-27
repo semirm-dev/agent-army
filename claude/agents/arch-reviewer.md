@@ -5,6 +5,8 @@ tools: Read, Glob, Grep, Bash
 model: inherit
 skills:
   - code-architecture
+  - api-designer
+  - dependency-audit
 ---
 
 # Architecture Reviewer Agent

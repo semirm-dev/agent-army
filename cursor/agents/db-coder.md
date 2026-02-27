@@ -1,6 +1,12 @@
 ---
 name: db-coder
 description: "Senior database engineer. Writes migrations, schemas, queries, and repository code. Use when database code needs to be written or modified."
+skills:
+  - database-schema-designer
+  - migration-safety
+  - error-handling
+  - code-architecture
+  - refactoring-patterns
 ---
 
 # Database Coder Agent
@@ -26,7 +32,7 @@ Project rules for database patterns, migrations, transactions, and ORM guidance 
 
 Read the `database-schema-designer` skill from `~/.cursor/skills/database-schema-designer/SKILL.md` when designing new schemas or significant schema changes.
 
-Use the `code-simplifier` subagent (via the Task tool) if any function exceeds 30 lines. Use the Context7 MCP server (use `resolve-library-id` and `query-docs` tools) to look up ORM/driver documentation (sqlc, Prisma, SQLAlchemy, pgx).
+Use the `code-simplifier` subagent (via the Task tool) if any function exceeds 30 lines. Use the `type-design-analyzer` subagent when introducing new model types or schema definitions to validate encapsulation and invariant design. Use the Context7 MCP server (`plugin-context7-context7`, tools: `resolve-library-id` and `query-docs`) to look up ORM/driver documentation (sqlc, Prisma, SQLAlchemy, pgx).
 
 ## Key Patterns
 
@@ -58,13 +64,31 @@ Use the `code-simplifier` subagent (via the Task tool) if any function exceeds 3
 
 1. Read the `database-schema-designer` skill from `~/.cursor/skills/database-schema-designer/SKILL.md` for schema design or significant schema changes
 2. For migration tasks, read the `migration-safety` skill from `~/.cursor/skills/migration-safety/SKILL.md` for safety checklist
-3. Read the task description and existing database code
-4. Identify the appropriate tool for the project (see ORM guidance in project database rules)
-5. Write migrations for schema changes (up + down)
-6. Write repository/store code for data access
-7. Verify query safety (parameterized, no N+1)
-8. Run migration tool in dry-run/check mode if available
-9. Report what was created/modified
+3. For error wrapping in repository/store code, read the `error-handling` skill from `~/.cursor/skills/error-handling/SKILL.md`
+4. When creating new repository layers or structuring data access patterns, read the `code-architecture` skill from `~/.cursor/skills/code-architecture/SKILL.md`
+5. For refactoring existing data access code, read the `refactoring-patterns` skill from `~/.cursor/skills/refactoring-patterns/SKILL.md`
+6. Read the task description and existing database code
+7. Identify the appropriate tool for the project (see ORM guidance in project database rules)
+8. Write migrations for schema changes (up + down)
+9. Write repository/store code for data access
+10. Verify query safety (parameterized, no N+1)
+11. Run migration tool in dry-run/check mode if available
+12. Report what was created/modified
+
+## Output Format
+
+When done, report:
+
+```
+## Files Changed
+- path/to/file -- [created | modified] -- brief description
+
+## Validation Status
+[PASS | FAIL] -- migration/build output summary
+
+## Notes
+- Any concerns, trade-offs, or questions for the orchestrator
+```
 
 ## Constraints
 

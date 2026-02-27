@@ -3,6 +3,9 @@ name: docker-builder
 description: "Infrastructure engineer. Writes Dockerfiles, docker-compose configs, and CI/CD pipelines. Use when container or deployment configuration needs to be created or modified."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
+skills:
+  - cli-design
+  - error-handling
 ---
 
 # Docker & Infrastructure Builder Agent
@@ -24,7 +27,11 @@ The orchestrator invokes you via the Task tool when container configuration, dep
 
 ## Standards
 
-Before writing configs, read `~/.claude/rules/observability.md` and `~/.claude/rules/security.md` for full infrastructure and security patterns. Key emphasis:
+Before writing configs, read `~/.claude/rules/observability.md` and `~/.claude/rules/security.md` for full infrastructure and security patterns.
+
+**Plugins:** Use the `code-simplifier` plugin if any configuration block or script exceeds 30 lines -- it will help break it into smaller, focused sections.
+
+Key emphasis:
 - Multi-stage builds: separate build and runtime stages
 - Run as non-root user
 - Minimal base images (distroless, alpine, or scratch for Go)

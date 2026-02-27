@@ -29,6 +29,7 @@ The orchestrator invokes you via the Task tool after the Docker Builder agent pr
 Before writing tests, read:
 - `~/.claude/rules/observability.md` for health check and CI/CD patterns
 - `~/.claude/rules/security.md` for container security requirements
+- `~/.claude/rules/testing-patterns.md` for cross-language testing standards (naming, fixtures, CI integration)
 
 Invoke the `testing-strategy` skill when planning test coverage or deciding which validation checks to prioritize.
 
