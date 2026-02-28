@@ -134,21 +134,7 @@ Use this workflow for any query that misses the database performance budget.
 | Hash Join with high bucket count | Large hash table in memory | Check join conditions, add index for nested loop path |
 | Bitmap Heap Scan with many recheck rows | Index returns too many candidates | Narrow the query filter, use composite index |
 
-### Example Analysis
-
-```sql
--- Slow query
-SELECT * FROM orders WHERE user_id = $1 AND status = 'active' ORDER BY created_at DESC LIMIT 20;
-
--- Run analysis
-EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
-SELECT * FROM orders WHERE user_id = $1 AND status = 'active' ORDER BY created_at DESC LIMIT 20;
-```
-
-Look for:
-- Is `user_id` indexed? Is there a composite index on `(user_id, status, created_at)`?
-- Is the sort using an index or doing an in-memory/disk sort?
-- How many rows are scanned vs returned?
+> See `rules/database.md` for `EXPLAIN ANALYZE` workflow and red flag patterns.
 
 ## Frontend Bundle Audit
 

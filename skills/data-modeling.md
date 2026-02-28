@@ -16,7 +16,7 @@ Invoke this skill when:
 - Reviewing schema design for a new feature
 - Planning a database migration (adding columns, changing types, splitting tables)
 
-> See `rules/database.md` for schema naming conventions, index design, composite ordering, migration safety rules, and anti-patterns.
+> See `rules/database.md` for schema naming conventions, SQL syntax examples, index design, composite ordering, migration safety rules, and anti-patterns.
 
 ## SQL vs NoSQL Decision Tree
 
@@ -78,25 +78,11 @@ Do you need ACID transactions across multiple entities?
 
 ```
 Is the data transactional (orders, payments, user accounts)?
-  |
-  +-- YES --> Normalize to 3NF
-  |           - Eliminate repeating groups (1NF)
-  |           - Remove partial dependencies (2NF)
-  |           - Remove transitive dependencies (3NF)
-  |           - Every non-key column depends on the key,
-  |             the whole key, and nothing but the key
-  |
+  +-- YES --> Normalize to 3NF (every non-key column depends on
+  |           the key, the whole key, and nothing but the key)
   +-- NO  --> Is read performance the primary concern?
-                |
-                +-- YES --> Denormalize for reads
-                |           - Duplicate data into read-optimized tables
-                |           - Use materialized views for aggregations
-                |           - Accept write complexity for read speed
-                |
-                +-- NO  --> Balanced: 3NF with strategic denormalization
-                            - Start normalized
-                            - Denormalize only after profiling shows bottlenecks
-                            - Document every denormalization decision
+                +-- YES --> Denormalize for reads (materialized views, duplicated data)
+                +-- NO  --> Start 3NF, denormalize only after profiling shows bottlenecks
 ```
 
 **Rule of thumb:** Normalize for writes, denormalize for reads. Start normalized. Measure. Denormalize only with evidence.
@@ -129,62 +115,24 @@ Is this a distributed system (multiple databases, microservices)?
 
 > See `rules/database.md` "Schema Conventions" for primary key selection guidelines.
 
-### Step 4: Add Audit Columns
+### Steps 4-7: Naming, Audit Columns, Constraints, Indexes
 
-Every table gets `created_at` and `updated_at` columns. Add `deleted_at` for soft deletes when audit trail is required.
+> See `rules/database.md` "Schema Conventions" for naming conventions, audit column definitions, and constraint guidance.
 
-> See `rules/database.md` "Schema Conventions" for audit column definitions and conventions.
-
-### Step 5: Apply Naming Conventions
-
-Follow the naming conventions defined in `rules/database.md` "Schema Conventions".
-
-### Step 6: Add Constraints
-
-Apply constraints to enforce data integrity at the database level:
-
-- `NOT NULL` on all columns unless NULL has explicit business meaning
-- `UNIQUE` on natural keys (email, username, external IDs)
-- `CHECK` for value ranges and valid states
-- `FOREIGN KEY` for all relationships (with appropriate `ON DELETE` action)
-- `DEFAULT` for columns with sensible defaults
-
-### Step 7: Plan Indexes
-
-See the Index Strategy Selection section below.
+- Add `created_at` and `updated_at` to every table. Add `deleted_at` for soft deletes.
+- Apply constraints: `NOT NULL`, `UNIQUE` on natural keys, `CHECK` for value ranges, `FOREIGN KEY` for relationships, `DEFAULT` where sensible.
+- Plan indexes using the Index Strategy Selection section below.
 
 ## Index Strategy Selection
 
-```
-Which columns appear in WHERE clauses?
-  --> Index those columns
+- Index columns that appear in `WHERE`, `JOIN`, and `ORDER BY` clauses
+- Always index foreign key columns
+- **Read-heavy tables:** more indexes acceptable — cover common query patterns, consider covering indexes
+- **Write-heavy tables:** fewer, targeted indexes — each index slows writes
 
-Which columns appear in JOIN conditions?
-  --> Index foreign key columns (always)
+After creating indexes, verify usage with query plan analysis. Check for sequential scans on large tables, nested loops with high loop count, and external sort spills.
 
-Which columns appear in ORDER BY?
-  --> Consider index if combined with WHERE filter
-
-Is this a read-heavy table?
-  |
-  +-- YES --> More indexes are acceptable
-  |           - Cover common query patterns
-  |           - Consider covering indexes (INCLUDE columns)
-  |
-  +-- NO (write-heavy) --> Fewer, targeted indexes
-                           - Each index slows writes
-                           - Only index columns used in critical queries
-```
-
-### Index Verification
-
-Always verify index usage after creation:
-
-```sql
-EXPLAIN ANALYZE SELECT ... ;  -- Check that the index is actually used
-```
-
-Red flags: sequential scan on large tables, nested loops with high loop count, external sort spills.
+> See `rules/database.md` for `EXPLAIN ANALYZE` workflow, red flag patterns, and composite index ordering.
 
 ## Relationship Modeling
 
@@ -200,119 +148,27 @@ Do the two entities always exist together?
               The "optional" side holds the FK
 ```
 
-```sql
--- Separate tables: user always exists, profile is optional
-CREATE TABLE users (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    email      TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE user_profiles (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id    BIGINT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-    bio        TEXT,
-    avatar_url TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-```
+> See `rules/database.md` for schema examples and naming conventions.
 
 ### One-to-Many (1:N)
 
 The "many" side holds the foreign key. Always index the FK column.
 
-```sql
-CREATE TABLE orders (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    total      NUMERIC(10, 2) NOT NULL CHECK (total >= 0),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX idx_orders_user_id ON orders (user_id);
-```
-
 ### Many-to-Many (M:N)
 
 Use a junction (join) table. Add a composite primary key or a composite unique constraint.
 
-```sql
-CREATE TABLE user_roles (
-    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    role_id    BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-    granted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    PRIMARY KEY (user_id, role_id)
-);
-```
-
 ### Self-Referential Relationships
 
-For hierarchical data (categories, org charts, comment threads):
-
-```sql
-CREATE TABLE categories (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    parent_id  BIGINT REFERENCES categories(id) ON DELETE SET NULL,
-    name       TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX idx_categories_parent_id ON categories (parent_id);
-```
-
-For deep hierarchies that need efficient querying, consider:
-- **Adjacency list** (above) -- simple, good for shallow trees
-- **Materialized path** (`path TEXT: '/1/5/12/'`) -- fast subtree queries
-- **Closure table** -- fast ancestor/descendant queries, more storage
+For hierarchical data (categories, org charts, comment threads), use a self-referencing foreign key. For deep hierarchies: **adjacency list** (simple, shallow trees), **materialized path** (fast subtree queries), or **closure table** (fast ancestor/descendant queries, more storage).
 
 ### Polymorphic Associations (Avoid)
 
-```
-Do you need a single table referencing multiple entity types?
-  |
-  +-- AVOID --> Polymorphic FKs (commentable_type + commentable_id)
-  |             - No FK constraint enforcement
-  |             - Complex queries
-  |             - Breaks referential integrity
-  |
-  +-- PREFER --> Separate FK columns (nullable) or separate junction tables
-                 - Each FK has proper constraints
-                 - Database enforces integrity
-```
-
-```sql
--- BAD: polymorphic
--- commentable_type TEXT, commentable_id BIGINT (no FK possible)
-
--- GOOD: separate nullable FKs
-CREATE TABLE comments (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    post_id    BIGINT REFERENCES posts(id) ON DELETE CASCADE,
-    article_id BIGINT REFERENCES articles(id) ON DELETE CASCADE,
-    body       TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CHECK (
-        (post_id IS NOT NULL AND article_id IS NULL) OR
-        (post_id IS NULL AND article_id IS NOT NULL)
-    )
-);
-```
+Avoid polymorphic FKs (`commentable_type` + `commentable_id`) — they break referential integrity and prevent FK constraint enforcement. Prefer separate nullable FK columns or separate junction tables instead.
 
 ### Soft Deletes
 
-> See `rules/database.md` for soft delete conventions and query patterns.
-
-When using soft deletes, add a partial index for active records:
-
-```sql
-CREATE INDEX idx_users_active ON users (email) WHERE deleted_at IS NULL;
-```
-
-**Important:** Every query must include `WHERE deleted_at IS NULL` unless explicitly querying deleted records. Consider a database view for convenience.
+> See `rules/database.md` for soft delete conventions, partial index patterns, and query patterns.
 
 ## Zero-Downtime Migration Strategy
 

@@ -15,6 +15,8 @@ Invoke this skill when:
 - A function exceeds 30 lines and needs decomposition
 - Renaming, moving, or reorganizing code across files or packages
 
+> See `rules/cross-cutting.md` for code clarity and structure standards.
+
 ## The Golden Rule
 
 ```

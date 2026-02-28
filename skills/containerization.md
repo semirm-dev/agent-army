@@ -50,91 +50,19 @@ Do you need shell access in the production container?
 
 Adapt multi-stage build patterns to your language's build toolchain and runtime requirements.
 
-### .dockerignore Essentials
+### .dockerignore
 
-Every project with a Dockerfile needs a `.dockerignore` to prevent sending unnecessary context:
-
-```
-.git
-.github
-.env
-.env.*
-node_modules
-__pycache__
-*.pyc
-dist
-build
-coverage
-.vscode
-.idea
-*.md
-!README.md
-docker-compose*.yml
-Dockerfile*
-.dockerignore
-```
+Every project with a Dockerfile needs a `.dockerignore` to prevent sending unnecessary context. Exclude version control directories, environment files, dependency caches, IDE configuration, build artifacts, and Docker-related files. Keep only what the build needs.
 
 ## Docker Compose for Dev
 
-### Service Definition Patterns
-
-```yaml
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: build  # Stop at build stage for dev (includes dev deps)
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/src         # Hot reload via volume mount
-      - /src/deps  # Prevent host dependencies from overriding container dependencies
-    env_file:
-      - .env.development
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev
-      POSTGRES_DB: app_dev
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dev"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
-volumes:
-  pgdata:
-```
-
 ### Key Patterns
 
-- **Volume mounts for hot reload:** Mount source code into the container so changes are reflected without rebuilding. Use framework-specific file watchers (nodemon, air, uvicorn --reload).
+- **Volume mounts for hot reload:** Mount source code into the container so changes are reflected without rebuilding. Use framework-specific file watchers.
 - **Anonymous volumes for dependencies:** Use anonymous volumes for dependency directories (without host path) to prevent host OS dependencies from overriding container dependencies. Relevant when native modules differ by platform.
 - **depends_on with healthcheck:** Use `condition: service_healthy` instead of bare `depends_on`. Bare depends_on only waits for the container to start, not for the service inside it to be ready.
 - **Environment variables:** Use `.env.development` files for dev config. Never commit `.env` files with real credentials. Provide a `.env.example` with placeholder values.
-- **Named volumes for persistence:** Use named volumes (`pgdata`) for database data so it survives `docker compose down`. Use `docker compose down -v` only when you want a clean slate.
+- **Named volumes for persistence:** Use named volumes for database data so it survives container restarts. Use volume removal only when you want a clean slate.
 
 ## CI/CD Pipeline Design
 
@@ -164,60 +92,33 @@ Before deploying to production, verify:
 
 Before shipping a container image, verify:
 
-1. [ ] **Read-only filesystem:** Where possible, run the container with a read-only root filesystem (`--read-only` flag or security context). Use tmpfs mounts for writable paths the application needs.
-2. [ ] **No unnecessary capabilities:** Drop all Linux capabilities and add back only what is needed. Default: `--cap-drop=ALL`.
+1. [ ] **Read-only filesystem:** Where possible, run the container with a read-only root filesystem. Use tmpfs mounts for writable paths the application needs.
+2. [ ] **No unnecessary capabilities:** Drop all Linux capabilities and add back only what is needed.
 3. [ ] **SBOM generated:** Software Bill of Materials produced for the image in CycloneDX or SPDX format. Store SBOM artifacts alongside release artifacts. Verify against known vulnerability databases before deploying to production.
-4. [ ] **.dockerignore present:** Build context excludes `.git`, `.env`, `node_modules`, and other unnecessary files.
+4. [ ] **.dockerignore present:** Build context excludes version control, environment files, and other unnecessary files.
 
 ## Health Check Configuration
 
-### Dockerfile HEALTHCHECK Directive
+### Container Health Check
 
-```dockerfile
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD ["wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/healthz"] \
-  || exit 1
-```
+Configure health checks with these parameters:
 
-- `interval`: Time between checks (30s is a reasonable default).
-- `timeout`: Maximum time for a single check (keep short -- 3-5s).
-- `start-period`: Grace period during startup before failures count. Set this to at least your application's startup time.
-- `retries`: Number of consecutive failures before marking unhealthy.
+- **interval:** Time between checks (30s is a reasonable default)
+- **timeout:** Maximum time for a single check (keep short -- 3-5s)
+- **start-period:** Grace period during startup before failures count. Set this to at least your application's startup time.
+- **retries:** Number of consecutive failures before marking unhealthy
 
-Use `wget` or `curl` depending on what is available in the base image. For scratch/distroless images, build a tiny health check binary into the image.
+Use a lightweight HTTP check against your application's health endpoint. For minimal images without HTTP clients, build a tiny health check binary into the image.
 
-### Kubernetes Probes
+### Orchestrator Probes
 
-```yaml
-livenessProbe:
-  httpGet:
-    path: /healthz
-    port: 3000
-  initialDelaySeconds: 5
-  periodSeconds: 15
-  timeoutSeconds: 3
-  failureThreshold: 3
-
-readinessProbe:
-  httpGet:
-    path: /readyz
-    port: 3000
-  initialDelaySeconds: 5
-  periodSeconds: 10
-  timeoutSeconds: 3
-  failureThreshold: 3
-
-startupProbe:
-  httpGet:
-    path: /healthz
-    port: 3000
-  periodSeconds: 5
-  failureThreshold: 30  # 30 * 5s = 150s max startup time
-```
+Configure three probe types for container orchestrators:
 
 - **Liveness (`/healthz`):** Is the process alive and not deadlocked? Failure triggers a restart. Keep this check cheap -- do not call external dependencies.
-- **Readiness (`/readyz`):** Can this instance serve traffic? Check database connectivity, cache availability, and other critical dependencies. Failure removes the pod from service endpoints.
+- **Readiness (`/readyz`):** Can this instance serve traffic? Check database connectivity, cache availability, and other critical dependencies. Failure removes the instance from service endpoints.
 - **Startup probe:** Use for slow-starting applications (JVM warmup, large model loading, migration on boot). The startup probe runs first. Liveness and readiness probes do not start until the startup probe succeeds.
+
+> See `rules/observability.md` for health check endpoint definitions and implementation details.
 
 ### Health Endpoint Implementation
 

@@ -14,6 +14,9 @@ Invoke this skill when:
 - Establishing review standards for a team
 - Training new reviewers on review priorities and process
 
+> See `rules/git-workflow.md` for branch naming, commit message format, and merge strategy.
+> See `rules/security.md` for security review checklist items.
+
 ## Multi-Pass Review Strategy
 
 Review in five ordered passes. Do not skip ahead. Each pass has a clear focus and a time budget.
@@ -123,14 +126,7 @@ Universal red flags to watch for:
 
 ## PR Size Guidelines
 
-Target: fewer than 400 lines changed.
-
-| Lines Changed | Category | Reviewer Action |
-|---------------|----------|-----------------|
-| < 200 | Easy | Review in one sitting, same day |
-| 200 - 400 | Normal | Review within one business day |
-| 400 - 800 | Large | Require justification in PR description. Ask: can this be split? |
-| 800+ | Too large | Request split before reviewing. Do not start a full review. |
+> See `rules/git-workflow.md` for PR size targets and merge strategy.
 
 ### Splitting Strategies
 
@@ -180,25 +176,12 @@ Prefix every review comment with a category tag. Include a suggestion with every
 
 ### Examples
 
-**bug:** Off-by-one in pagination. When `offset` equals `total`, this returns an empty page instead of stopping. Consider:
-```
-if offset >= total {
-    return []
-}
-```
-
-**security:** User ID comes from the request body without verifying it matches the authenticated user. An attacker could modify another user's data. Validate `req.UserID == ctx.AuthUser.ID` before proceeding.
-
-**perf:** This query runs inside a loop, causing N+1 database calls. Batch the IDs and query once:
-```
-SELECT * FROM orders WHERE user_id = ANY($1)
-```
-
-**design:** `ProcessOrder` handles validation, payment, and notification in 120 lines. Consider splitting into `validateOrder`, `chargePayment`, and `sendConfirmation` to isolate responsibilities.
-
-**nit:** Inconsistent naming -- `userData` here but `userInfo` on line 45. Pick one and use it consistently.
-
-**question:** Why does this retry 5 times instead of the standard 3? Is there a known issue with this upstream service?
+- **bug:** "Off-by-one in pagination. When `offset` equals `total`, returns empty page instead of stopping. Check boundary condition."
+- **security:** "User ID from request body not verified against authenticated user. Validate ownership before proceeding."
+- **perf:** "Query inside loop causes N+1 calls. Batch the IDs and query once."
+- **design:** "Function handles validation, payment, and notification in 120 lines. Split into focused functions."
+- **nit:** "Inconsistent naming -- `userData` here but `userInfo` on line 45."
+- **question:** "Why retry 5 times instead of standard 3? Known upstream issue?"
 
 ## Approval Criteria Checklist
 

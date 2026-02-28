@@ -15,6 +15,8 @@ Invoke this skill when:
 - Diagnosing intermittent or non-deterministic failures
 - Conducting a post-incident review
 
+> See `rules/observability.md` for structured logging field requirements and log level definitions.
+
 ## Debugging Workflow
 
 Follow these six steps in order. Do not skip steps.
@@ -105,79 +107,19 @@ A bug that can recur is not fixed.
 
 ```
 Can you reproduce the bug?
-  |
-  +-- YES
-  |     |
-  |     +--> Capture exact reproduction steps (inputs, config, data state)
-  |     |
-  |     +--> Reproduce locally
-  |     |
-  |     +--> Isolate with binary search (Step 2)
-  |     |
-  |     +--> Fix (Step 5)
-  |
-  +-- NO
-        |
-        +--> Do you have logs or traces?
-               |
-               +-- YES
-               |     |
-               |     +--> Run log analysis (see below)
-               |     |
-               |     +--> Reconstruct timeline
-               |     |
-               |     +--> Form hypothesis from log evidence (Step 3)
-               |     |
-               |     +--> Attempt targeted reproduction based on hypothesis
-               |
-               +-- NO
-                     |
-                     +--> Add structured logging at suspect boundaries
-                     |
-                     +--> Add metrics for the suspected failure mode
-                     |
-                     +--> Set up alerts for recurrence
-                     |
-                     +--> Wait for recurrence with instrumentation in place
-                     |
-                     +--> Capture data on next occurrence --> restart from top
+  +-- YES --> Capture steps → reproduce locally → isolate (Step 2) → fix (Step 5)
+  +-- NO  --> Do you have logs or traces?
+                +-- YES --> Log analysis → reconstruct timeline → hypothesize → targeted repro
+                +-- NO  --> Add logging at suspect boundaries + metrics + alerts → wait for
+                            recurrence with instrumentation → capture data → restart from top
 ```
 
 ## Log Analysis Patterns
 
-### Find the First Error
-
-Cascading failures produce many log entries. The first error in the timeline is usually the root cause. Everything after is a consequence.
-
-```
-# Search for the first error in the time window
-# Filter by timestamp range, then sort chronologically
-# Look for ERROR or WARN level entries
-```
-
-### Correlate by Request ID / Trace ID
-
-Use `request_id` or `trace_id` to follow a single request across services.
-
-```
-# Grep by request_id to see the full lifecycle of one request
-# across all services and log files
-```
-
-### Timeline Reconstruction
-
-1. Identify the time window: when did the issue start and stop?
-2. Collect logs from all involved services for that window.
-3. Sort by timestamp. Look for the transition from healthy to unhealthy.
-4. Identify what changed at the transition point: deploy, config change, traffic spike, dependency failure.
-
-### Pattern Matching
-
-Look for:
-- **Repeated error messages** with increasing frequency (cascading failure)
-- **Gaps in expected log entries** (process crash, deadlock, or resource exhaustion)
-- **Correlation with external events** (deploy timestamps, cron job schedules, traffic patterns)
-- **Resource metrics at the time of failure** (CPU, memory, connection pool usage, queue depth)
+- **Find the first error:** Cascading failures produce many log entries. The first error in the timeline is usually the root cause. Filter by timestamp range, sort chronologically, look for ERROR or WARN level.
+- **Correlate by request/trace ID:** Use `request_id` or `trace_id` to follow a single request across services.
+- **Reconstruct timeline:** Identify the time window, collect logs from all services, sort by timestamp, find the transition from healthy to unhealthy.
+- **Pattern match:** Look for repeated errors with increasing frequency (cascading failure), gaps in expected logs (crash, deadlock), correlation with external events (deploys, cron jobs), and resource metrics at the failure time.
 
 ## Common Root Causes by Symptom
 
@@ -200,41 +142,13 @@ Use `git bisect` when you know the bug was introduced between two known states (
 - You can write a test or script that reliably detects the bug
 - The commit history between good and bad states is non-trivial (10+ commits)
 
-### Manual Bisect
+### Running Bisect
 
-```
-git bisect start
-git bisect bad                    # current commit is broken
-git bisect good <known-good-sha> # last known working commit
+1. `git bisect start` → `git bisect bad` (current) → `git bisect good <known-good-sha>`
+2. Git checks out a middle commit. Test it. Mark `git bisect good` or `git bisect bad`.
+3. Repeat until git identifies the first bad commit. Run `git bisect reset` when done.
 
-# Git checks out a middle commit. Test it.
-git bisect good   # if this commit works
-git bisect bad    # if this commit is broken
-
-# Repeat until git identifies the first bad commit.
-git bisect reset  # return to original branch when done
-```
-
-### Automated Bisect
-
-Write a script that exits 0 for good and non-zero for bad:
-
-```bash
-#!/bin/bash
-# bisect-test.sh
-# Run the specific test that detects the bug
-# Exit 0 = good, exit 1 = bad
-go test ./internal/auth/ -run TestLoginFlow -count=1
-```
-
-```
-git bisect start
-git bisect bad HEAD
-git bisect good <known-good-sha>
-git bisect run ./bisect-test.sh
-```
-
-Git runs the script at each bisect step automatically and reports the first bad commit.
+**Automated:** Write a script that exits 0 for good and non-zero for bad, then run `git bisect run ./bisect-test.sh` to let git test each step automatically.
 
 ## Post-Fix Verification
 

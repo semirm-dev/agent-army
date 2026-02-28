@@ -56,7 +56,7 @@ Adapt DI approach to your language's idiomatic patterns.
 ## Interface Boundary Guidelines
 
 - **Define at consumer side:** The package that _uses_ the interface defines it, not the package that implements it
-- **Keep narrow:** 2-3 methods maximum (Go). If wider, split into focused interfaces
+- **Keep narrow:** 2-3 methods maximum. If wider, split into focused interfaces
 - **No leaking:** Public APIs should not expose internal types (database models, framework types)
 - **Cross-boundary DTOs:** Use dedicated types for data crossing package boundaries
 
