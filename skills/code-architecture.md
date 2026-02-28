@@ -15,6 +15,8 @@ Invoke this skill when:
 - Reviewing dependency injection patterns
 - Evaluating whether to split or keep code together
 
+> See `rules/code-quality.md` for code clarity and structure standards.
+
 ## Architecture Decision Tree
 
 ```

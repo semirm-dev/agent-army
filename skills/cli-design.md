@@ -145,5 +145,5 @@ myapp
 Guidelines:
 - **Max 2 levels deep:** `myapp migrate up`, not `myapp db migrate schema up`
 - **Consistent verb patterns:** `create`, `list`, `show`, `delete`, `update`
-- **Hidden commands:** Use for internal/debug commands (cobra: `Hidden: true`)
+- **Hidden commands:** Use for internal/debug commands (most CLI frameworks support hidden commands)
 - **Aliases:** Support common shortcuts (`myapp ls` -> `myapp list`)

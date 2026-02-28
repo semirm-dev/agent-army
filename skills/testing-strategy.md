@@ -64,7 +64,7 @@ Full user journey across multiple services/pages?
 
 - **Generated code:** protobuf stubs, OpenAPI clients, ORM migrations (test the queries, not the generated glue)
 - **Trivial getters/setters:** If the function just returns a field, don't test it
-- **Third-party internals:** Don't test that Express routes correctly or that React renders -- test YOUR logic
+- **Third-party internals:** Don't test that your framework routes correctly or that your UI library renders -- test YOUR logic
 - **Configuration wiring:** Test that the app starts, not every config combination
 - **Private functions:** Test through the public API. If a private function is complex enough to need its own test, it should probably be a public function in a smaller package
 

@@ -48,7 +48,7 @@ What is slow?
   |     |     NO  |
   |     |         +-- Slow API calls from client?
   |     |         |     YES --> Trace back to API investigation
-  |     |         |     NO  --> Check render performance (React Profiler, layout thrashing)
+  |     |         |     NO  --> Check render performance (framework profiler, layout thrashing)
   |     |
   |     +-- Large images or assets?
   |           YES --> Optimize images, add lazy loading, use CDN
