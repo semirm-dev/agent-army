@@ -1,18 +1,9 @@
 {
-  "npm_skills": [
-    {
-      "name": "golang-pro",
-      "repo": "https://github.com/jeffallan/claude-skills",
-      "description": "Go development skill"
-    },
-    {
-      "name": "database-schema-designer",
-      "repo": "https://github.com/softaworks/agent-toolkit",
-      "description": "Database schema design skill"
-    },
+  "public_skills": [
     {
       "name": "skill-creator",
       "repo": "https://github.com/anthropics/skills",
+      "tool": "npm",
       "description": "Skill authoring guide"
     }
   ],
@@ -24,102 +15,12 @@
     { "name": "superpowers", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
     { "name": "context7", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" }
   ],
-  "custom_skills": [
-    { "name": "git-conventions", "invoke_when": "creating branches, writing commit messages, or creating PRs" },
-    { "name": "api-designer", "invoke_when": "designing new API endpoints, scaffolding error formats, or reviewing API consistency" },
-    { "name": "migration-safety", "invoke_when": "writing or reviewing database migrations" },
-    { "name": "dependency-audit", "invoke_when": "auditing dependencies for vulnerabilities or planning updates" },
-    { "name": "error-handling", "invoke_when": "creating error types, reviewing error propagation, or designing user-facing error messages" },
-    { "name": "code-architecture", "invoke_when": "starting new modules, deciding package structure, or reviewing dependency injection patterns" },
-    { "name": "testing-strategy", "invoke_when": "planning test coverage, choosing test types, or diagnosing flaky tests" },
-    { "name": "cli-design", "invoke_when": "building CLI tools, admin scripts, or migration runners" },
-    { "name": "refactoring-patterns", "invoke_when": "extracting methods, renaming, moving code, or addressing code smells" }
-  ],
-  "agents": [
-    {
-      "group": "Go",
-      "roles": [
-        { "name": "go-coder", "notes": "(invokes `golang-pro` skill)" },
-        { "name": "go-reviewer" },
-        { "name": "go-tester" }
-      ]
-    },
-    {
-      "group": "TypeScript/JS",
-      "roles": [
-        { "name": "ts-coder" },
-        { "name": "ts-reviewer" },
-        { "name": "ts-tester" }
-      ]
-    },
-    {
-      "group": "React",
-      "roles": [
-        { "name": "react-coder", "notes": "(uses `frontend-design` plugin)" },
-        { "name": "react-reviewer" },
-        { "name": "react-tester" }
-      ]
-    },
-    {
-      "group": "Python",
-      "roles": [
-        { "name": "py-coder" },
-        { "name": "py-reviewer" },
-        { "name": "py-tester" }
-      ]
-    },
-    {
-      "group": "Database",
-      "roles": [
-        { "name": "db-coder", "notes": "(invokes `database-schema-designer` skill)" },
-        { "name": "db-reviewer", "notes": "(read-only)" },
-        { "name": "db-tester" }
-      ]
-    },
-    {
-      "group": "Infrastructure",
-      "roles": [
-        { "name": "docker-builder" },
-        { "name": "docker-reviewer", "notes": "(read-only)" },
-        { "name": "docker-tester" }
-      ]
-    },
-    {
-      "group": "Architecture",
-      "roles": [
-        { "name": "arch-reviewer", "notes": "(read-only, dependency + cohesion analysis)" }
-      ]
-    },
-    {
-      "group": "Documentation",
-      "roles": [
-        { "name": "docs-writer", "notes": "(standalone, READMEs, ADRs, API docs)" }
-      ]
-    }
-  ],
-  "sync_pairs": [
-    { "label": "Go Patterns", "rule": "go-patterns.md", "cursor": "100-golang.mdc", "description": "Go coding + testing patterns" },
-    { "label": "TypeScript Patterns", "rule": "ts-patterns.md", "cursor": "101-typescript.mdc", "description": "TypeScript coding + testing patterns" },
-    { "label": "Python Patterns", "rule": "py-patterns.md", "cursor": "102-python.mdc", "description": "Python coding + testing patterns" },
-    { "label": "Git Workflow", "rule": "git-workflow.md", "cursor": "300-git.mdc", "description": "Git conventions" },
-    { "label": "React Patterns", "rule": "react-patterns.md", "cursor": "103-react.mdc", "description": "React component and frontend patterns" },
-    { "label": "API Design", "rule": "api-design.md", "cursor": "400-api-design.mdc", "description": "API design patterns" },
-    { "label": "Database Patterns", "rule": "database.md", "cursor": "401-database.mdc", "description": "Database patterns, migrations, pooling" },
-    { "label": "Observability", "rule": "observability.md", "cursor": "500-observability.mdc", "description": "Logging, metrics, health checks, Docker, CI/CD" },
-    { "label": "Security", "rule": "security.md", "cursor": "501-security.mdc", "description": "Auth, CORS, rate limiting, secrets management" },
-    { "label": "Cross-Cutting", "rule": "cross-cutting.md", "cursor": "502-cross-cutting.mdc", "description": "Error taxonomy, coverage targets, dependency policy" },
-    { "label": "Concurrency", "rule": "concurrency.md", "cursor": "503-concurrency.mdc", "description": "Concurrency patterns (goroutines, promises, asyncio)" },
-    { "label": "Testing Patterns", "rule": "testing-patterns.md", "cursor": "504-testing.mdc", "description": "Testing patterns (naming, table-driven, fixtures, CI)" },
-    { "label": "Caching Patterns", "rule": "caching-patterns.md", "cursor": "505-caching.mdc", "description": "Caching patterns (cache-aside, invalidation, key design)" },
-    { "label": "Messaging Patterns", "rule": "messaging-patterns.md", "cursor": "506-messaging.mdc", "description": "Messaging patterns (queues, DLQ, idempotency, events)" },
-    { "label": "AI-Assisted Development", "rule": "ai-assisted-development.md", "cursor": "507-ai-dev.mdc", "description": "AI-assisted development patterns" }
-  ],
   "rsync_excludes": [
-    "settings.json",
-    "installed_plugins.json",
+    "rules/",
+    "skills/",
     "plugins/",
-    "projects/",
-    "todos/"
+    "agents/",
+    "settings.json"
   ],
   "settings": {
     "defaultMode": "plan",

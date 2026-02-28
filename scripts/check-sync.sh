@@ -303,10 +303,13 @@ if [ -f "$AGENT_GUIDE" ]; then
   CUSTOM_SKILLS_LIST=$(mktemp "$TMPDIR_SYNC/custom_skills.XXXXXX")
   cfg '.custom_skills[].name' > "$CUSTOM_SKILLS_LIST"
 
-  # Parse the matrix table from AGENT-GUIDE.md
-  # Format: | agent-name | custom-skills | plugins |
+  # Cursor built-in subagent types (no .md files, skip in agent file checks)
+  CURSOR_BUILTINS="explore generalPurpose shell browser-use code-reviewer code-simplifier docs-researcher"
+
+  # Parse the skills matrix table from AGENT-GUIDE.md (not the built-in agents table)
+  # Format: | agent-name | custom-skills | external-skills | subagents |
   GUIDE_MATRIX=$(mktemp "$TMPDIR_SYNC/guide_matrix.XXXXXX")
-  awk '/^\| Agent /,/^$/' "$AGENT_GUIDE" \
+  awk '/^\| Agent \| Custom Skills/,/^$/' "$AGENT_GUIDE" \
     | grep -v '^| Agent ' \
     | grep -v '^|---' \
     | grep '|' \
@@ -320,28 +323,38 @@ if [ -f "$AGENT_GUIDE" ]; then
     # Skip empty lines
     [ -z "$guide_agent" ] && continue
 
-    # Resolve agent file
-    agent_file="$CLAUDE_AGENTS_DIR/${guide_agent}.md"
-    if [ ! -f "$agent_file" ]; then
-      echo "WARNING [AGENT-GUIDE skills] Agent '$guide_agent' listed in guide but no file at claude/agents/${guide_agent}.md"
+    # Skip Cursor built-in types
+    if echo "$CURSOR_BUILTINS" | grep -qw "$guide_agent"; then
+      continue
+    fi
+
+    # Resolve agent file (prefer cursor/ for skill path refs, fall back to claude/)
+    cursor_agent_file="$CURSOR_AGENTS_DIR/${guide_agent}.md"
+    claude_agent_file="$CLAUDE_AGENTS_DIR/${guide_agent}.md"
+    if [ -f "$cursor_agent_file" ]; then
+      agent_file="$cursor_agent_file"
+    elif [ -f "$claude_agent_file" ]; then
+      agent_file="$claude_agent_file"
+    else
+      echo "WARNING [AGENT-GUIDE skills] Agent '$guide_agent' listed in guide but no file found"
       WARN_COUNT=$((WARN_COUNT + 1))
       continue
     fi
 
-    # Extract skills from agent frontmatter (YAML list: "  - skill-name")
-    FRONTMATTER_SKILLS=$(mktemp "$TMPDIR_SYNC/fm_skills.XXXXXX")
-    sed -n '/^---$/,/^---$/p' "$agent_file" \
-      | awk '/^skills:/{found=1; next} /^[a-z]/{found=0} found && /^[[:space:]]*- /' \
-      | sed 's/^[[:space:]]*- //' \
-      | sort > "$FRONTMATTER_SKILLS"
+    # Extract skills referenced in agent body (after YAML frontmatter)
+    BODY_SKILLS=$(mktemp "$TMPDIR_SYNC/body_skills.XXXXXX")
+    awk 'BEGIN{n=0} /^---$/{n++; next} n>=2' "$agent_file" \
+      | grep -oE '~/\.(cursor|claude)/skills/[a-z-]+/SKILL\.md' \
+      | sed 's|.*/skills/||;s|/SKILL\.md||' \
+      | sort -u > "$BODY_SKILLS" || true
 
-    # Filter frontmatter skills to only custom skills (exclude npm skills like golang-pro)
-    FRONTMATTER_CUSTOM=$(mktemp "$TMPDIR_SYNC/fm_custom.XXXXXX")
+    # Filter body skills to only custom skills (exclude npm skills like golang-pro)
+    BODY_CUSTOM=$(mktemp "$TMPDIR_SYNC/body_custom.XXXXXX")
     while read -r skill; do
       if grep -qx "$skill" "$CUSTOM_SKILLS_LIST"; then
         echo "$skill"
       fi
-    done < "$FRONTMATTER_SKILLS" | sort > "$FRONTMATTER_CUSTOM"
+    done < "$BODY_SKILLS" | sort > "$BODY_CUSTOM"
 
     # Parse guide custom skills column (comma-separated, or em-dash/dash for none)
     # The guide uses Unicode em dash (U+2014) to mean "no skills"
@@ -354,14 +367,14 @@ if [ -f "$AGENT_GUIDE" ]; then
     fi
 
     # Compare
-    if ! diff -q "$GUIDE_CUSTOM" "$FRONTMATTER_CUSTOM" > /dev/null 2>&1; then
+    if ! diff -q "$GUIDE_CUSTOM" "$BODY_CUSTOM" > /dev/null 2>&1; then
       guide_list=$(tr '\n' ',' < "$GUIDE_CUSTOM" | sed 's/,$//')
-      frontmatter_list=$(tr '\n' ',' < "$FRONTMATTER_CUSTOM" | sed 's/,$//')
+      body_list=$(tr '\n' ',' < "$BODY_CUSTOM" | sed 's/,$//')
       [ -z "$guide_list" ] && guide_list="none"
-      [ -z "$frontmatter_list" ] && frontmatter_list="none"
+      [ -z "$body_list" ] && body_list="none"
       echo "WARNING [AGENT-GUIDE skills — $guide_agent]"
-      echo "  guide says:       $guide_list"
-      echo "  frontmatter says: $frontmatter_list"
+      echo "  guide says:      $guide_list"
+      echo "  agent body says: $body_list"
       WARN_COUNT=$((WARN_COUNT + 1))
     fi
   done < "$GUIDE_MATRIX"
@@ -369,6 +382,10 @@ if [ -f "$AGENT_GUIDE" ]; then
   # Also check for agents that exist as files but are missing from the guide
   for agent_file in "$CLAUDE_AGENTS_DIR"/*.md; do
     agent_basename=$(basename "$agent_file" .md)
+    # Skip Cursor built-in types (they don't have .md files and aren't in the matrix)
+    if echo "$CURSOR_BUILTINS" | grep -qw "$agent_basename"; then
+      continue
+    fi
     if ! grep -q "| ${agent_basename} " "$GUIDE_MATRIX" 2>/dev/null; then
       echo "WARNING [AGENT-GUIDE coverage] Agent '$agent_basename' exists in claude/agents/ but is not listed in AGENT-GUIDE.md matrix"
       WARN_COUNT=$((WARN_COUNT + 1))

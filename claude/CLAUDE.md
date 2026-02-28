@@ -15,23 +15,27 @@
 - **Parallelism:** For any task involving >3 files, suggest splitting work into parallel subagents or teams if applicable (e.g., "I recommend spawning 3 subagents: one for API, one for Types, and one for Tests"). Automatically send agents to background so they can run in parallel.
 - **Agent Definitions:** Reusable agent prompts live in `~/.claude/agents/`. Use these when delegating via the Task tool:
 <!-- BEGIN:agent-definitions -->
-  - **Go:** `go-coder.md` (invokes `golang-pro` plugin), `go-reviewer.md`, `go-tester.md`
+  - **Go:** `go-coder.md` (invokes `golang-pro` skill), `go-reviewer.md`, `go-tester.md`
   - **TypeScript/JS:** `ts-coder.md`, `ts-reviewer.md`, `ts-tester.md`
-  - **React:** `react-coder.md` (uses `frontend-design` plugin), `react-reviewer.md`, `react-tester.md`
+  - **React:** `react-coder.md` (uses `frontend-design` skill), `react-reviewer.md`, `react-tester.md`
   - **Python:** `py-coder.md`, `py-reviewer.md`, `py-tester.md`
-  - **Database:** `db-coder.md` (invokes `database-schema-designer` plugin), `db-reviewer.md` (read-only), `db-tester.md`
+  - **Database:** `db-coder.md` (invokes `database-schema-designer` skill), `db-reviewer.md` (read-only), `db-tester.md`
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
   - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
+  - **Quality:** `type-design-analyzer.md`, `silent-failure-hunter.md`, `comment-analyzer.md`, `pr-test-analyzer.md`
 <!-- END:agent-definitions -->
 - **Cursor Built-in Agents:** When running in Cursor, these additional `subagent_type` values are available and complement the custom agents above:
+  - `explore` -- Fast codebase exploration agent. Use for finding files, searching code, and answering structural questions about the codebase before coding.
+  - `generalPurpose` -- General-purpose agent for complex multi-step tasks requiring multiple tools and extended reasoning.
+  - `shell` -- Command execution specialist. Use for running build commands, git operations, and terminal tasks.
+  - `browser-use` -- Web testing and automation agent. Use for navigating web pages, testing UI changes, filling forms, and taking screenshots.
   - `code-reviewer` -- Cross-language code review against project guidelines and style. Use after writing or modifying code, especially before commits or PRs.
   - `code-simplifier` -- Simplifies recently modified code for clarity and maintainability while preserving functionality. Use after completing a coding task.
-  - `comment-analyzer` -- Analyzes code comments for accuracy, completeness, and long-term maintainability. Use after generating documentation comments or before finalizing PRs.
   - `docs-researcher` -- Lightweight agent for fetching library documentation without cluttering main conversation context. Use when looking up unfamiliar APIs.
-  - `pr-test-analyzer` -- Reviews PR test coverage quality and completeness. Use after creating or updating a PR to ensure tests cover new functionality.
-  - `silent-failure-hunter` -- Identifies silent failures, inadequate error handling, and inappropriate fallback behavior. Use after completing work involving error handling or catch blocks.
-  - `type-design-analyzer` -- Expert analysis of type design for encapsulation, invariant expression, and enforcement. Use when introducing or refactoring types.
+- **Subagent Launch Tips:**
+  - Use `readonly: true` when launching reviewer agents (`*-reviewer`, `arch-reviewer`, `type-design-analyzer`, `silent-failure-hunter`, `comment-analyzer`, `pr-test-analyzer`) to enforce read-only access at the tool level.
+  - Use `model: "fast"` for quick, scoped tasks (reviewers analyzing a few files, simple test generation, codebase exploration). Use the default model for complex coding tasks requiring deep reasoning.
 - **Plugins vs Skills:** Plugins (e.g., `context7-plugin`, `frontend-design`, `code-review`, `superpowers`) are installed via `claude plugin install` from their respective marketplaces and enabled via `enabledPlugins` in settings.json. Plugin config (names, marketplaces, sources) lives in `config.json` under the `plugins` array. npm skills (e.g., `golang-pro`, `database-schema-designer`) are installed via `npx skills add`. Custom skills (below) are markdown files in `~/.claude/skills/` that define structured workflows. Both are invoked via the Skill tool, but plugins receive automatic updates while custom skills are version-controlled in this repo.
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
 <!-- BEGIN:custom-skills -->
@@ -80,6 +84,8 @@ When rules contradict, follow this priority order:
 ---
 
 # Agentic Implementation Plan
+
+Skip for trivial changes (single-file fixes, typo corrections, config tweaks).
 
 Before any code execution for complex tasks, generate a plan using this structure:
 
@@ -138,7 +144,7 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 | `rules/react-patterns.md` | `cursor/103-react.mdc` | React component and frontend patterns |
 | `rules/api-design.md` | `cursor/400-api-design.mdc` | API design patterns |
 | `rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
-| `rules/observability.md` | `cursor/500-observability.mdc` | Logging, metrics, health checks, Docker, CI/CD |
+| `rules/observability.md` | `cursor/500-observability.mdc` | Logging, metrics, health checks, tracing |
 | `rules/security.md` | `cursor/501-security.mdc` | Auth, CORS, rate limiting, secrets management |
 | `rules/cross-cutting.md` | `cursor/502-cross-cutting.mdc` | Error taxonomy, coverage targets, dependency policy |
 | `rules/concurrency.md` | `cursor/503-concurrency.mdc` | Concurrency patterns (goroutines, promises, asyncio) |

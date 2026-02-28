@@ -35,7 +35,18 @@
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git switch:*)",
-      "Bash(trash:*)"
+      "Bash(trash:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ci:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(poetry install:*)",
+      "Bash(poetry lock:*)",
+      "Bash(uv pip install:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker compose down:*)",
+      "Bash(curl:*)",
+      "Bash(govulncheck:*)"
     ],
     "defaultMode": "plan"
   },
