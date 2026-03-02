@@ -1,5 +1,5 @@
 ---
-name: Cross-Cutting Standards
+name: cross-cutting
 description: Error taxonomy, coverage targets, dependency policy, performance budgets, and data lifecycle
 scope: universal
 languages: []

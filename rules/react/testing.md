@@ -1,12 +1,10 @@
 ---
-name: React Testing
+name: react-testing
 description: Testing Library patterns, user-centric queries, MSW mocking, and component tests
 scope: language-specific
 languages: [react]
 extends: [testing-patterns]
 ---
-
-> Extends `testing-patterns.md`. See parent for universal patterns (naming, isolation, flaky prevention).
 
 # React Testing Patterns
 

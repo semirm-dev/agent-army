@@ -1,12 +1,10 @@
 ---
-name: React Patterns
+name: react-patterns
 description: Component structure, state management, data fetching, accessibility, and performance
 scope: language-specific
 languages: [react]
 extends: [code-quality, typescript/patterns]
 ---
-
-> Extends `code-quality.md`. React components use TypeScript; see `typescript/patterns.md` for TS-specific standards.
 
 # React & Frontend Patterns
 

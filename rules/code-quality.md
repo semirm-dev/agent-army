@@ -1,5 +1,5 @@
 ---
-name: Code Quality
+name: code-quality
 description: Code clarity, structure, naming, comments, and linting standards
 scope: universal
 languages: []

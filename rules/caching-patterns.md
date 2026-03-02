@@ -1,5 +1,5 @@
 ---
-name: Caching Patterns
+name: caching-patterns
 description: Cache-aside strategy, write policies, invalidation, key design, and failure handling
 scope: universal
 languages: []

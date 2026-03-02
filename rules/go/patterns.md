@@ -1,12 +1,10 @@
 ---
-name: Go Patterns
+name: go-patterns
 description: Go coding conventions, error handling, project structure, and concurrency
 scope: language-specific
 languages: [go]
 extends: [code-quality]
 ---
-
-> Extends `code-quality.md`. Language-agnostic standards apply.
 
 # Go Coding Patterns
 - **Linting:** Use `golangci-lint` with project config. Fix all warnings before committing.

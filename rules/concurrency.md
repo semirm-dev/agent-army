@@ -1,5 +1,5 @@
 ---
-name: Concurrency
+name: concurrency
 description: Race condition prevention, deadlock avoidance, backpressure, and graceful shutdown
 scope: universal
 languages: []

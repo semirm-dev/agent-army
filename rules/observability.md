@@ -1,5 +1,5 @@
 ---
-name: Observability
+name: observability
 description: Health checks, structured logging, metrics, distributed tracing, and alerting
 scope: universal
 languages: []

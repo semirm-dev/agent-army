@@ -1,5 +1,5 @@
 ---
-name: Infrastructure
+name: infrastructure
 description: Container best practices, image scanning, secrets handling, and CI/CD pipelines
 scope: universal
 languages: []

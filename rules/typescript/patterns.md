@@ -1,12 +1,10 @@
 ---
-name: TypeScript Patterns
+name: typescript-patterns
 description: Strict mode, type safety, naming, imports, error handling, and async patterns
 scope: language-specific
 languages: [typescript]
 extends: [code-quality]
 ---
-
-> Extends `code-quality.md`. Language-agnostic standards apply.
 
 # TypeScript Coding Patterns
 - **Strict Mode:** All projects must use `strict: true` in tsconfig.json. No exceptions.

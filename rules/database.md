@@ -1,5 +1,5 @@
 ---
-name: Database
+name: database
 description: Migrations, connection pooling, transactions, query safety, indexes, and schema conventions
 scope: universal
 languages: []

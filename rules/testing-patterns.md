@@ -1,5 +1,5 @@
 ---
-name: Testing Patterns
+name: testing-patterns
 description: Test naming, organization, isolation, mocking, async testing, and flaky prevention
 scope: universal
 languages: []

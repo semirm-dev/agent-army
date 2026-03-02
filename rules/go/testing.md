@@ -1,12 +1,10 @@
 ---
-name: Go Testing
+name: go-testing
 description: Table-driven tests, race detection, benchmarks, and Go test helpers
 scope: language-specific
 languages: [go]
 extends: [testing-patterns]
 ---
-
-> Extends `testing-patterns.md`. See parent for universal patterns (naming, isolation, flaky prevention).
 
 # Go Testing Patterns
 

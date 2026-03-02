@@ -1,12 +1,10 @@
 ---
-name: Python Patterns
+name: python-patterns
 description: Type hints, formatting, error handling, async patterns, and project structure
 scope: language-specific
 languages: [python]
 extends: [code-quality]
 ---
-
-> Extends `code-quality.md`. Language-agnostic standards apply.
 
 # Python Coding Patterns
 - **Type Hints:** Use type hints on all function signatures. Use `from __future__ import annotations` for forward references.

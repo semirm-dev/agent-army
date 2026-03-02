@@ -1,5 +1,5 @@
 ---
-name: Security
+name: security
 description: Authentication, authorization, CORS, rate limiting, input sanitization, and secrets management
 scope: universal
 languages: []

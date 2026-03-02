@@ -1,5 +1,5 @@
 ---
-name: Messaging Patterns
+name: messaging-patterns
 description: Queue patterns, idempotent consumers, DLQs, event schemas, and delivery guarantees
 scope: universal
 languages: []

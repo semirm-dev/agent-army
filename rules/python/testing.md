@@ -1,12 +1,10 @@
 ---
-name: Python Testing
+name: python-testing
 description: Pytest conventions, parametrize, fixtures, and async test support
 scope: language-specific
 languages: [python]
 extends: [testing-patterns]
 ---
-
-> Extends `testing-patterns.md`. See parent for universal patterns (naming, isolation, flaky prevention).
 
 # Python Testing Patterns
 

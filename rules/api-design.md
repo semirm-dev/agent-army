@@ -1,5 +1,5 @@
 ---
-name: API Design
+name: api-design
 description: REST conventions, error formats, caching headers, versioning, and batch operations
 scope: universal
 languages: []

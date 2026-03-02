@@ -1,5 +1,5 @@
 ---
-name: AI-Assisted Development
+name: ai-assisted-development
 description: Safe practices for AI-generated code, verification patterns, and anti-patterns
 scope: universal
 languages: []

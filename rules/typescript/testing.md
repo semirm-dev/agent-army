@@ -1,12 +1,10 @@
 ---
-name: TypeScript Testing
+name: typescript-testing
 description: Vitest/Jest config, table-driven tests, async error testing, and test doubles
 scope: language-specific
 languages: [typescript]
 extends: [testing-patterns]
 ---
-
-> Extends `testing-patterns.md`. See parent for universal patterns (naming, isolation, flaky prevention).
 
 # TypeScript Testing Patterns
 

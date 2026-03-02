@@ -1,5 +1,5 @@
 ---
-name: Git Workflow
+name: git-workflow
 description: Branch naming, commit messages, PR conventions, merge strategy, and release tagging
 scope: universal
 languages: []
