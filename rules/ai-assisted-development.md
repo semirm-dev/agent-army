@@ -22,9 +22,9 @@ languages: []
 - **Stale context.** AI working from outdated file reads — verify files are current before generating changes.
 - **Missing verification.** Marking tasks done without running build/test. Evidence before assertions.
 
-## Test Patterns for AI Verification
-- **Descriptive assertion messages.** Include context that explains what was expected and why.
-- **Deterministic tests.** No random data, no time-dependent assertions, no external dependencies in unit tests.
-- **Table-driven tests with named cases.** Each case name describes the scenario being tested.
-- **One assertion per test when practical.** Easier to diagnose which behavior broke.
-- **Edge cases as explicit test cases.** Not hidden in helper functions or shared fixtures.
+## Testing After AI Changes
+- **Re-run full test suite** after any AI-generated change, even if the change looks trivial.
+- **Add regression tests** for the specific behavior the AI modified. AI may silently alter edge cases.
+- **Diff-test before and after.** If a refactoring should be behavior-preserving, add a characterization test first, then apply the AI change.
+- **Check test quality.** AI-generated tests may assert implementation details or use tautological assertions (testing mocks, not behavior).
+- **Verify edge cases independently.** AI tends to handle happy paths well but miss boundary conditions, off-by-one errors, and empty/null inputs.

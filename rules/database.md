@@ -37,9 +37,6 @@ languages: []
 - **Monitor:** Watch for unused indexes (bloat) and missing indexes (slow queries).
 - **N+1 prevention:** Detect and eliminate N+1 query patterns. Use eager loading, joins, or batch queries instead of querying in loops.
 
-## Query Plan Analysis
-- **Query Plans:** Analyze with `EXPLAIN ANALYZE` for all new queries.
-
 ## Schema Conventions
 - **Primary keys:** UUID for distributed systems, BIGINT/SERIAL for single-database systems.
 - **Timestamps:** Use `timestamptz` for all date/time columns. Never `timestamp` without timezone.

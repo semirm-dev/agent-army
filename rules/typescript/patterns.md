@@ -19,3 +19,12 @@ uses_rules: [code-quality, security, cross-cutting, testing-patterns]
 - **Configuration:** Access env vars through a validated config module, never directly via `process.env` in business logic.
 - **Linting:** Use ESLint with strict TypeScript rules. Fix all warnings before committing.
 - **Formatting:** Use Prettier (or Biome). Enforce via pre-commit hook or CI.
+
+## Type Patterns
+- **Discriminated unions** for state modeling: `type Result<T, E> = { ok: true; data: T } | { ok: false; error: E }`. Use a literal discriminant field.
+- **Branded types** for domain IDs: `type UserId = string & { __brand: "UserId" }`. Prevents mixing IDs across domains.
+- **`satisfies` operator** over type annotations when you want type checking without widening the inferred type.
+- **Avoid `enum`:** Use `as const` objects or union types instead. Enums have runtime overhead and quirky reverse-mapping behavior.
+- **Generic constraints:** Prefer `<T extends Base>` over unconstrained generics. Keeps type inference useful at call sites.
+- **Utility types:** Use `Pick`, `Omit`, `Partial`, `Required` to derive types from existing ones instead of duplicating shapes.
+- **`readonly` by default:** Mark arrays as `readonly T[]` and object properties as `readonly` unless mutation is intentional.
