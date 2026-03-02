@@ -58,3 +58,8 @@ const { container } = render(<Navigation />);
 const results = await axe(container);
 expect(results).toHaveNoViolations();
 ```
+
+## Error Boundary Testing
+- Test that the fallback UI renders when a child component throws.
+- Test the reset/retry flow via `resetErrorBoundary` to verify recovery.
+- Test that `onError` fires with the error and component stack for logging.

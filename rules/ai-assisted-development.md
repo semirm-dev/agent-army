@@ -19,7 +19,6 @@ languages: []
 - **Blind trust.** Accepting AI suggestions without reading them. Every line must be understood.
 - **Cargo-culting.** Copying AI patterns without understanding why. If you can't explain the code, don't commit it.
 - **Scope creep.** Letting AI add "improvements" beyond the requested change. A bug fix is not an invitation to refactor.
-- **Stale context.** AI working from outdated file reads — verify files are current before generating changes.
 - **Missing verification.** Marking tasks done without running build/test. Evidence before assertions.
 
 ## Testing After AI Changes

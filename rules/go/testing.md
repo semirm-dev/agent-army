@@ -34,10 +34,19 @@ for _, tt := range tests {
 }
 ```
 
+## Test Helpers
+- Use `t.Helper()` in test helper functions so failure locations point to the caller, not the helper.
+- Helper functions should accept `testing.TB` to work with both tests and benchmarks.
+
 ## Test Isolation
 - Use `t.Cleanup()` for resource teardown
 - Use `t.TempDir()` for temporary file system tests
 - Wrap database tests in a transaction, rollback after
+
+## Fuzz Testing
+- Use `testing.F` for fuzz tests on parsers, validators, and serialization logic.
+- Seed the corpus with known edge cases via `f.Add()`.
+- Fuzz tests should assert invariants (no panic, round-trip equality), not specific outputs.
 
 ## CI Parallelization
 - `go test -parallel N` controls per-test parallelism

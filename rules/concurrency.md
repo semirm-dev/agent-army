@@ -11,6 +11,7 @@ languages: []
 - **Minimize shared mutable state.** Prefer message passing (channels, queues) over shared memory.
 - **Immutable data:** At message-passing boundaries, pass copies or immutable values — not mutable references — between concurrent units.
 - **Atomic operations:** Use language-provided atomics for simple counters/flags.
+- **Cancellation propagation:** Pass cancellation tokens/contexts through the call chain. Check for cancellation before expensive operations. Respect cancellation in loops and retry logic.
 
 ## Deadlock Avoidance
 - **Consistent lock ordering:** Always acquire locks in the same order across all code paths.

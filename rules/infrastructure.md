@@ -14,6 +14,7 @@ languages: []
 - **Pin base image versions** by digest or specific tag for reproducibility. Floating tags (`latest`) cause non-deterministic builds.
 - **Layer ordering:** Place frequently-changing layers (application code) last in the build to maximize cache reuse.
 - **HEALTHCHECK instruction:** Include a `HEALTHCHECK` in Dockerfiles so the orchestrator can detect unhealthy containers. Use the application's health endpoint, not a generic TCP check.
+- **`.dockerignore`:** Maintain a `.dockerignore` file to exclude build artifacts, test files, `.git`, and local config from the build context. Prevents image bloat and unintended secret leakage.
 - **Resource limits:** Always set CPU and memory limits in deployment manifests. Containers without limits can starve co-located workloads.
 
 ## Secrets in Containers
