@@ -7,8 +7,6 @@ languages: []
 
 # Cross-Cutting Standards
 
-Standards that span multiple domains.
-
 ## Error Taxonomy
 Categorize all errors into three levels:
 - **Domain Errors:** Validation failures, not-found, conflict, business rule violations. These are expected and handled. Return appropriate 4xx status codes.

@@ -44,6 +44,12 @@ languages: []
 - Alert on sudden hit rate drops -- may indicate invalidation bugs or traffic pattern shifts.
 - Log cache eviction rate -- high eviction signals an undersized cache or missing TTL tuning.
 
+## Multi-Tier Caching
+- **L1 (in-process):** Fast, small, per-instance. Use for hot data with short TTL.
+- **L2 (distributed):** Shared across instances (Redis, Memcached). Larger capacity, higher latency.
+- **Read path:** Check L1 → L2 → source of truth. Populate both on miss.
+- **Invalidation:** Invalidate L2 on write. L1 expires via short TTL -- do not attempt cross-instance L1 invalidation.
+
 ## Anti-Patterns
 - **No TTL:** Every entry must expire. Unbounded caches grow until out of memory.
 - **Cache as primary store:** Cache is ephemeral. Always have a source of truth.
