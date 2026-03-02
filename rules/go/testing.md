@@ -54,6 +54,10 @@ for _, tt := range tests {
 - Compare before/after with `benchstat`. Require statistically significant results.
 - Never benchmark in CI by default -- run on dedicated hardware or use relative comparison.
 
+## Integration Tests
+- Use `testing.Short()` to skip slow integration tests during local development: `if testing.Short() { t.Skip("skipping integration test") }`. Run full suite in CI with `go test ./...` (no `-short` flag).
+- Use `testcontainers-go` to spin up real dependencies (databases, caches, queues) in Docker for integration tests. Prefer real dependencies over mocks for integration-level verification.
+
 ## CI Parallelization
 - `go test -parallel N` controls per-test parallelism
 - `-count=1` disables test caching

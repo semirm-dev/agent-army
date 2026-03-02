@@ -17,6 +17,7 @@ uses_rules: [code-quality, security, cross-cutting, observability, testing-patte
 ## Type Safety
 - **Type Hints:** Use type hints on all function signatures. Use `from __future__ import annotations` for forward references.
 - **Type checking:** Use `mypy` (strict mode) or `pyright`. Run in CI. Fix all type errors before committing.
+- **Protocols:** Use `typing.Protocol` for structural subtyping (duck typing with type safety). Define protocols for dependencies to enable testing without inheritance coupling.
 - **Dataclasses/Pydantic:** Prefer `dataclasses` or `pydantic.BaseModel` over plain dicts for structured data. Use `frozen=True` for immutable value objects.
 
 ## Error Handling

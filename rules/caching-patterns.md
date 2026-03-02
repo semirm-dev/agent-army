@@ -12,13 +12,13 @@ languages: []
 - **Write path:** Write to source of truth, then invalidate cache. Never update cache directly on write.
 - **TTL required:** Every cache entry must have a TTL. No indefinite caching.
 
-## Write Strategies
+## Read/Write Strategies
 
-| Strategy | When to Use | Trade-off |
-|----------|-------------|-----------|
-| **Write-through** | Data consistency critical, low write volume | Higher write latency, always consistent |
-| **Write-behind** | High write volume, eventual consistency acceptable | Lower latency, risk of data loss |
-| **Cache-aside** | Default choice. Read-heavy workloads | Stale reads during TTL window |
+| Strategy | Pattern | When to Use | Trade-off |
+|----------|---------|-------------|-----------|
+| **Cache-aside** | Read (with invalidate-on-write) | Default choice. Read-heavy workloads | Stale reads during TTL window |
+| **Write-through** | Write | Data consistency critical, low write volume | Higher write latency, always consistent |
+| **Write-behind** | Write | High write volume, eventual consistency acceptable | Lower latency, risk of data loss |
 
 ## Cache Invalidation
 - **TTL-based:** Default strategy. Set TTL based on data volatility (user profiles: 15min, config: 5min, sessions: match session timeout).

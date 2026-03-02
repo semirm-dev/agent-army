@@ -36,4 +36,5 @@ uses_rules: [code-quality, security, cross-cutting, observability, testing-patte
 - **Generic constraints:** Prefer `<T extends Base>` over unconstrained generics. Keeps type inference useful at call sites.
 - **Utility types:** Use `Pick`, `Omit`, `Partial`, `Required` to derive types from existing ones instead of duplicating shapes.
 - **`readonly` by default:** Mark arrays as `readonly T[]` and object properties as `readonly` unless mutation is intentional.
+- **`using` keyword** (TS 5.2+): Use `using` and `Disposable`/`AsyncDisposable` for deterministic resource cleanup (connections, file handles, locks). Replaces manual try/finally patterns.
 - **Runtime validation:** Use schema validation libraries (e.g., Zod, Valibot) at system boundaries (API responses, form input, environment config). TypeScript types are erased at runtime -- untrusted data must be validated, not just typed.
