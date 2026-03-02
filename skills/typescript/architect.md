@@ -1,5 +1,5 @@
 ---
-name: typescript-architect
+name: typescript/architect
 description: TypeScript project architecture — layout selection, module decomposition, dependency direction, type architecture decisions, barrel file strategy, and evolution planning.
 scope: language-specific
 uses_rules:

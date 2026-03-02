@@ -1,5 +1,5 @@
 ---
-name: python-architect
+name: python/architect
 description: Python project architecture — layout selection, module decomposition, dependency direction, async architecture decisions, package organization, and evolution planning.
 scope: language-specific
 uses_rules:

@@ -1,5 +1,5 @@
 ---
-name: python-coder
+name: python/coder
 description: Python implementation workflow — code placement, error handling patterns, async decisions, type safety enforcement, dependency management, and pre-PR verification.
 scope: language-specific
 uses_rules:

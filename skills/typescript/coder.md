@@ -1,5 +1,5 @@
 ---
-name: typescript-coder
+name: typescript/coder
 description: TypeScript implementation workflow — code placement, type design decisions, error handling patterns, async patterns, dependency management, and pre-PR verification.
 scope: language-specific
 uses_rules:

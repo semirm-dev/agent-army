@@ -147,7 +147,7 @@ while IFS= read -r file; do
   skill_scopes+=("$scope")
   skill_uses_rules+=("$uses")
   skill_paths+=("skills/$relpath")
-done < <(find "$SKILLS_DIR" -maxdepth 1 -name '*.md' -not -name 'INDEX.md' | sort)
+done < <(find "$SKILLS_DIR" -name '*.md' -not -name 'INDEX.md' | sort)
 
 # --- Generate rules/INDEX.md ---
 
@@ -201,7 +201,8 @@ echo "Generated $RULES_DIR/INDEX.md"
   echo '|-------|-----------|---------|'
 
   for i in "${!skill_names[@]}"; do
-    echo "| [${skill_names[$i]}](${skill_names[$i]}.md) | ${skill_uses_rules[$i]} | ${skill_summaries[$i]} |"
+    relpath="${skill_paths[$i]#skills/}"
+    echo "| [${skill_names[$i]}](${relpath}) | ${skill_uses_rules[$i]} | ${skill_summaries[$i]} |"
   done
 } > "$SKILLS_DIR/INDEX.md"
 

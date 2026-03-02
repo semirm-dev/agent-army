@@ -1,5 +1,5 @@
 ---
-name: go-reviewer
+name: go/reviewer
 description: Go code review workflow — review order, concurrency audit, error handling verification, performance red flags, security checklist, and anti-pattern detection.
 scope: language-specific
 uses_rules:

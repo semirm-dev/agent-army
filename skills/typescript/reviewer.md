@@ -1,5 +1,5 @@
 ---
-name: typescript-reviewer
+name: typescript/reviewer
 description: TypeScript code review workflow — review order, type safety audit, async verification, performance red flags, security checklist, and anti-pattern detection.
 scope: language-specific
 uses_rules:

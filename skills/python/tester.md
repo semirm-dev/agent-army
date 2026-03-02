@@ -1,5 +1,5 @@
 ---
-name: python-tester
+name: python/tester
 description: Python testing workflow — test type selection, pytest patterns, fixture design, mock vs real dependency decisions, async test setup, coverage analysis, and hypothesis usage.
 scope: language-specific
 uses_rules:

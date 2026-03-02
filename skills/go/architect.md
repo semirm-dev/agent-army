@@ -1,5 +1,5 @@
 ---
-name: go-architect
+name: go/architect
 description: Go project architecture — layout selection, package decomposition, dependency direction, interface boundary design, module organization, and evolution planning.
 scope: language-specific
 uses_rules:
