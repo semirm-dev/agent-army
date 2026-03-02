@@ -3,10 +3,7 @@ name: security-hardening
 description: Security implementation workflows -- auth flow selection, JWT vs session decision, input validation checklist, secrets management, CORS decision tree, and rate limiting strategy.
 scope: universal
 languages: []
-uses_rules:
-  - security
-  - cross-cutting
-  - api-design
+uses_rules: [security, cross-cutting, api-design]
 ---
 
 # Security Hardening Skill

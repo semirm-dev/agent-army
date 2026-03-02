@@ -3,8 +3,7 @@ name: typescript/tester
 description: TypeScript testing workflow — test type selection, vitest/jest patterns, mock design, React component testing, async test patterns, coverage analysis, and CI integration.
 scope: language-specific
 languages: [typescript]
-uses_rules:
-  - typescript/testing
+uses_rules: [typescript/testing]
 ---
 
 # TypeScript Tester Skill

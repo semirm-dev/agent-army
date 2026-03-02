@@ -3,8 +3,7 @@ name: react/reviewer
 description: React code review workflow — review order, component anti-patterns, hook correctness, accessibility audit, performance red flags, and security checklist.
 scope: language-specific
 languages: [react]
-uses_rules:
-  - react/testing
+uses_rules: [react/testing]
 ---
 
 # React Reviewer Skill

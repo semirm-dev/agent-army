@@ -3,10 +3,7 @@ name: messaging-patterns
 description: Messaging workflow — queue pattern selection, idempotency design, DLQ setup, event schema conventions, delivery guarantee trade-offs, and transactional outbox guidance.
 scope: universal
 languages: []
-uses_rules:
-  - messaging-patterns
-  - cross-cutting
-  - observability
+uses_rules: [messaging-patterns, cross-cutting, observability]
 ---
 
 # Messaging Patterns Skill

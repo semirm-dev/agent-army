@@ -3,11 +3,7 @@ name: performance-audit
 description: Performance investigation workflow — profiling cycle, decision trees, query plan analysis, bundle auditing, benchmark methodology, and reporting template.
 scope: universal
 languages: []
-uses_rules:
-  - cross-cutting
-  - database
-  - observability
-  - infrastructure
+uses_rules: [cross-cutting, database, observability, infrastructure]
 ---
 
 # Performance Audit Skill
