@@ -11,7 +11,7 @@ uses_rules: [code-quality, security, cross-cutting, observability, testing-patte
 ## Naming and Structure
 - **Packages:** Avoid "stuttering." Use `auth.Service` instead of `auth.AuthService`.
 - **Naming:** Use `MixedCaps` (Acronyms like `ID`, `HTTP`, `URL` should be consistent case).
-- **Project structure:** Follow vertical-slices architecture (feature + hexagonal/clean), package by feature. Follow Golang best practices.
+- **Project structure:** Follow vertical-slices architecture (feature + hexagonal/clean), package by feature. Keep `cmd/` thin -- delegate to packages immediately.
 - **Godoc:** All exported types, functions, and methods must have a godoc comment starting with the identifier name.
 
 ## Error Handling

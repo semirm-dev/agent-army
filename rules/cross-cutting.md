@@ -1,6 +1,6 @@
 ---
 name: cross-cutting
-description: Error taxonomy, coverage targets, dependency policy, performance budgets, and data lifecycle
+description: Error taxonomy, dependency policy, performance budgets, and data lifecycle
 scope: universal
 languages: []
 ---
@@ -14,12 +14,6 @@ Categorize all errors into three levels:
 - **Domain Errors:** Validation failures, not-found, conflict, business rule violations. These are expected and handled. Return appropriate 4xx status codes.
 - **Infrastructure Errors:** Timeouts, connection failures, service unavailable. These are retryable. Log at WARN, return 503 with retry guidance.
 - **System Errors:** Internal bugs, panic recovery, unhandled states. These are unexpected. Log at ERROR with full stack trace, return 500. Page on-call if in production.
-
-## Testing Coverage Targets
-- **Critical paths** (auth, payments, data mutations): 80%+ line coverage.
-- **Utilities and shared libraries:** 90%+ line coverage.
-- **Generated code** (protobuf, OpenAPI stubs): No coverage requirement.
-- **Integration tests:** Cover all API endpoints and external service interactions. Not counted toward line coverage targets.
 
 ## Dependency Update Policy
 - **Security patches:** Apply immediately. No waiting for a release cycle.
@@ -40,12 +34,6 @@ Categorize all errors into three levels:
 - Generate SBOM as part of the CI/CD build stage, before the deploy stage.
 - Store SBOM artifacts alongside release artifacts and verify against known vulnerability databases before deploying to production.
 
-## Service Level Objectives
-- Define SLOs for availability and latency per service. SLOs are business decisions that drive alerting and observability implementation.
-
 ## Data Lifecycle
 - Classify data by sensitivity: public, internal, confidential, restricted.
-- Encrypt confidential and restricted data at rest and in transit.
 - Define retention policies per data class -- never retain data indefinitely without justification.
-- Anonymize or pseudonymize PII in non-production environments.
-- Log access to restricted data for audit purposes.

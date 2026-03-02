@@ -34,9 +34,8 @@ languages: []
 - Use language-specific spy/mock tools (`vi.fn`, `unittest.mock`, `gomock`) only for call verification.
 
 ## Snapshot Testing
-- Avoid snapshot tests for UI rendering. They break on every change and provide no diagnostic signal.
-- Snapshots can be acceptable for serialized output (API response shapes, CLI output) where the exact shape IS the contract -- but prefer explicit assertions when feasible.
-- Assert specific values and behaviors instead of relying on snapshot comparisons.
+- Do not use snapshot tests for UI rendering. They break on cosmetic changes and provide no diagnostic signal when they fail.
+- Snapshots are acceptable only for serialized contracts (API response shapes, CLI output) where the exact shape is the spec. Prefer explicit assertions when feasible.
 
 ## Async Testing
 - Always await async operations. Unawaited assertions silently pass and hide real failures.

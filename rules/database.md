@@ -51,5 +51,5 @@ languages: []
 - Account for replication lag in read-after-write scenarios. Read from primary when consistency matters.
 
 ## Technology Choices
-- **ORMs vs Raw SQL:** Pick one approach per operation. Never mix ORM and raw SQL for the same entity.
+- **ORMs vs Raw SQL:** Pick one approach per entity. Never mix ORM and raw SQL queries for the same table.
 - **Default to PostgreSQL** unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).
