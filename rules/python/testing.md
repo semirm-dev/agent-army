@@ -3,7 +3,7 @@ name: python/testing
 description: Pytest conventions, parametrize, fixtures, and async test support
 scope: language-specific
 languages: [python]
-uses_rules: [testing-patterns, cross-cutting, python/patterns]
+uses_rules: [python/patterns]
 ---
 
 # Python Testing Patterns

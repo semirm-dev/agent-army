@@ -8,6 +8,9 @@ RULES_DIR="$REPO_ROOT/rules"
 SKILLS_DIR="$REPO_ROOT/skills"
 MANIFEST="$REPO_ROOT/manifest.json"
 
+# Source shared dependency library
+source "$REPO_ROOT/scripts/lib-deps.sh"
+
 # --- Helpers ---
 
 # Read valid rule names from manifest.json.
@@ -40,42 +43,6 @@ get_current_uses_rules() {
     }
     c >= 2 { exit }
   ' "$file"
-}
-
-# Rewrite uses_rules line in a file.
-# Usage: write_uses_rules <file> <comma-separated-rules>
-# If rules is empty, removes the uses_rules line entirely.
-write_uses_rules() {
-  local file="$1" rules="$2"
-
-  if [ -z "$rules" ]; then
-    # Remove the uses_rules line
-    awk '
-      /^---$/ { c++; print; next }
-      c == 1 && /^uses_rules:/ { next }
-      { print }
-    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-  else
-    # Check if uses_rules line exists
-    local has_line
-    has_line=$(awk '/^---$/{c++;next} c==1 && /^uses_rules:/{print "yes";exit}' "$file")
-
-    if [ "$has_line" = "yes" ]; then
-      # Replace existing line
-      awk -v newval="uses_rules: [$rules]" '
-        /^---$/ { c++; print; next }
-        c == 1 && /^uses_rules:/ { print newval; next }
-        { print }
-      ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-    else
-      # Insert before closing ---
-      awk -v newval="uses_rules: [$rules]" '
-        /^---$/ { c++ }
-        c == 2 { print newval; c = 3 }
-        { print }
-      ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-    fi
-  fi
 }
 
 # Prompt user to select one item from a numbered list.
@@ -248,6 +215,19 @@ for r in "${new_rules[@]}"; do
     new_csv="$new_csv, $r"
   fi
 done
+
+# Check for redundant entries
+if [ -n "$new_csv" ]; then
+  load_rule_deps
+  redundancies="$(find_redundant_rules "$new_csv")"
+  if [ -n "$redundancies" ]; then
+    echo ""
+    echo "Warning: Redundant entries detected:"
+    while IFS='|' read -r redundant_rule covered_by; do
+      echo "  - \"$redundant_rule\" is already included transitively by \"$covered_by\""
+    done <<< "$redundancies"
+  fi
+fi
 
 # 5. Show diff preview
 echo ""

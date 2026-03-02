@@ -3,7 +3,7 @@ name: react/testing
 description: Testing Library patterns, user-centric queries, MSW mocking, and component tests
 scope: language-specific
 languages: [react]
-uses_rules: [testing-patterns, cross-cutting, react/patterns, typescript/patterns]
+uses_rules: [react/patterns]
 ---
 
 # React Testing Patterns

@@ -3,7 +3,7 @@ name: react/patterns
 description: Component structure, state management, data fetching, accessibility, and performance
 scope: language-specific
 languages: [react]
-uses_rules: [code-quality, typescript/patterns, cross-cutting, security, testing-patterns]
+uses_rules: [typescript/patterns]
 ---
 
 # React & Frontend Patterns
