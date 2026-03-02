@@ -30,7 +30,6 @@ languages: []
 - **Retry on conflict.** Serialization failures should be retried, not surfaced as user errors.
 
 ## Query Safety
-- **Always parameterized.** Never string-concatenate user input into queries.
 - **Query builders/ORMs:** Use parameterized execution. Verify generated SQL in development.
 - **Avoid `SELECT *`.** List columns explicitly. Prevents schema change breakage and reduces data transfer.
 - **Query timeouts:** Set statement-level timeouts on all queries. A runaway query without a timeout can exhaust the connection pool.
