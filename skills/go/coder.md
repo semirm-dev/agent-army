@@ -2,6 +2,7 @@
 name: go/coder
 description: Go implementation workflow — code placement, error handling patterns, interface design decisions, dependency management, and pre-PR verification.
 scope: language-specific
+languages: [go]
 uses_rules:
   - go/patterns
   - code-quality

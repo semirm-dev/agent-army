@@ -2,6 +2,7 @@
 name: go/reviewer
 description: Go code review workflow — review order, concurrency audit, error handling verification, performance red flags, security checklist, and anti-pattern detection.
 scope: language-specific
+languages: [go]
 uses_rules:
   - go/patterns
   - go/testing

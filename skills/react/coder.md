@@ -2,6 +2,7 @@
 name: react/coder
 description: React implementation workflow — component placement, hook design, state management, accessibility, form handling, and pre-PR verification.
 scope: language-specific
+languages: [react]
 uses_rules:
   - react/patterns
   - typescript/patterns

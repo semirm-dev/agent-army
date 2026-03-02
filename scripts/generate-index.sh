@@ -125,6 +125,7 @@ done < <(find "$RULES_DIR" -name '*.md' -not -name 'INDEX.md' | sort)
 declare -a skill_names=()
 declare -a skill_summaries=()
 declare -a skill_scopes=()
+declare -a skill_languages=()
 declare -a skill_uses_rules=()
 declare -a skill_paths=()
 
@@ -139,12 +140,14 @@ while IFS= read -r file; do
   scope="$(extract_fm_value "scope" "$fm")"
   [ -z "$scope" ] && scope="universal"
 
+  langs="$(extract_fm_list "languages" "$fm" | paste -sd ',' - || true)"
   uses="$(extract_fm_list "uses_rules" "$fm" | paste -sd ',' - || true)"
   summary="$(extract_h1 < "$file")"
 
   skill_names+=("$name")
   skill_summaries+=("$summary")
   skill_scopes+=("$scope")
+  skill_languages+=("$langs")
   skill_uses_rules+=("$uses")
   skill_paths+=("skills/$relpath")
 done < <(find "$SKILLS_DIR" -name '*.md' -not -name 'INDEX.md' | sort)
@@ -266,7 +269,27 @@ echo "Generated $SKILLS_DIR/INDEX.md"
     comma=","
     [ "$i" -eq "$last_skill" ] && comma=""
 
+    langs="${skill_languages[$i]}"
     uses="${skill_uses_rules[$i]}"
+
+    # Build optional JSON fields
+    optional=""
+
+    if [ "${skill_scopes[$i]}" = "language-specific" ] && [ -n "$langs" ]; then
+      lang_json="["
+      first=1
+      IFS=',' read -ra lang_arr <<< "$langs"
+      for l in "${lang_arr[@]}"; do
+        l="$(echo "$l" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+        [ -z "$l" ] && continue
+        [ "$first" -eq 0 ] && lang_json+=", "
+        lang_json+="\"$(json_escape "$l")\""
+        first=0
+      done
+      lang_json+="]"
+      optional+=", \"languages\": ${lang_json}"
+    fi
+
     uses_json="["
     first=1
     if [ -n "$uses" ]; then
@@ -281,7 +304,7 @@ echo "Generated $SKILLS_DIR/INDEX.md"
     fi
     uses_json+="]"
 
-    echo "    { \"name\": \"$(json_escape "${skill_names[$i]}")\", \"scope\": \"$(json_escape "${skill_scopes[$i]}")\", \"uses_rules\": ${uses_json}, \"path\": \"$(json_escape "${skill_paths[$i]}")\" }${comma}"
+    echo "    { \"name\": \"$(json_escape "${skill_names[$i]}")\", \"scope\": \"$(json_escape "${skill_scopes[$i]}")\"${optional}, \"uses_rules\": ${uses_json}, \"path\": \"$(json_escape "${skill_paths[$i]}")\" }${comma}"
   done
 
   echo '  ]'

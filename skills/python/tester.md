@@ -2,6 +2,7 @@
 name: python/tester
 description: Python testing workflow — test type selection, pytest patterns, fixture design, mock vs real dependency decisions, async test setup, coverage analysis, and hypothesis usage.
 scope: language-specific
+languages: [python]
 uses_rules:
   - python/testing
   - testing-patterns

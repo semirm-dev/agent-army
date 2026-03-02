@@ -2,6 +2,7 @@
 name: go/tester
 description: Go testing workflow — test type selection, table-driven test design, mock vs real dependency decisions, testcontainers usage, coverage analysis, and benchmark methodology.
 scope: language-specific
+languages: [go]
 uses_rules:
   - go/testing
   - testing-patterns

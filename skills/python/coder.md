@@ -2,6 +2,7 @@
 name: python/coder
 description: Python implementation workflow — code placement, error handling patterns, async decisions, type safety enforcement, dependency management, and pre-PR verification.
 scope: language-specific
+languages: [python]
 uses_rules:
   - python/patterns
   - code-quality
