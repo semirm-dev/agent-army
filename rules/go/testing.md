@@ -42,6 +42,7 @@ for _, tt := range tests {
 - Use `t.Cleanup()` for resource teardown
 - Use `t.TempDir()` for temporary file system tests
 - Wrap database tests in a transaction, rollback after
+- Call `t.Parallel()` in subtests when tests are independent. Capture loop variables in table-driven tests (Go < 1.22) to avoid data races.
 
 ## Fuzz Testing
 - Use `testing.F` for fuzz tests on parsers, validators, and serialization logic.

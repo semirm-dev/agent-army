@@ -32,11 +32,6 @@ Default targets. Adjust per-project based on domain requirements.
 - **INP:** < 200ms. Profile with Chrome DevTools.
 - **Bundle size:** < 200KB gzipped initial load. Code-split routes.
 
-## SBOM Requirement
-- **Production deployments** must include a Software Bill of Materials (SBOM) in CycloneDX or SPDX format.
-- Generate SBOM as part of the CI/CD build stage, before the deploy stage.
-- Store SBOM artifacts alongside release artifacts and verify against known vulnerability databases before deploying to production.
-
 ## Data Lifecycle
 - Classify data by sensitivity: public, internal, confidential, restricted. Apply controls proportional to classification.
 - **Retention policies:** Define per data class. Automate enforcement -- scheduled jobs to purge or archive expired data. Never retain data indefinitely without justification.

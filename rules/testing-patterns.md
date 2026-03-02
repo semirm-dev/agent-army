@@ -40,7 +40,7 @@ languages: []
 - Use language-specific spy/mock tools (`vi.fn`, `unittest.mock`, `gomock`) only for call verification.
 
 ## Snapshot Testing
-- Avoid snapshot tests for rendered HTML/JSX -- large diffs with no diagnostic signal. Use snapshot tests only for serialized contracts (API response shapes, CLI output, config schemas) where the exact shape is the specification.
+- Avoid snapshot tests for rendered UI output -- large diffs with no diagnostic signal. Use snapshot tests only for serialized contracts (API response shapes, CLI output, config schemas) where the exact shape is the specification.
 
 ## Async Testing
 - Always await async operations. Unawaited assertions silently pass and hide real failures.
