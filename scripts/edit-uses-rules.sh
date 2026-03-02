@@ -182,7 +182,7 @@ done < <(get_current_uses_rules "$CHOSEN_FILE")
 if [ "${#current[@]}" -eq 0 ]; then
   echo "Current uses_rules: (none)"
 else
-  echo "Current uses_rules: [$(IFS=', '; echo "${current[*]}")]"
+  echo "Current uses_rules: [$(printf '%s, ' "${current[@]}" | sed 's/, $//')]"
 fi
 
 # 4. Choose action
@@ -255,7 +255,7 @@ echo "--- Change Preview ---"
 if [ "${#current[@]}" -eq 0 ]; then
   echo "  Before: (none)"
 else
-  echo "  Before: [$(IFS=', '; echo "${current[*]}")]"
+  echo "  Before: [$(printf '%s, ' "${current[@]}" | sed 's/, $//')]"
 fi
 if [ -z "$new_csv" ]; then
   echo "  After:  (none — line will be removed)"
