@@ -48,6 +48,12 @@ for _, tt := range tests {
 - Seed the corpus with known edge cases via `f.Add()`.
 - Fuzz tests should assert invariants (no panic, round-trip equality), not specific outputs.
 
+## Benchmarks
+- Use `func BenchmarkX(b *testing.B)` for performance-sensitive code.
+- Run with `go test -bench=. -benchmem` to include memory allocations.
+- Compare before/after with `benchstat`. Require statistically significant results.
+- Never benchmark in CI by default -- run on dedicated hardware or use relative comparison.
+
 ## CI Parallelization
 - `go test -parallel N` controls per-test parallelism
 - `-count=1` disables test caching

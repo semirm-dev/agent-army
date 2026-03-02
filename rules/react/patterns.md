@@ -55,4 +55,3 @@ uses_rules: [code-quality, typescript/patterns, cross-cutting, security, testing
 - **Wrap at route level:** Each route should have an error boundary with a fallback UI.
 - **Fallback UI:** Show actionable error messages with a "Try again" button using `resetErrorBoundary`.
 - **Logging:** Use `onError` prop to report errors to your logging service.
-

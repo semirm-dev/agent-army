@@ -86,3 +86,8 @@ async def test_async_service(mocker) -> None:
     result = await get_item(1)
     assert result["id"] == 1
 ```
+
+## Property-Based Testing
+- Use `hypothesis` for testing parsers, validators, and serialization logic.
+- Define strategies for domain types. Seed with known edge cases via `@example()`.
+- Property tests should assert invariants (round-trip equality, no exceptions), not specific outputs.

@@ -22,6 +22,7 @@ Categorize all errors into three levels:
 - **Audit:** Run dependency audit tools as part of CI. Block merges on critical vulnerabilities.
 
 ## Performance Budget Targets
+Default targets. Adjust per-project based on domain requirements and user expectations.
 - **API endpoints:** p95 response time < 200ms for reads, < 500ms for writes. Measure at the handler boundary, excluding network.
 - **Database queries:** p95 < 50ms for indexed lookups, < 200ms for complex joins. Verify with query plan analysis.
 - **Startup time:** Service healthy within 10s of container start. Measure from process start to first successful health check.

@@ -8,7 +8,7 @@ languages: []
 # Security Patterns
 
 ## Password Hashing
-- **Use modern adaptive hashing algorithms** (bcrypt, argon2id, scrypt). Never use general-purpose hash functions (MD5, SHA-1, SHA-256, PBKDF2-SHA1) for password storage.
+- **Use modern adaptive hashing algorithms** (bcrypt, argon2id, scrypt). Never use general-purpose hash functions (MD5, SHA-1, SHA-256) for password storage. PBKDF2 is acceptable only with SHA-256 and >= 600,000 iterations per NIST SP 800-63B.
 - **Tune cost parameters** to the maximum your hardware can sustain within acceptable login latency (~250ms).
 - **Upgrade strategy:** Re-hash on login if the cost factor has increased since the last hash.
 

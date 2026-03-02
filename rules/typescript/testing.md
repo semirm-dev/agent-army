@@ -13,19 +13,16 @@ uses_rules: [testing-patterns, cross-cutting, typescript/patterns]
 - Use clear, behavioral names that describe expected outcomes
 
 ## Table-Driven Tests
-- Use array of case objects with `for...of`:
+- Use `it.each` for data-driven tests:
 
 ```typescript
-const cases = [
+it.each([
   { name: "positive", input: 5, want: 25 },
   { name: "zero", input: 0, want: 0 },
   { name: "negative", input: -3, want: 9 },
-];
-for (const { name, input, want } of cases) {
-  it(name, () => {
-    expect(square(input)).toBe(want);
-  });
-}
+])("$name", ({ input, want }) => {
+  expect(square(input)).toBe(want);
+});
 ```
 
 ## Test Isolation
