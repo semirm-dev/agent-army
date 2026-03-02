@@ -1,4 +1,6 @@
 ---
+name: Python Testing
+description: Pytest conventions, parametrize, fixtures, and async test support
 scope: language-specific
 languages: [python]
 extends: [testing-patterns]

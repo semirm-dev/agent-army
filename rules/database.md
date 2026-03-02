@@ -1,4 +1,6 @@
 ---
+name: Database
+description: Migrations, connection pooling, transactions, query safety, indexes, and schema conventions
 scope: universal
 languages: []
 ---
@@ -48,7 +50,3 @@ languages: []
 ## Technology Choices
 - **ORMs vs Raw SQL:** Pick one approach per operation. Never mix ORM and raw SQL for the same entity.
 - **Default to PostgreSQL** unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).
-
-## Cross-References
-- See `security.md` for SQL injection prevention and the threat model behind query safety.
-- See `caching-patterns.md` for cache-aside patterns that involve database reads on cache miss.

@@ -1,4 +1,6 @@
 ---
+name: React Testing
+description: Testing Library patterns, user-centric queries, MSW mocking, and component tests
 scope: language-specific
 languages: [react]
 extends: [testing-patterns]

@@ -1,4 +1,6 @@
 ---
+name: TypeScript Patterns
+description: Strict mode, type safety, naming, imports, error handling, and async patterns
 scope: language-specific
 languages: [typescript]
 extends: [code-quality]

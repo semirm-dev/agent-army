@@ -1,4 +1,6 @@
 ---
+name: Observability
+description: Health checks, structured logging, metrics, distributed tracing, and alerting
 scope: universal
 languages: []
 ---
@@ -19,7 +21,7 @@ languages: []
   - `INFO` -- Normal business operations. Request served, job completed, config loaded.
   - `DEBUG` -- Development diagnostics only. Never enable in production by default.
 - Never log at ERROR for expected conditions (validation failures, not-found, rate-limited requests).
-- Never log secrets, tokens, passwords, or PII. Mask or redact sensitive fields. See `security.md`.
+- Never log secrets, tokens, passwords, or PII. Mask or redact sensitive fields.
 
 ## Metrics
 - **Naming pattern:** `<namespace>_<subsystem>_<name>_<unit>` (e.g., `app_http_requests_total`, `app_db_query_duration_seconds`).
@@ -41,7 +43,3 @@ languages: []
 - **Every alert must have:** severity level, link to a runbook, and expected response time.
 - **Tiered severity:** Critical (pages on-call, immediate), Warning (next business day), Info (dashboard only).
 - **Alert fatigue is a failure mode.** If an alert fires regularly with no action taken, delete it or tune the threshold.
-
-## Cross-References
-- See `cross-cutting.md` for SLO definitions and alert-on-SLO-violation guidance.
-- See `security.md` for secrets and PII handling referenced in logging rules above.

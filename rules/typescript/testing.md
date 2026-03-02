@@ -1,4 +1,6 @@
 ---
+name: TypeScript Testing
+description: Vitest/Jest config, table-driven tests, async error testing, and test doubles
 scope: language-specific
 languages: [typescript]
 extends: [testing-patterns]

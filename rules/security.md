@@ -1,4 +1,6 @@
 ---
+name: Security
+description: Authentication, authorization, CORS, rate limiting, input sanitization, and secrets management
 scope: universal
 languages: []
 ---
@@ -68,9 +70,6 @@ languages: []
 - **Certificate pinning:** Pin certificates or public keys for mobile clients calling known backends to prevent MITM attacks. Implement a rotation strategy to avoid bricking clients on certificate renewal.
 
 ## Injection & Output Safety
-- **SQL injection:** Always use parameterized queries. See `database.md` "Query Safety" for full rules.
+- **SQL injection:** Always use parameterized queries. Never string-concatenate user input into queries.
 - **XSS:** Context-appropriate output encoding + strict CSP. Never insert untrusted data into raw HTML.
 - **CSRF:** Protect all state-changing endpoints with synchronizer tokens + SameSite cookies.
-
-## Cross-References
-- See `database.md` for query safety and parameterized query patterns.

@@ -1,4 +1,6 @@
 ---
+name: React Patterns
+description: Component structure, state management, data fetching, accessibility, and performance
 scope: language-specific
 languages: [react]
 extends: [code-quality, typescript/patterns]

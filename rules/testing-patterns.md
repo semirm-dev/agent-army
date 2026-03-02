@@ -1,4 +1,6 @@
 ---
+name: Testing Patterns
+description: Test naming, organization, isolation, mocking, async testing, and flaky prevention
 scope: universal
 languages: []
 ---
@@ -58,6 +60,3 @@ languages: []
 - Run coverage as part of CI, not just locally.
 - Set coverage thresholds as CI gates. Fail the build if coverage drops below the threshold.
 - Prefer branch coverage over line coverage. Line coverage misses untested conditional paths.
-
-## Cross-References
-- See `cross-cutting.md` for coverage targets by code category.

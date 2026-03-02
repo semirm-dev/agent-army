@@ -1,4 +1,6 @@
 ---
+name: Code Quality
+description: Code clarity, structure, naming, comments, and linting standards
 scope: universal
 languages: []
 ---
@@ -32,7 +34,3 @@ languages: []
 - **Automate formatting.** Enforce consistent style via automated tools — no manual style debates.
 - **Pre-commit or CI gates.** Run linter and formatter before code reaches the main branch.
 - **Zero warnings in committed code.** Treat linter warnings as errors in CI.
-
-## Cross-References
-
-- For testing patterns, see `testing-patterns.md`.

@@ -1,4 +1,6 @@
 ---
+name: Go Patterns
+description: Go coding conventions, error handling, project structure, and concurrency
 scope: language-specific
 languages: [go]
 extends: [code-quality]

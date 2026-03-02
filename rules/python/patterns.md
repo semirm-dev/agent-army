@@ -1,4 +1,6 @@
 ---
+name: Python Patterns
+description: Type hints, formatting, error handling, async patterns, and project structure
 scope: language-specific
 languages: [python]
 extends: [code-quality]

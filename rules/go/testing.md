@@ -1,4 +1,6 @@
 ---
+name: Go Testing
+description: Table-driven tests, race detection, benchmarks, and Go test helpers
 scope: language-specific
 languages: [go]
 extends: [testing-patterns]

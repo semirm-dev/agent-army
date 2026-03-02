@@ -1,4 +1,6 @@
 ---
+name: API Design
+description: REST conventions, error formats, caching headers, versioning, and batch operations
 scope: universal
 languages: []
 ---
@@ -51,8 +53,3 @@ Use a consistent envelope across all endpoints:
 ## RPC / Binary Protocols
 - **Schema versioning:** Always backward-compatible. Use proto field numbering or Avro schema registry.
 - **Deadline propagation:** Propagate timeouts across service boundaries. Set a default deadline on every call.
-
-## Cross-References
-
-- **Caching:** See `caching-patterns.md` for server-side caching strategies behind API endpoints.
-- **Security:** See `security.md` for authentication, authorization, CORS, and rate limiting.

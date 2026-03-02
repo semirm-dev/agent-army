@@ -1,4 +1,6 @@
 ---
+name: Concurrency
+description: Race condition prevention, deadlock avoidance, backpressure, and graceful shutdown
 scope: universal
 languages: []
 ---
@@ -19,7 +21,6 @@ languages: []
 - **Bounded queues:** Never use unbounded buffers. Set capacity limits.
 - **Rate limiting:** Limit producers to match consumer throughput.
 - **Load shedding:** Drop or reject work when queues are full, rather than accumulating.
-- For queue-specific backpressure, see `messaging-patterns.md`.
 
 ## Graceful Shutdown
 1. **Stop accepting new work** (close listeners, stop consumers)
@@ -31,7 +32,3 @@ languages: []
 - Monitor active concurrent task/worker count — unbounded growth indicates a leak.
 - Track queue depth and processing latency for work queues.
 - Propagate trace context across concurrent boundaries.
-
-## Cross-References
-- See `messaging-patterns.md` for queue-specific backpressure patterns.
-- See `observability.md` for trace context propagation and monitoring.

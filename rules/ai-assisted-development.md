@@ -1,10 +1,9 @@
 ---
+name: AI-Assisted Development
+description: Safe practices for AI-generated code, verification patterns, and anti-patterns
 scope: universal
 languages: []
-extends: [code-quality]
 ---
-
-> Extends `code-quality.md`. Code clarity and naming standards apply.
 
 # AI-Assisted Development Patterns
 
@@ -29,7 +28,3 @@ extends: [code-quality]
 - **Table-driven tests with named cases.** Each case name describes the scenario being tested.
 - **One assertion per test when practical.** Easier to diagnose which behavior broke.
 - **Edge cases as explicit test cases.** Not hidden in helper functions or shared fixtures.
-
-## Cross-References
-- See `code-quality.md` for naming, constants, error messages, and implicit behavior rules.
-- See `testing-patterns.md` for universal testing patterns referenced in "Test Patterns for AI Verification" above.

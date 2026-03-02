@@ -1,4 +1,6 @@
 ---
+name: Infrastructure
+description: Container best practices, image scanning, secrets handling, and CI/CD pipelines
 scope: universal
 languages: []
 ---
@@ -29,8 +31,3 @@ languages: []
 - **Image tagging:** Tag images with the commit SHA. Never rely on `latest` for deployment — it is ambiguous and not rollback-friendly.
 - **Dependency caching:** Cache dependency downloads (modules, packages) across pipeline runs to reduce build times.
 - **Artifact signing:** Sign container images and verify signatures before deployment to prevent supply chain tampering.
-
-## Cross-References
-- See `observability.md` for health checks and telemetry that verify deployed services.
-- See `security.md` for secrets management and access control patterns.
-- See `cross-cutting.md` for performance budget targets that affect CI/deployment thresholds.

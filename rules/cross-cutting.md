@@ -1,11 +1,13 @@
 ---
+name: Cross-Cutting Standards
+description: Error taxonomy, coverage targets, dependency policy, performance budgets, and data lifecycle
 scope: universal
 languages: []
 ---
 
 # Cross-Cutting Standards
 
-Standards that span multiple domains. Each section defines the universal policy; implementation details live in the referenced domain files.
+Standards that span multiple domains.
 
 ## Error Taxonomy
 Categorize all errors into three levels:
@@ -32,7 +34,6 @@ Categorize all errors into three levels:
 - **Web LCP:** Largest Contentful Paint < 2.5s on 4G connection. Measure with Lighthouse CI.
 - **Web INP:** Interaction to Next Paint < 200ms. Profile with Chrome DevTools Performance panel.
 - **Bundle size:** JavaScript bundle < 200KB gzipped for initial load. Use code splitting for routes.
-- **Frontend (other):** See language-specific frontend rules for framework-specific performance guidance.
 
 ## SBOM Requirement
 - **Production deployments** must include a Software Bill of Materials (SBOM) in CycloneDX or SPDX format.
@@ -52,7 +53,3 @@ Categorize all errors into three levels:
 - Define retention policies per data class -- never retain data indefinitely without justification.
 - Anonymize or pseudonymize PII in non-production environments.
 - Log access to restricted data for audit purposes.
-
-## Cross-References
-- See `observability.md` for alerting implementation patterns, severity tiers, and runbook requirements.
-- See `security.md` for transport security and secrets management.
