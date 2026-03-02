@@ -31,6 +31,10 @@ Use a consistent envelope across all endpoints:
 - **ETag / Conditional Requests:** Support `ETag` and `If-None-Match` for read endpoints to reduce bandwidth and enable conditional updates (`If-Match` for optimistic concurrency).
 - **Vary:** Include `Vary` header when response differs by request header (e.g., `Accept`, `Authorization`).
 
+## Rate Limit Headers
+
+- Include `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` (or `RateLimit` headers per IETF draft) on rate-limited endpoints so clients can self-throttle.
+
 ## Deprecation Strategy
 
 - **Announce early.** Add `Deprecated` response header and `sunset` date before removing any endpoint.

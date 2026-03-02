@@ -31,7 +31,7 @@ languages: []
 
 ## Event Schema Design
 - **Envelope:** Include `event_id`, `event_type`, `correlation_id`, `timestamp`, `version`, `data` in every event.
-- **Versioning:** Include `version` field. Support at least N-1 versions. Use schema registry for contract validation.
+- **Versioning:** Include `version` field. Maintain backward compatibility (new consumers can read old events). Support at least N-1 versions. Use schema registry for contract validation.
 - **Correlation ID:** Propagate `correlation_id` across all events in a workflow for distributed tracing.
 - **Event naming:** Use past tense (`user.created`, `order.shipped`), not imperative (`create.user`).
 

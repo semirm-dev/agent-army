@@ -59,9 +59,9 @@ languages: []
 - For service-to-service APIs, use consumer-driven contract tests (e.g., Pact) to catch breaking changes before deployment.
 
 ## Coverage
+- **Prefer branch coverage over line coverage.** Line coverage misses untested conditional paths.
 - Run coverage as part of CI, not just locally.
 - Set coverage thresholds as CI gates. Fail the build if coverage drops below the threshold.
 - **Critical paths** (auth, payments, data mutations): 80%+ line coverage.
 - **Utilities and shared libraries:** 90%+ line coverage.
 - **Generated code** (protobuf, OpenAPI stubs): No coverage requirement.
-- Prefer branch coverage over line coverage. Line coverage misses untested conditional paths.

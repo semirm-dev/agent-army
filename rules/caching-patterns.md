@@ -49,4 +49,5 @@ languages: []
 - **Cache as primary store:** Cache is ephemeral. Always have a source of truth.
 - **N+1 cache calls:** Batch multi-key lookups instead of individual get calls in loops.
 - **Caching errors:** Never cache error responses or null results without a short TTL (< 30s).
+- **Cache stampede:** When a popular key expires, many requests simultaneously rebuild it, overwhelming the source of truth. Mitigate with lock-on-rebuild (only one request rebuilds, others wait), stale-while-revalidate (serve stale data while one request rebuilds in background), or probabilistic early expiration.
 - **Over-caching:** Do not cache data that changes every request or is cheap to compute.

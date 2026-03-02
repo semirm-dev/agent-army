@@ -29,6 +29,10 @@ languages: []
 - Use a larger pool for I/O-bound work. Size based on expected concurrent I/O operations, not cores.
 - Always drain worker pools on shutdown (see Graceful Shutdown).
 
+## Structured Concurrency
+- Scope concurrent task lifetimes to a parent. When the parent completes or fails, all child tasks are joined or canceled.
+- Never fire-and-forget goroutines, threads, or async tasks without a mechanism to await or cancel them.
+
 ## Graceful Shutdown
 1. **Stop accepting new work** (close listeners, stop consumers)
 2. **Drain in-flight work** (wait for active requests/tasks to complete)
