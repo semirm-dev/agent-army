@@ -1,6 +1,6 @@
 ---
 name: database
-description: Migrations, connection pooling, transactions, query safety, indexes, schema conventions, and backup recovery
+description: Migrations, connection pooling, transactions, query safety, indexes, schema conventions, backup recovery, and observability
 scope: universal
 languages: []
 ---
@@ -56,6 +56,12 @@ languages: []
 ## Read Replicas
 - Route read-only queries to replicas when available. Write queries always go to primary.
 - Account for replication lag in read-after-write scenarios. Read from primary when consistency matters.
+
+## Observability
+- Monitor slow query logs. Set a threshold (e.g., >100ms) and alert.
+- Track connection pool utilization (active, idle, waiting). Alert when pool is near max.
+- Monitor replication lag on read replicas. Route reads to primary if lag exceeds threshold.
+- Log query execution plans for queries that exceed performance budgets.
 
 ## Technology Choices
 - **ORMs vs Raw SQL:** Pick one approach per entity. Never mix ORM and raw SQL queries for the same table.

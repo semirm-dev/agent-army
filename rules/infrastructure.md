@@ -40,4 +40,4 @@ languages: []
 - **Canary deployments:** Route a small percentage of traffic (1-5%) to the new version first. Monitor error rate and latency before full rollout.
 - **Rollback:** Every deployment must have a documented rollback path. For container deployments, rollback means redeploying the previous image tag (commit SHA). Verify rollback works before relying on it.
 - **Post-deploy verification:** Run smoke tests or synthetic checks against the new deployment. Verify health check endpoints return healthy before routing production traffic.
-- **Database migrations and deploys are separate steps.** Apply backward-compatible migrations before deploying new code. Never couple a breaking migration with the deploy that requires it.
+- **Schema migrations and application deploys are separate steps.** Apply backward-compatible migrations before deploying new code. Never couple a breaking migration with the deploy that requires it.
