@@ -20,6 +20,10 @@
 | [python/coder](python/coder.md) | python/patterns,code-quality,cross-cutting,security | Python Coder Skill |
 | [python/reviewer](python/reviewer.md) | python/patterns,python/testing,code-quality,cross-cutting,security | Python Reviewer Skill |
 | [python/tester](python/tester.md) | python/testing,testing-patterns,cross-cutting | Python Tester Skill |
+| [react/architect](react/architect.md) | react/patterns,typescript/patterns,code-quality,cross-cutting | React Architect Skill |
+| [react/coder](react/coder.md) | react/patterns,typescript/patterns,code-quality,cross-cutting,security | React Coder Skill |
+| [react/reviewer](react/reviewer.md) | react/patterns,react/testing,typescript/patterns,code-quality,cross-cutting,security | React Reviewer Skill |
+| [react/tester](react/tester.md) | react/testing,testing-patterns,cross-cutting | React Tester Skill |
 | [refactoring-patterns](refactoring-patterns.md) | code-quality,testing-patterns,cross-cutting | Refactoring Patterns Skill |
 | [security-hardening](security-hardening.md) | security,cross-cutting,api-design | Security Hardening Skill |
 | [testing-strategy](testing-strategy.md) | testing-patterns,cross-cutting | Testing Strategy Skill |
