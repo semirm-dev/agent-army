@@ -3,7 +3,7 @@ name: python/patterns
 description: Type hints, formatting, error handling, async patterns, and project structure
 scope: language-specific
 languages: [python]
-uses_rules: [code-quality, security, cross-cutting, observability, testing-patterns]
+uses_rules: [code-quality, security, cross-cutting, observability]
 ---
 
 # Python Coding Patterns

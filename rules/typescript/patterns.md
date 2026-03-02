@@ -3,7 +3,7 @@ name: typescript/patterns
 description: Strict mode, type safety, naming, imports, error handling, and async patterns
 scope: language-specific
 languages: [typescript]
-uses_rules: [code-quality, security, cross-cutting, observability, testing-patterns]
+uses_rules: [code-quality, security, cross-cutting, observability]
 ---
 
 # TypeScript Coding Patterns

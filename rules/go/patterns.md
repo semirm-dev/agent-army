@@ -3,7 +3,7 @@ name: go/patterns
 description: Go coding conventions, error handling, project structure, and concurrency
 scope: language-specific
 languages: [go]
-uses_rules: [code-quality, security, cross-cutting, observability, testing-patterns]
+uses_rules: [code-quality, security, cross-cutting, observability]
 ---
 
 # Go Coding Patterns
