@@ -51,7 +51,13 @@ Do you need shell access in the production container?
 
 ## Multi-Stage Build Patterns
 
-Adapt multi-stage build patterns to your language's build toolchain and runtime requirements.
+Every multi-stage build follows the same principle: the build stage has everything needed to compile/bundle, the runtime stage has only what's needed to run.
+
+1. **Build stage:** Start from a full SDK/toolchain image. Copy source and dependency manifests. Install dependencies, then copy source and run the build command.
+2. **Runtime stage:** Start from a minimal base image (scratch, distroless, alpine, or slim). Copy only the built artifact from the build stage. Set the entrypoint.
+3. **Layer ordering:** Copy dependency manifests and install dependencies before copying source code. This maximizes Docker layer cache hits — dependencies change less often than source.
+
+Adapt the specific base images, build commands, and artifact paths to your language's toolchain.
 
 ### .dockerignore
 

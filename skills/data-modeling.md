@@ -162,6 +162,10 @@ Avoid polymorphic FKs (`commentable_type` + `commentable_id`) — they break ref
 
 ### Soft Deletes
 
+- Use a `deleted_at` timestamp column (nullable) instead of physical `DELETE`. A `NULL` value means the row is active.
+- Add a partial index on active rows (e.g., `WHERE deleted_at IS NULL`) to keep queries fast and avoid scanning deleted records.
+- Filter deleted rows at the query level or via a repository/middleware layer. Be consistent — choose one approach per project.
+
 ## Zero-Downtime Migration Strategy
 
 For changes that cannot be applied in a single step:

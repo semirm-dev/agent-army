@@ -23,7 +23,17 @@ Invoke this skill when:
 
 ## Performance Budget Reference
 
-If a target is missed, investigate before shipping. Document exceptions with justification.
+| Category | Target | Measurement Point |
+|----------|--------|-------------------|
+| API reads | p95 < 200ms | Handler boundary (excluding network) |
+| API writes | p95 < 500ms | Handler boundary (excluding network) |
+| Web LCP | < 2.5s | Lighthouse on 4G connection |
+| JS bundle (initial) | < 200KB gzipped | After code splitting |
+| DB indexed lookups | p95 < 50ms | `EXPLAIN ANALYZE` |
+| DB complex joins | p95 < 200ms | `EXPLAIN ANALYZE` |
+| Service startup | Healthy < 10s | Container start to first health check pass |
+
+If a target is missed, investigate before shipping. Document exceptions with justification. See `cross-cutting` rules for full budget details.
 
 ## "What's Slow?" Decision Tree
 

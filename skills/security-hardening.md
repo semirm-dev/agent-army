@@ -64,6 +64,10 @@ Run through this checklist for every handler/controller that accepts external in
 1. [ ] No hardcoded secrets; all secrets loaded from environment or secret manager
 2. [ ] Different secrets per environment (dev, staging, production) -- never share across environments
 3. [ ] Access to production secrets restricted to minimum required personnel
+4. [ ] `.env` added to `.gitignore` -- never commit environment files with real credentials
+5. [ ] Secrets are never logged, printed, or included in error messages -- mask in all output
+6. [ ] CI/CD uses pipeline secret injection (GitHub Actions secrets, GitLab CI variables) -- never hardcoded in pipeline files
+7. [ ] Rotation strategy defined -- secrets should be rotatable without application restart when possible
 
 ### Environment Variables vs Secret Manager
 
@@ -122,4 +126,19 @@ What type of endpoint?
         Monitor but start permissive
 ```
 
-Implement input validation, rate limiting, and auth middleware using your project's framework conventions.
+## Session Security
+
+### Cookie Configuration
+
+Set all session cookies with these flags:
+- **`Secure`:** HTTPS only — prevents transmission over plain HTTP
+- **`HttpOnly`:** No JavaScript access — prevents XSS from stealing session IDs
+- **`SameSite`:** `Strict` (default) or `Lax` (if cross-site navigation is needed) — prevents CSRF
+
+### Session Lifecycle
+
+- **Regenerate session ID on login.** Prevents session fixation attacks where an attacker sets a known session ID before authentication.
+- **Set two timeouts:** Idle timeout (inactivity, e.g., 30 minutes) and absolute timeout (max lifetime, e.g., 24 hours). Both are required.
+- **Store session data server-side.** The cookie should contain only the session ID, never session data.
+
+Implement input validation, rate limiting, auth middleware, and session management using your project's framework conventions.
