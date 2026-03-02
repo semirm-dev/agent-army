@@ -4,6 +4,7 @@ description: Pytest conventions, parametrize, fixtures, and async test support
 scope: language-specific
 languages: [python]
 extends: [testing-patterns]
+uses_rules: [cross-cutting, python/patterns]
 ---
 
 # Python Testing Patterns
@@ -86,7 +87,3 @@ async def test_async_service(mocker) -> None:
     result = await get_item(1)
     assert result["id"] == 1
 ```
-
-## Cross-References
-- See `cross-cutting.md` for coverage targets and error taxonomy.
-- See `python/patterns.md` for async/concurrency patterns used in tested code.

@@ -4,6 +4,7 @@ description: Strict mode, type safety, naming, imports, error handling, and asyn
 scope: language-specific
 languages: [typescript]
 extends: [code-quality]
+uses_rules: [security, cross-cutting, testing-patterns]
 ---
 
 # TypeScript Coding Patterns
@@ -19,8 +20,3 @@ extends: [code-quality]
 - **Configuration:** Access env vars through a validated config module, never directly via `process.env` in business logic.
 - **Linting:** Use ESLint with strict TypeScript rules. Fix all warnings before committing.
 - **Formatting:** Use Prettier (or Biome). Enforce via pre-commit hook or CI.
-
-## Cross-References
-- See `security.md` for secrets management, input validation, and injection prevention.
-- See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
-- See `testing-patterns.md` for universal testing patterns.

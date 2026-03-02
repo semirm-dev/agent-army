@@ -4,6 +4,7 @@ description: Vitest/Jest config, table-driven tests, async error testing, and te
 scope: language-specific
 languages: [typescript]
 extends: [testing-patterns]
+uses_rules: [cross-cutting, typescript/patterns]
 ---
 
 # TypeScript Testing Patterns
@@ -68,7 +69,3 @@ spy.mockRestore();
 ```
 
 - Prefer fake implementations or thin interfaces over heavy mocking. Use `vi.fn()` / `jest.fn()` only for call verification.
-
-## Cross-References
-- See `cross-cutting.md` for coverage targets and error taxonomy.
-- See `typescript/patterns.md` for TypeScript-specific standards and error handling patterns.

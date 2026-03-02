@@ -4,6 +4,7 @@ description: Testing Library patterns, user-centric queries, MSW mocking, and co
 scope: language-specific
 languages: [react]
 extends: [testing-patterns]
+uses_rules: [cross-cutting, react/patterns, typescript/patterns]
 ---
 
 # React Testing Patterns
@@ -23,8 +24,3 @@ extends: [testing-patterns]
 - Use MSW (Mock Service Worker) for API mocking. Define handlers at suite level.
 - Share handlers via a `handlers.ts` file. Override per-test when needed.
 - Assert on request payloads when testing mutation flows.
-
-## Cross-References
-- See `cross-cutting.md` for coverage targets and error taxonomy.
-- See `react/patterns.md` for component structure, state management, and error boundary patterns.
-- See `typescript/patterns.md` for TypeScript-specific standards used in React components.

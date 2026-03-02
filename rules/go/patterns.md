@@ -4,6 +4,7 @@ description: Go coding conventions, error handling, project structure, and concu
 scope: language-specific
 languages: [go]
 extends: [code-quality]
+uses_rules: [security, cross-cutting, observability, testing-patterns]
 ---
 
 # Go Coding Patterns
@@ -24,9 +25,3 @@ extends: [code-quality]
 - **Type assertions:** Always use the two-value form: `v, ok := x.(Type)`. Never use single-value form that panics.
 - **Generics:** Use generics for type-safe collections and utilities; prefer interfaces for domain logic.
 - **defer:** Use `defer` for resource cleanup. Be aware of loop and closure pitfalls (e.g., `defer` in a loop defers until function exit, not iteration end).
-
-## Cross-References
-- See `security.md` for secrets management, input validation, and injection prevention.
-- See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
-- See `observability.md` for logging standards. Use `log/slog` for structured logging.
-- See `testing-patterns.md` for universal testing patterns.

@@ -4,6 +4,7 @@ description: Component structure, state management, data fetching, accessibility
 scope: language-specific
 languages: [react]
 extends: [code-quality, typescript/patterns]
+uses_rules: [cross-cutting, security, testing-patterns]
 ---
 
 # React & Frontend Patterns
@@ -50,11 +51,4 @@ extends: [code-quality, typescript/patterns]
 - **Wrap at route level:** Each route should have an error boundary with a fallback UI.
 - **Fallback UI:** Show actionable error messages with a "Try again" button using `resetErrorBoundary`.
 - **Logging:** Use `onError` prop to report errors to your logging service.
-
-## Cross-References
-- See `code-quality.md` for universal code quality standards.
-- See `typescript/patterns.md` for TypeScript-specific standards used by React components.
-- See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets (LCP, bundle size, INP).
-- See `security.md` for secrets management, input validation, and injection prevention.
-- See `testing-patterns.md` for universal testing standards.
 

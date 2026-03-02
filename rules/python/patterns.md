@@ -4,6 +4,7 @@ description: Type hints, formatting, error handling, async patterns, and project
 scope: language-specific
 languages: [python]
 extends: [code-quality]
+uses_rules: [security, cross-cutting, observability, testing-patterns]
 ---
 
 # Python Coding Patterns
@@ -24,9 +25,3 @@ extends: [code-quality]
 - **Dataclasses/Pydantic:** Prefer `dataclasses` or `pydantic.BaseModel` over plain dicts for structured data. Use `frozen=True` for immutable value objects.
 - **Path handling:** Use `pathlib.Path` over `os.path` string manipulation.
 - **Context managers:** Use `with` for resource cleanup. Implement `__enter__`/`__exit__` or use `contextlib.contextmanager` / `contextlib.asynccontextmanager`.
-
-## Cross-References
-- See `security.md` for secrets management, input validation, and injection prevention.
-- See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
-- See `observability.md` for logging standards. Use `structlog` or `logging` with JSON formatter.
-- See `testing-patterns.md` for universal testing patterns.
