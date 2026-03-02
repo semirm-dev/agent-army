@@ -37,7 +37,7 @@ languages: []
 ## Mocking Philosophy
 - Prefer fakes and thin interfaces over heavy mocking frameworks.
 - Mock at system boundaries (HTTP, DB, message queues), not between internal modules.
-- Use language-specific spy/mock tools (`vi.fn`, `unittest.mock`, `gomock`) only for call verification.
+- Use spy/mock tools only for call verification, not for replacing internal module behavior.
 
 ## Snapshot Testing
 - Avoid snapshot tests for rendered UI output -- large diffs with no diagnostic signal. Use snapshot tests only for serialized contracts (API response shapes, CLI output, config schemas) where the exact shape is the specification.
@@ -62,7 +62,7 @@ languages: []
 - **Explicit timeouts.** Set test timeouts to catch hangs. CI timeouts should be stricter than local.
 
 ## Contract Testing
-- For service-to-service APIs, use consumer-driven contract tests (e.g., Pact) to catch breaking changes before deployment.
+- For service-to-service APIs, use consumer-driven contract tests to catch breaking changes before deployment.
 
 ## Coverage
 - **Prefer branch coverage over line coverage.** Line coverage misses untested conditional paths.

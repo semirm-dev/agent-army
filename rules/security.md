@@ -44,7 +44,6 @@ languages: []
 - **Distributed:** Use distributed state for rate limiting across multiple instances.
 
 ## Input Sanitization
-- **Validate at boundary** (handler/controller layer). Never trust client input past the handler.
 - **Allowlists over denylists.** Define what is accepted, not what is rejected.
 - **Strip HTML before storage** when rich text is not needed. Use a vetted sanitizer library when HTML is required.
 - **Size limits:** Enforce maximum lengths on all string inputs, file uploads, and request bodies.

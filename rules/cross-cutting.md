@@ -17,7 +17,6 @@ Categorize all errors into three levels:
 - **Security patches:** Apply immediately. No waiting for a release cycle.
 - **Minor versions:** Review and update monthly. Check changelogs for breaking behavior changes despite semver.
 - **Major versions:** Evaluate breaking changes, plan migration, test in isolation before upgrading. Create a dedicated branch for major upgrades.
-- **Audit:** Run dependency audit tools as part of CI. Block merges on critical vulnerabilities.
 
 ## Performance Budget Targets
 Default targets. Adjust per-project based on domain requirements.
