@@ -12,6 +12,7 @@ languages: []
 - **Immutable data:** At message-passing boundaries, pass copies or immutable values — not mutable references — between concurrent units.
 - **Atomic operations:** Use language-provided atomics for simple counters/flags.
 - **Cancellation propagation:** Pass cancellation tokens/contexts through the call chain. Check for cancellation before expensive operations. Respect cancellation in loops and retry logic.
+- **Thread-safe collections:** Use concurrent-safe data structures when shared mutable collections are unavoidable. Prefer message passing or copying over shared concurrent access.
 
 ## Deadlock Avoidance
 - **Consistent lock ordering:** Always acquire locks in the same order across all code paths.

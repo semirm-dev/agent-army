@@ -22,6 +22,7 @@ languages: []
   - `DEBUG` -- Development diagnostics only. Never enable in production by default.
 - Never log at ERROR for expected conditions (validation failures, not-found, rate-limited requests).
 - Never log secrets, tokens, passwords, or PII. Mask or redact sensitive fields.
+- **Log sampling:** For high-throughput paths, sample repetitive log entries to prevent log volume from overwhelming storage and budgets.
 
 ## Metrics
 - **Naming pattern:** `<namespace>_<subsystem>_<name>_<unit>` (e.g., `app_http_requests_total`, `app_db_query_duration_seconds`).

@@ -19,6 +19,7 @@ languages: []
 - **Health checks:** Validate connections before use (ping or lightweight query).
 - **Graceful shutdown:** Drain pool on application shutdown. Close idle connections first, wait for active queries.
 - **Credentials:** Store connection strings via secrets management. Never hardcode in application config or environment-specific files committed to source control.
+- **Encrypt connections:** Require SSL/TLS for all database connections. Reject plaintext connections in production. Verify server certificates.
 
 ## Transactions
 - **Keep short.** No network calls (HTTP, gRPC) inside transactions.

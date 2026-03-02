@@ -16,6 +16,7 @@ languages: []
 - **HEALTHCHECK instruction:** Include a `HEALTHCHECK` in Dockerfiles so the orchestrator can detect unhealthy containers. Use the application's health endpoint, not a generic TCP check.
 - **`.dockerignore`:** Maintain a `.dockerignore` file to exclude build artifacts, test files, `.git`, and local config from the build context. Prevents image bloat and unintended secret leakage.
 - **Resource limits:** Always set CPU and memory limits in deployment manifests. Containers without limits can starve co-located workloads.
+- **Log to stdout/stderr.** Never write logs to files inside containers. Let the orchestrator (Docker, Kubernetes) handle log collection and routing.
 
 ## Secrets in Containers
 - **Never bake secrets into images.** No ENV with credentials, no COPY of .env files, no ARG for sensitive values.
