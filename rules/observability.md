@@ -44,3 +44,8 @@ languages: []
 - **Every alert must have:** severity level, link to a runbook, and expected response time.
 - **Tiered severity:** Critical (pages on-call, immediate), Warning (next business day), Info (dashboard only).
 - **Alert fatigue is a failure mode.** If an alert fires regularly with no action taken, delete it or tune the threshold.
+
+## Service Level Indicators & Objectives
+- **Define SLIs per service:** availability (success rate), latency (p50/p95/p99), error rate. Derived from metrics, not logs.
+- **Set SLO targets:** e.g., 99.9% availability, p95 latency < 200ms. Base on user expectations and business requirements.
+- **Error budget:** Track remaining error budget. When budget is exhausted, prioritize reliability over features.

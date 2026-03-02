@@ -22,13 +22,17 @@ Categorize all errors into three levels:
 - **Audit:** Run dependency audit tools as part of CI. Block merges on critical vulnerabilities.
 
 ## Performance Budget Targets
-Default targets. Adjust per-project based on domain requirements and user expectations.
-- **API endpoints:** p95 response time < 200ms for reads, < 500ms for writes. Measure at the handler boundary, excluding network.
-- **Database queries:** p95 < 50ms for indexed lookups, < 200ms for complex joins. Verify with query plan analysis.
-- **Startup time:** Service healthy within 10s of container start. Measure from process start to first successful health check.
-- **Web LCP:** Largest Contentful Paint < 2.5s on 4G connection. Measure with Lighthouse CI.
-- **Web INP:** Interaction to Next Paint < 200ms. Profile with Chrome DevTools Performance panel.
-- **Bundle size:** JavaScript bundle < 200KB gzipped for initial load. Use code splitting for routes.
+Default targets. Adjust per-project based on domain requirements.
+
+### Backend
+- **API endpoints:** p95 < 200ms reads, < 500ms writes. Measure at handler boundary.
+- **Database queries:** p95 < 50ms indexed lookups, < 200ms complex joins. Verify with query plan analysis.
+- **Startup time:** Service healthy within 10s of container start.
+
+### Frontend
+- **LCP:** < 2.5s on 4G. Measure with Lighthouse CI.
+- **INP:** < 200ms. Profile with Chrome DevTools.
+- **Bundle size:** < 200KB gzipped initial load. Code-split routes.
 
 ## SBOM Requirement
 - **Production deployments** must include a Software Bill of Materials (SBOM) in CycloneDX or SPDX format.

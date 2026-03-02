@@ -41,3 +41,7 @@ languages: []
 - **Rollback:** Every deployment must have a documented rollback path. For container deployments, rollback means redeploying the previous image tag (commit SHA). Verify rollback works before relying on it.
 - **Post-deploy verification:** Run smoke tests or synthetic checks against the new deployment. Verify health check endpoints return healthy before routing production traffic.
 - **Schema migrations and application deploys are separate steps.** Apply backward-compatible migrations before deploying new code. Never couple a breaking migration with the deploy that requires it.
+
+## Environment Parity
+- **Keep dev, staging, and production as similar as possible.** Same base images, same configuration structure, same database engine.
+- **Differences between environments should be limited to:** credentials, resource sizing, and feature flags. Not architecture.

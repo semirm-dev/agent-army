@@ -74,3 +74,8 @@ languages: []
 - **XSS:** Context-appropriate output encoding + strict CSP. Never insert untrusted data into raw HTML.
 - **CSP:** Start with `default-src 'self'`. Add specific directives as needed. Use `report-uri` or `report-to` to detect violations before enforcing. Never use `unsafe-inline` or `unsafe-eval` in production.
 - **CSRF:** Protect all state-changing endpoints with synchronizer tokens + SameSite cookies.
+
+## Dependency Security
+- **Scan dependencies for known vulnerabilities** as part of CI. Block merges on critical/high severity CVEs.
+- **Monitor for new CVEs** in deployed dependencies. New vulnerabilities appear after build time.
+- **Minimize dependency count.** Every dependency is attack surface. Evaluate before adding.

@@ -7,6 +7,12 @@ languages: []
 
 # Testing Patterns
 
+## Test Types
+- **Unit tests:** Test a single function or module in isolation. No I/O, no network, no database.
+- **Integration tests:** Test multiple modules working together, including real I/O (database, filesystem, HTTP). Slower, run in CI.
+- **End-to-end tests:** Test the full system from the user's perspective. Most expensive, fewest in number.
+- **Default to unit tests.** Use integration tests for boundary interactions. Use e2e tests sparingly for critical user flows.
+
 ## Test Naming
 - Describe behavior, not implementation: "returns error when user not found" not "test getUserById."
 - Test names should read as documentation. A failing test name alone should tell you what broke.
