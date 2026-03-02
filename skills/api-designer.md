@@ -4,6 +4,8 @@ description: API style selection, REST resource design, versioning strategy, pag
 scope: universal
 uses_rules:
   - api-design
+  - cross-cutting
+  - security
 ---
 
 # API Designer

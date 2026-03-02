@@ -4,6 +4,8 @@ description: Security implementation workflows -- auth flow selection, JWT vs se
 scope: universal
 uses_rules:
   - security
+  - cross-cutting
+  - api-design
 ---
 
 # Security Hardening Skill

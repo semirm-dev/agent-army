@@ -5,6 +5,7 @@ scope: universal
 uses_rules:
   - cross-cutting
   - database
+  - observability
 ---
 
 # Performance Audit Skill

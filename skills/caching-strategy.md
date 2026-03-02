@@ -4,6 +4,8 @@ description: Cache decision trees, strategy selection, TTL guidance, invalidatio
 scope: universal
 uses_rules:
   - caching-patterns
+  - observability
+  - cross-cutting
 ---
 
 # Caching Strategy Skill
