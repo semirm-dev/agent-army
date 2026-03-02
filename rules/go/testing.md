@@ -3,8 +3,7 @@ name: go-testing
 description: Table-driven tests, race detection, benchmarks, and Go test helpers
 scope: language-specific
 languages: [go]
-extends: [testing-patterns]
-uses_rules: [cross-cutting, go/patterns]
+uses_rules: [testing-patterns, cross-cutting, go/patterns]
 ---
 
 # Go Testing Patterns

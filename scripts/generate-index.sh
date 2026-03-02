@@ -95,7 +95,6 @@ declare -a rule_scopes=()
 declare -a rule_summaries=()
 declare -a rule_paths=()
 declare -a rule_languages=()
-declare -a rule_extends=()
 declare -a rule_uses_rules=()
 
 while IFS= read -r file; do
@@ -109,7 +108,6 @@ while IFS= read -r file; do
   scope="$(extract_fm_value "scope" "$fm")"
   summary="$(extract_h1 < "$file")"
   langs="$(extract_fm_list "languages" "$fm" | paste -sd ',' - || true)"
-  extends="$(extract_fm_list "extends" "$fm" | paste -sd ',' - || true)"
   uses_rules="$(extract_fm_list "uses_rules" "$fm" | paste -sd ',' - || true)"
 
   [ -z "$scope" ] && scope="universal"
@@ -119,7 +117,6 @@ while IFS= read -r file; do
   rule_summaries+=("$summary")
   rule_paths+=("rules/$relpath")
   rule_languages+=("$langs")
-  rule_extends+=("$extends")
   rule_uses_rules+=("$uses_rules")
 done < <(find "$RULES_DIR" -name '*.md' -not -name 'INDEX.md' | sort)
 
@@ -159,13 +156,13 @@ done < <(find "$SKILLS_DIR" -maxdepth 1 -name '*.md' -not -name 'INDEX.md' | sor
   echo ''
   echo '# Rules Index'
   echo ''
-  echo '| Rule | Scope | Extends | Uses Rules | Summary |'
-  echo '|------|-------|---------|------------|---------|'
+  echo '| Rule | Scope | Uses Rules | Summary |'
+  echo '|------|-------|------------|---------|'
 
   # Universal rules first (sorted by name)
   for i in "${!rule_names[@]}"; do
     if [ "${rule_scopes[$i]}" = "universal" ]; then
-      echo "| [${rule_names[$i]}](${rule_names[$i]}.md) | universal | ${rule_extends[$i]} | ${rule_uses_rules[$i]} | ${rule_summaries[$i]} |"
+      echo "| [${rule_names[$i]}](${rule_names[$i]}.md) | universal | ${rule_uses_rules[$i]} | ${rule_summaries[$i]} |"
     fi
   done
 
@@ -173,7 +170,7 @@ done < <(find "$SKILLS_DIR" -maxdepth 1 -name '*.md' -not -name 'INDEX.md' | sor
   lang_entries=()
   for i in "${!rule_names[@]}"; do
     if [ "${rule_scopes[$i]}" = "language-specific" ]; then
-      lang_entries+=("${rule_languages[$i]}|${rule_names[$i]}|${rule_summaries[$i]}|${rule_extends[$i]}|${rule_uses_rules[$i]}")
+      lang_entries+=("${rule_languages[$i]}|${rule_names[$i]}|${rule_summaries[$i]}|${rule_uses_rules[$i]}")
     fi
   done
 
@@ -185,9 +182,8 @@ done < <(find "$SKILLS_DIR" -maxdepth 1 -name '*.md' -not -name 'INDEX.md' | sor
       lang="$(echo "$entry" | cut -d'|' -f1)"
       name="$(echo "$entry" | cut -d'|' -f2)"
       summary="$(echo "$entry" | cut -d'|' -f3)"
-      extends="$(echo "$entry" | cut -d'|' -f4)"
-      uses_rules="$(echo "$entry" | cut -d'|' -f5)"
-      echo "| [${name}](${name}.md) | language-specific (${lang}) | ${extends} | ${uses_rules} | ${summary} |"
+      uses_rules="$(echo "$entry" | cut -d'|' -f4)"
+      echo "| [${name}](${name}.md) | language-specific (${lang}) | ${uses_rules} | ${summary} |"
     done
   fi
 } > "$RULES_DIR/INDEX.md"
@@ -223,7 +219,6 @@ echo "Generated $SKILLS_DIR/INDEX.md"
     [ "$i" -eq "$last_rule" ] && comma=""
 
     langs="${rule_languages[$i]}"
-    extends="${rule_extends[$i]}"
     uses_rules="${rule_uses_rules[$i]}"
 
     # Build optional JSON fields
@@ -242,21 +237,6 @@ echo "Generated $SKILLS_DIR/INDEX.md"
       done
       lang_json+="]"
       optional+=", \"languages\": ${lang_json}"
-    fi
-
-    if [ -n "$extends" ]; then
-      ext_json="["
-      first=1
-      IFS=',' read -ra ext_arr <<< "$extends"
-      for e in "${ext_arr[@]}"; do
-        e="$(echo "$e" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
-        [ -z "$e" ] && continue
-        [ "$first" -eq 0 ] && ext_json+=", "
-        ext_json+="\"$(json_escape "$e")\""
-        first=0
-      done
-      ext_json+="]"
-      optional+=", \"extends\": ${ext_json}"
     fi
 
     if [ -n "$uses_rules" ]; then
