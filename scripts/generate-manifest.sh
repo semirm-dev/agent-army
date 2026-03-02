@@ -117,6 +117,80 @@ while IFS= read -r file; do
   rule_uses_rules+=("$uses_rules")
 done < <(find "$RULES_DIR" -name '*.md' | sort)
 
+# --- Transitive resolution helpers ---
+
+# Look up uses_rules for a rule name by searching the parallel arrays.
+_rule_deps() {
+  local name="$1"
+  for j in "${!rule_names[@]}"; do
+    if [ "${rule_names[$j]}" = "$name" ]; then
+      printf '%s' "${rule_uses_rules[$j]}"
+      return
+    fi
+  done
+}
+
+# Transitively resolve uses_rules via BFS.
+# Takes a comma-separated list of rule names, returns a deduplicated
+# comma-separated list including all transitive dependencies.
+resolve_uses_rules() {
+  local input="$1"
+  [ -z "$input" ] && return
+
+  local visited=""
+  local result=""
+  local queue=""
+
+  queue="$input"
+
+  while [ -n "$queue" ]; do
+    # Pop the first item from the queue
+    local current
+    current="$(echo "$queue" | cut -d',' -f1 | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+    local rest
+    rest="$(echo "$queue" | cut -d',' -f2- -s)"
+    queue="$rest"
+
+    [ -z "$current" ] && continue
+
+    # Check if already visited (deduplicate)
+    local already=0
+    if [ -n "$visited" ]; then
+      IFS=',' read -ra vis_arr <<< "$visited"
+      for v in "${vis_arr[@]}"; do
+        if [ "$v" = "$current" ]; then
+          already=1
+          break
+        fi
+      done
+    fi
+    [ "$already" -eq 1 ] && continue
+
+    # Mark visited and add to result
+    if [ -n "$visited" ]; then
+      visited="${visited},${current}"
+    else
+      visited="$current"
+    fi
+    if [ -n "$result" ]; then
+      result="${result},${current}"
+    else
+      result="$current"
+    fi
+
+    # Look up transitive deps for this rule
+    local deps
+    deps="$(_rule_deps "$current")"
+    if [ -n "$deps" ] && [ -n "$queue" ]; then
+      queue="${queue},${deps}"
+    elif [ -n "$deps" ]; then
+      queue="$deps"
+    fi
+  done
+
+  printf '%s' "$result"
+}
+
 # --- Collect skills ---
 
 declare -a skill_names=()
@@ -207,7 +281,7 @@ done < <(find "$SKILLS_DIR" -name '*.md' | sort)
     [ "$i" -eq "$last_skill" ] && comma=""
 
     langs="${skill_languages[$i]}"
-    uses="${skill_uses_rules[$i]}"
+    uses="$(resolve_uses_rules "${skill_uses_rules[$i]}")"
 
     # Build optional JSON fields
     optional=""

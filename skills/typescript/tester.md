@@ -5,8 +5,6 @@ scope: language-specific
 languages: [typescript]
 uses_rules:
   - typescript/testing
-  - testing-patterns
-  - cross-cutting
 ---
 
 # TypeScript Tester Skill

@@ -5,8 +5,6 @@ scope: language-specific
 languages: [typescript]
 uses_rules:
   - typescript/patterns
-  - code-quality
-  - cross-cutting
 ---
 
 # TypeScript Architect Skill

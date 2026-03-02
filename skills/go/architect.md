@@ -5,8 +5,6 @@ scope: language-specific
 languages: [go]
 uses_rules:
   - go/patterns
-  - code-quality
-  - cross-cutting
 ---
 
 # Go Architect Skill

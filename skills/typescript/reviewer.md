@@ -4,11 +4,7 @@ description: TypeScript code review workflow — review order, type safety audit
 scope: language-specific
 languages: [typescript]
 uses_rules:
-  - typescript/patterns
   - typescript/testing
-  - code-quality
-  - cross-cutting
-  - security
 ---
 
 # TypeScript Reviewer Skill

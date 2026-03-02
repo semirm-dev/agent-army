@@ -5,8 +5,6 @@ scope: language-specific
 languages: [python]
 uses_rules:
   - python/testing
-  - testing-patterns
-  - cross-cutting
 ---
 
 # Python Tester Skill

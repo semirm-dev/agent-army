@@ -5,10 +5,6 @@ scope: language-specific
 languages: [react]
 uses_rules:
   - react/patterns
-  - typescript/patterns
-  - code-quality
-  - cross-cutting
-  - security
 ---
 
 # React Coder Skill

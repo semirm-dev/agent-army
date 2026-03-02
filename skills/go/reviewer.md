@@ -4,11 +4,7 @@ description: Go code review workflow — review order, concurrency audit, error 
 scope: language-specific
 languages: [go]
 uses_rules:
-  - go/patterns
   - go/testing
-  - code-quality
-  - cross-cutting
-  - security
 ---
 
 # Go Reviewer Skill

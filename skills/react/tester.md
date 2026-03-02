@@ -5,8 +5,6 @@ scope: language-specific
 languages: [react]
 uses_rules:
   - react/testing
-  - testing-patterns
-  - cross-cutting
 ---
 
 # React Tester Skill

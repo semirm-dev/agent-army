@@ -5,9 +5,6 @@ scope: language-specific
 languages: [python]
 uses_rules:
   - python/patterns
-  - code-quality
-  - cross-cutting
-  - security
 ---
 
 # Python Coder Skill

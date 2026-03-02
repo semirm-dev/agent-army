@@ -4,11 +4,7 @@ description: Python code review workflow — review order, async audit, type saf
 scope: language-specific
 languages: [python]
 uses_rules:
-  - python/patterns
   - python/testing
-  - code-quality
-  - cross-cutting
-  - security
 ---
 
 # Python Reviewer Skill

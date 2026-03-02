@@ -5,8 +5,6 @@ scope: language-specific
 languages: [go]
 uses_rules:
   - go/testing
-  - testing-patterns
-  - cross-cutting
 ---
 
 # Go Tester Skill

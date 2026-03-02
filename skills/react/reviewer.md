@@ -4,12 +4,7 @@ description: React code review workflow — review order, component anti-pattern
 scope: language-specific
 languages: [react]
 uses_rules:
-  - react/patterns
   - react/testing
-  - typescript/patterns
-  - code-quality
-  - cross-cutting
-  - security
 ---
 
 # React Reviewer Skill
