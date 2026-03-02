@@ -1,5 +1,5 @@
 ---
-name: react-patterns
+name: react/patterns
 description: Component structure, state management, data fetching, accessibility, and performance
 scope: language-specific
 languages: [react]

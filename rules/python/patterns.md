@@ -1,5 +1,5 @@
 ---
-name: python-patterns
+name: python/patterns
 description: Type hints, formatting, error handling, async patterns, and project structure
 scope: language-specific
 languages: [python]

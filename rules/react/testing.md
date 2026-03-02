@@ -1,5 +1,5 @@
 ---
-name: react-testing
+name: react/testing
 description: Testing Library patterns, user-centric queries, MSW mocking, and component tests
 scope: language-specific
 languages: [react]

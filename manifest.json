@@ -28,11 +28,23 @@
     { "name": "concurrency", "scope": "universal", "uses_rules": ["concurrency", "cross-cutting", "observability"], "path": "skills/concurrency.md" },
     { "name": "containerization", "scope": "universal", "uses_rules": ["infrastructure", "observability", "security", "cross-cutting"], "path": "skills/containerization.md" },
     { "name": "data-modeling", "scope": "universal", "uses_rules": ["database", "cross-cutting", "security"], "path": "skills/data-modeling.md" },
+    { "name": "go-architect", "scope": "language-specific", "uses_rules": ["go/patterns", "code-quality", "cross-cutting"], "path": "skills/go-architect.md" },
+    { "name": "go-coder", "scope": "language-specific", "uses_rules": ["go/patterns", "code-quality", "cross-cutting", "security"], "path": "skills/go-coder.md" },
+    { "name": "go-reviewer", "scope": "language-specific", "uses_rules": ["go/patterns", "go/testing", "code-quality", "cross-cutting", "security"], "path": "skills/go-reviewer.md" },
+    { "name": "go-tester", "scope": "language-specific", "uses_rules": ["go/testing", "testing-patterns", "cross-cutting"], "path": "skills/go-tester.md" },
     { "name": "messaging-patterns", "scope": "universal", "uses_rules": ["messaging-patterns", "cross-cutting", "observability"], "path": "skills/messaging-patterns.md" },
     { "name": "observability-setup", "scope": "universal", "uses_rules": ["observability", "cross-cutting"], "path": "skills/observability-setup.md" },
     { "name": "performance-audit", "scope": "universal", "uses_rules": ["cross-cutting", "database", "observability", "infrastructure"], "path": "skills/performance-audit.md" },
+    { "name": "python-architect", "scope": "language-specific", "uses_rules": ["python/patterns", "code-quality", "cross-cutting"], "path": "skills/python-architect.md" },
+    { "name": "python-coder", "scope": "language-specific", "uses_rules": ["python/patterns", "code-quality", "cross-cutting", "security"], "path": "skills/python-coder.md" },
+    { "name": "python-reviewer", "scope": "language-specific", "uses_rules": ["python/patterns", "python/testing", "code-quality", "cross-cutting", "security"], "path": "skills/python-reviewer.md" },
+    { "name": "python-tester", "scope": "language-specific", "uses_rules": ["python/testing", "testing-patterns", "cross-cutting"], "path": "skills/python-tester.md" },
     { "name": "refactoring-patterns", "scope": "universal", "uses_rules": ["code-quality", "testing-patterns", "cross-cutting"], "path": "skills/refactoring-patterns.md" },
     { "name": "security-hardening", "scope": "universal", "uses_rules": ["security", "cross-cutting", "api-design"], "path": "skills/security-hardening.md" },
-    { "name": "testing-strategy", "scope": "universal", "uses_rules": ["testing-patterns", "cross-cutting"], "path": "skills/testing-strategy.md" }
+    { "name": "testing-strategy", "scope": "universal", "uses_rules": ["testing-patterns", "cross-cutting"], "path": "skills/testing-strategy.md" },
+    { "name": "typescript-architect", "scope": "language-specific", "uses_rules": ["typescript/patterns", "code-quality", "cross-cutting"], "path": "skills/typescript-architect.md" },
+    { "name": "typescript-coder", "scope": "language-specific", "uses_rules": ["typescript/patterns", "code-quality", "cross-cutting", "security"], "path": "skills/typescript-coder.md" },
+    { "name": "typescript-reviewer", "scope": "language-specific", "uses_rules": ["typescript/patterns", "typescript/testing", "code-quality", "cross-cutting", "security"], "path": "skills/typescript-reviewer.md" },
+    { "name": "typescript-tester", "scope": "language-specific", "uses_rules": ["typescript/testing", "testing-patterns", "cross-cutting"], "path": "skills/typescript-tester.md" }
   ]
 }

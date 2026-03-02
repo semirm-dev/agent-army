@@ -1,5 +1,5 @@
 ---
-name: go-testing
+name: go/testing
 description: Table-driven tests, race detection, benchmarks, and Go test helpers
 scope: language-specific
 languages: [go]

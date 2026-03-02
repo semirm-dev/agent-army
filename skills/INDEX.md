@@ -9,9 +9,21 @@
 | [concurrency](concurrency.md) | concurrency,cross-cutting,observability | Concurrency Skill |
 | [containerization](containerization.md) | infrastructure,observability,security,cross-cutting | Containerization Skill |
 | [data-modeling](data-modeling.md) | database,cross-cutting,security | Data Modeling Skill |
+| [go-architect](go-architect.md) | go/patterns,code-quality,cross-cutting | Go Architect Skill |
+| [go-coder](go-coder.md) | go/patterns,code-quality,cross-cutting,security | Go Coder Skill |
+| [go-reviewer](go-reviewer.md) | go/patterns,go/testing,code-quality,cross-cutting,security | Go Reviewer Skill |
+| [go-tester](go-tester.md) | go/testing,testing-patterns,cross-cutting | Go Tester Skill |
 | [messaging-patterns](messaging-patterns.md) | messaging-patterns,cross-cutting,observability | Messaging Patterns Skill |
 | [observability-setup](observability-setup.md) | observability,cross-cutting | Observability Setup Skill |
 | [performance-audit](performance-audit.md) | cross-cutting,database,observability,infrastructure | Performance Audit Skill |
+| [python-architect](python-architect.md) | python/patterns,code-quality,cross-cutting | Python Architect Skill |
+| [python-coder](python-coder.md) | python/patterns,code-quality,cross-cutting,security | Python Coder Skill |
+| [python-reviewer](python-reviewer.md) | python/patterns,python/testing,code-quality,cross-cutting,security | Python Reviewer Skill |
+| [python-tester](python-tester.md) | python/testing,testing-patterns,cross-cutting | Python Tester Skill |
 | [refactoring-patterns](refactoring-patterns.md) | code-quality,testing-patterns,cross-cutting | Refactoring Patterns Skill |
 | [security-hardening](security-hardening.md) | security,cross-cutting,api-design | Security Hardening Skill |
 | [testing-strategy](testing-strategy.md) | testing-patterns,cross-cutting | Testing Strategy Skill |
+| [typescript-architect](typescript-architect.md) | typescript/patterns,code-quality,cross-cutting | TypeScript Architect Skill |
+| [typescript-coder](typescript-coder.md) | typescript/patterns,code-quality,cross-cutting,security | TypeScript Coder Skill |
+| [typescript-reviewer](typescript-reviewer.md) | typescript/patterns,typescript/testing,code-quality,cross-cutting,security | TypeScript Reviewer Skill |
+| [typescript-tester](typescript-tester.md) | typescript/testing,testing-patterns,cross-cutting | TypeScript Tester Skill |

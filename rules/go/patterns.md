@@ -1,5 +1,5 @@
 ---
-name: go-patterns
+name: go/patterns
 description: Go coding conventions, error handling, project structure, and concurrency
 scope: language-specific
 languages: [go]

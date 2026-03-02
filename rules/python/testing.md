@@ -1,5 +1,5 @@
 ---
-name: python-testing
+name: python/testing
 description: Pytest conventions, parametrize, fixtures, and async test support
 scope: language-specific
 languages: [python]
