@@ -37,10 +37,7 @@ languages: []
 - **N+1 prevention:** Detect and eliminate N+1 query patterns. Use eager loading, joins, or batch queries instead of querying in loops.
 
 ## Query Plan Analysis
-
-- Analyze query execution plans for all new queries to detect inefficiencies.
-- **Red flags:** Full table scan on large tables with filter (add index), Nested Loop with high loop count (use JOIN), external sort spills (add index or increase memory budget), Rows Removed by Filter >> returned rows (missing index)
-- **Common join strategies:** Nested loop (small/indexed), hash join (large equality), merge join (pre-sorted).
+- **Query Plans:** Analyze with `EXPLAIN ANALYZE` for all new queries.
 
 ## Schema Conventions
 - **Primary keys:** UUID for distributed systems, BIGINT/SERIAL for single-database systems.
@@ -50,36 +47,7 @@ languages: []
 - **Naming:** `snake_case` for tables and columns. Plural table names (`users`, `orders`). Foreign keys: `<table>_id` (e.g., `user_id`).
 
 ## ORMs vs Raw SQL
-- **ORMs:** Use when productivity matters (CRUD-heavy code, rapid prototyping). Good for simple queries and schema management.
-- **Raw SQL:** Use for complex queries, performance-critical paths, bulk operations, and advanced database features.
-- **Never mix both in the same function.** Pick one approach per operation. Mixing creates confusion about query execution and error handling.
+- **ORMs:** Pick one approach per operation. Never mix ORM and raw SQL for the same entity.
 
-## NoSQL Patterns
-
-### Document Stores
-
-- **Denormalize for reads.** Embed related data in the document when it's always read together.
-- **Reference for writes.** Use references (foreign keys) when related data changes independently.
-- **Pagination:** Use cursor-based pagination (`_id > last_id`). Never use skip/offset on large collections.
-- **Transactions:** Use sparingly. Multi-document transactions are expensive. Design schemas to minimize cross-document updates.
-- **Indexes:** Index all query fields. Use compound indexes for multi-field queries. Monitor with `explain()`.
-- **Schema validation:** Enforce schema at the application layer (application-layer validators) even though the DB is schemaless.
-
-### Key-Value Stores
-
-- **Right data structure:** Choose the appropriate data structure for the access pattern: simple strings for cache/counters, hash maps for object fields, sets for unique collections, sorted sets for ranked data, lists for queues.
-- **Always set TTL.** Every key must expire. Unbounded key spaces grow until out of memory.
-- **Key naming:** `{service}:{entity}:{id}:{field}` (e.g., `auth:session:abc123`).
-- **Atomic operations:** Use transactions or scripting features for multi-step operations that must be atomic.
-
-### When to Choose NoSQL vs Relational
-
-| Factor | Relational DB | Document Store | Key-Value |
-|--------|--------------|----------------|-----------|
-| **Data model** | Relational, normalized | Nested, denormalized | Flat key-value |
-| **Query complexity** | Complex joins, aggregations | Single-document queries, simple aggregations | Key lookup only |
-| **Consistency** | Strong (ACID) | Tunable (eventual to strong) | Eventual |
-| **Scale** | Vertical + read replicas | Horizontal sharding | Horizontal sharding |
-| **Best for** | Business data, transactions | Content, catalogs, user profiles | Cache, sessions, real-time |
-
-**Default to a relational database** unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).
+## NoSQL
+- **NoSQL:** Default to PostgreSQL unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).

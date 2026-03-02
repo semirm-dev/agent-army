@@ -1,6 +1,7 @@
 ---
 scope: language-specific
 languages: [go]
+extends: [code-quality]
 ---
 
 > Extends `code-quality.md`. Language-agnostic standards apply.
@@ -26,55 +27,6 @@ languages: [go]
 
 ## Cross-References
 > See `security.md` for secrets management, input validation, and injection prevention.
-> See `cross-cutting.md` for error taxonomy and coverage targets.
+> See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
 > See `observability.md` for logging standards. Use `log/slog` for structured logging.
-
-## Concurrency
-> See `concurrency.md` for universal patterns (deadlocks, backpressure, shutdown).
-
-### Goroutine Lifecycle
-- Always pass `context.Context` for cancellation
-- Use `errgroup.Group` for coordinated goroutine management with error propagation
-- Use `sync.WaitGroup` only when errors aren't needed
-- Every goroutine must have a clear shutdown path — never fire-and-forget
-
-### Channel Patterns
-- **Fan-out/fan-in:** Distribute work across N goroutines, merge results into one channel
-- **Pipeline:** Chain stages where each reads from input channel, writes to output channel
-- **Done channel:** Use `ctx.Done()` (preferred) or a dedicated `done` channel for cancellation
-- Always close channels from the sender side, never the receiver
-
-### Sync Primitives
-- **`sync.Mutex`:** Protect shared state. Keep critical sections small.
-- **`sync.RWMutex`:** Use when reads vastly outnumber writes
-- **`sync.Once`:** Safe one-time initialization (prefer over `init()`)
-- **`sync.Pool`:** Reuse temporary objects to reduce GC pressure (buffers, encoders)
-
-### Pitfalls
-- **Goroutine leak:** Every goroutine must terminate. Use context cancellation + select.
-- **Race on map:** Maps are not safe for concurrent access. Use `sync.Map` or `sync.Mutex`.
-- **Closure capture in loop (pre-Go 1.22):** `go func() { use(v) }()` captures the variable, not the value. Pass as parameter: `go func(v T) { use(v) }(v)`. Go 1.22+ scopes loop variables per iteration.
-- **Defer in loop:** `defer` runs at function exit, not loop iteration end. Use an inner function.
-
-For testing patterns, see `testing-patterns.md`.
-
-## Recommended Stack
-
-### Database
-> See `database.md` for universal patterns.
-- **Query generation:** sqlc — type-safe SQL query generation from raw SQL
-- **Driver/Pooling:** pgx/pgxpool — high-performance PostgreSQL driver with built-in connection pooling
-- **Migrations:** golang-migrate — versioned, forward-only database migrations
-
-### Messaging
-> See `messaging-patterns.md` for universal patterns.
-- **asynq:** Redis-based task queue. Good for background jobs with retry and scheduling.
-- **watermill:** Message router supporting multiple backends (Kafka, RabbitMQ, NATS, Google Pub/Sub).
-
-### Observability
-> See `observability.md` for universal patterns.
-- **OTel:** Use `go.opentelemetry.io/contrib/instrumentation/` packages (net/http, gRPC, database/sql)
-- **Logging:** Use `log/slog` for structured logging
-
-## Performance Budgets
-> See `cross-cutting.md` for performance budget targets.
+> See `testing-patterns.md` for universal testing patterns.

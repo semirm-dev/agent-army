@@ -49,59 +49,8 @@ Use a consistent envelope across all endpoints:
 - **Size limits.** Enforce a maximum batch size to protect server resources. Document the limit.
 
 ## RPC / Binary Protocols
-
-- **Schema versioning:** Use numbered package versions in the schema definition. Never remove or renumber existing fields -- mark them as reserved.
-- **Method semantics:** Choose unary calls for simple request-response, server streaming for large result sets, client streaming for uploads, bidirectional streaming for real-time channels.
-- **Error model:** Use the protocol's canonical error codes. Attach structured error details for machine-readable context.
-- **Deadline propagation:** Always propagate deadlines/timeouts across service boundaries. Set a default deadline on every call; never allow unbounded waits.
-
-## GraphQL
-
-### Schema-First Design
-
-- **Schema is the contract.** Define the schema as a standalone artifact. Generate server types and client types from it.
-- **Thin resolvers.** Resolvers parse input and delegate to the service layer. No business logic in resolvers.
-
-### Data Fetching
-
-- **N+1 prevention:** Every relationship field must use a batching/caching loader. One query per type per request, not one per row.
-- **Pagination:** Use Relay cursor-based pagination (`first`, `after`, `last`, `before`) with `Connection` types:
-  ```graphql
-  type UserConnection {
-    edges: [UserEdge!]!
-    pageInfo: PageInfo!
-  }
-  type UserEdge {
-    node: User!
-    cursor: String!
-  }
-  type PageInfo {
-    hasNextPage: Boolean!
-    endCursor: String
-  }
-  ```
-
-### Error Handling
-
-- **Machine-readable errors.** Use `extensions.code` on every error for programmatic handling. Return partial data with errors when possible.
-- **Error taxonomy.** Follow the same domain/infrastructure/system classification as REST. See `cross-cutting.md` for the error taxonomy.
-
-### Authorization
-
-- **Auth in middleware.** Authenticate in the request context layer, not in individual resolvers.
-- **Schema directives.** Use custom directives (e.g., `@auth`, `@hasRole`) for field-level authorization. Authorization logic stays declarative and auditable.
-
-### Query Safety
-
-- **Depth limit.** Set a maximum query depth to prevent deeply nested abuse queries.
-- **Complexity scoring.** Assign a cost to each field. Reject queries exceeding the total complexity budget.
-- **Timeout.** Enforce a per-query execution timeout. Cancel and return a partial error on breach.
-
-### Subscriptions
-
-- **Use for real-time data only.** Live updates, notifications, collaborative editing. Not a replacement for polling infrequent changes.
-- **Connection lifecycle.** Handle connect, disconnect, keep-alive, and reconnection with backoff.
-- **Authorization on subscribe.** Validate permissions at subscription time and on each emitted event.
+- **Schema versioning:** Always backward-compatible. Use proto field numbering or Avro schema registry.
+- **Deadline propagation:** Propagate timeouts across service boundaries. Set a default deadline on every call.
 
 ## Cross-References
 

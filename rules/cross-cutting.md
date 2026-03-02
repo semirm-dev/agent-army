@@ -37,8 +37,7 @@ Categorize all errors into three levels:
 ## SBOM Requirement
 - **Production deployments** must include a Software Bill of Materials (SBOM) in CycloneDX or SPDX format.
 - Generate SBOM as part of the CI/CD build stage, before the deploy stage.
-- Store SBOM artifacts alongside release artifacts (container registry, release page).
-- Verify SBOM against known vulnerability databases before deploying to production.
+- Store SBOM artifacts alongside release artifacts and verify against known vulnerability databases before deploying to production.
 
 ## Monitoring & Alerting
 - Define SLOs (Service Level Objectives) for availability and latency per service.

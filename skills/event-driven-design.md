@@ -2,6 +2,9 @@
 name: event-driven-design
 description: "Event-driven architecture workflow — sync vs async decision tree, delivery guarantees, queue technology selection, event schema design, idempotency key selection, consumer patterns, and circuit breaker design."
 scope: universal
+uses_rules:
+  - messaging-patterns
+  - concurrency
 ---
 
 # Event-Driven Design Skill

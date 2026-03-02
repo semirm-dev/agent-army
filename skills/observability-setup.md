@@ -2,6 +2,9 @@
 name: observability-setup
 description: "Observability implementation workflow -- maturity decision tree, log level guide, health endpoint patterns, metrics RED/USE selection, and alert design."
 scope: universal
+uses_rules:
+  - observability
+  - cross-cutting
 ---
 
 # Observability Setup Skill

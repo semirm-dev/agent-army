@@ -18,44 +18,10 @@ languages: []
 - **Validation:** Always verify signature, expiry, issuer, and audience. Reject tokens with `alg: none`.
 
 ## OAuth 2.0 / OIDC
-
-### Authorization Flows
-
-- **Authorization Code + PKCE:** Default flow for all client types (web, mobile, SPA). Never use the Implicit flow.
-- **PKCE:** Use `S256` code challenge method. Never use `plain`.
-- **Client Credentials:** Service-to-service authentication only. Scope tokens to the minimum required permissions.
-
-### OIDC Discovery
-
-- **Use the provider's discovery endpoint** (`/.well-known/openid-configuration`) to fetch all endpoints dynamically.
-- **Never hardcode provider URLs.** Discovery ensures resilience to provider infrastructure changes.
-
-### Token Storage by Client Type
-
-- **Server-rendered web:** Store tokens in HTTP-only, Secure cookies.
-- **Single-page applications:** Use the Backend-for-Frontend (BFF) pattern. Tokens stay server-side; the browser receives only a session cookie.
-- **Mobile applications:** Store in the platform's secure credential storage.
-- **Never store tokens in browser-accessible storage** (localStorage, sessionStorage).
-
-### CSRF and State
-
-- **Always include a `state` parameter** in authorization requests. Validate it on the callback to prevent CSRF.
-- **Bind state to the user's session** so it cannot be replayed across sessions.
-
-### Scopes and Consent
-
-- **Request minimum scopes needed.** Avoid requesting broad permissions upfront.
-- **Use incremental consent** to request additional permissions only when the user needs the feature that requires them.
-
-### ID Token Validation
-
-- **Verify all required claims:** `iss`, `aud`, `exp`, `nonce` (if used in the request).
-- **Check `at_hash`** when the ID token accompanies an access token to ensure token binding.
-
-### Logout
-
-- **Implement both local session cleanup and provider logout** via the provider's `end_session_endpoint`.
-- **Revoke refresh tokens** on logout to prevent token reuse.
+- **Authorization Code + PKCE:** Default flow for all clients. Never use Implicit flow.
+- **Never store tokens in localStorage/sessionStorage.** Use HTTP-only cookies (server-rendered) or BFF pattern (SPA).
+- **Request minimum scopes needed.** Use incremental consent.
+- **Implement both local session cleanup and provider logout.**
 
 ## Authorization
 - **RBAC/ABAC at service layer.** Check permissions after authentication, never skip.
@@ -101,20 +67,7 @@ languages: []
 - **Certificate validation:** Always validate certificates. Never disable certificate checks, even in staging.
 - **Certificate pinning:** Pin certificates or public keys for mobile clients calling known backends to prevent MITM attacks. Implement a rotation strategy to avoid bricking clients on certificate renewal.
 
-## SQL Injection Prevention
-- **Always use parameterized queries.** Never string-concatenate user input into SQL.
-- **ORM/query builder:** Use parameterized execution. Verify generated SQL during development.
-- **Stored procedures** do not guarantee safety. Parameterize inputs to stored procedures the same way.
-- See `database.md` "Query Safety" for additional query hygiene rules.
-
-## XSS Prevention
-- **Context-appropriate output encoding.** Encode for the correct context: HTML body, HTML attributes, JavaScript, URL parameters, CSS.
-- **Content-Security-Policy header:** Define strict CSP. Avoid `unsafe-inline` and `unsafe-eval` where possible.
-- **Never insert untrusted data into raw HTML** — use the framework's built-in escaping mechanisms.
-- **Sanitize rich text input** with a vetted library before rendering.
-
-## CSRF Protection
-- **Protect all state-changing endpoints** (POST, PUT, PATCH, DELETE).
-- **Synchronizer token pattern:** Generate a unique token per session, validate on every state-changing request.
-- **SameSite cookies** provide defense-in-depth but are not sufficient alone in all browsers. Pair with token-based protection.
-- **Custom request headers** (e.g., `X-Requested-With`) add an extra layer for AJAX-only endpoints, since browsers enforce CORS on custom headers.
+## Injection & Output Safety
+- **SQL injection:** Always use parameterized queries. See `database.md` "Query Safety" for full rules.
+- **XSS:** Context-appropriate output encoding + strict CSP. Never insert untrusted data into raw HTML.
+- **CSRF:** Protect all state-changing endpoints with synchronizer tokens + SameSite cookies.

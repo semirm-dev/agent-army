@@ -1,6 +1,7 @@
 ---
 scope: language-specific
 languages: [python]
+extends: [code-quality]
 ---
 
 > Extends `code-quality.md`. Language-agnostic standards apply.
@@ -26,52 +27,6 @@ languages: [python]
 
 ## Cross-References
 > See `security.md` for secrets management, input validation, and injection prevention.
-> See `cross-cutting.md` for error taxonomy and coverage targets.
+> See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
 > See `observability.md` for logging standards. Use `structlog` or `logging` with JSON formatter.
-
-## Concurrency
-> See `concurrency.md` for universal patterns (deadlocks, backpressure, shutdown).
-
-### asyncio
-- **`asyncio.gather`:** Run multiple coroutines concurrently. Use `return_exceptions=True` for partial failure handling.
-- **`asyncio.TaskGroup`** (3.11+): Structured concurrency — all tasks cancel on first failure
-- **`asyncio.create_task`:** Schedule coroutine execution. Always hold a reference to the task.
-- **`asyncio.to_thread`:** Offload blocking/CPU-bound work to a thread pool
-
-### Sync Primitives
-- **`asyncio.Lock`:** Protect shared async state. Use `async with lock:`.
-- **`asyncio.Semaphore`:** Limit concurrent access (e.g., max 10 DB connections)
-- **`asyncio.Event`:** Signal between coroutines
-
-### ThreadPoolExecutor
-- Use for CPU-bound work or legacy blocking libraries
-- Set `max_workers` explicitly based on workload type
-- Use `asyncio.to_thread` (3.9+) instead of raw executor
-
-### Pitfalls
-- **Forgetting to await:** Unawaited coroutines silently don't execute. Enable `RuntimeWarning`.
-- **Blocking the event loop:** `time.sleep()`, synchronous I/O in async context. Use `asyncio.sleep()`.
-- **Task reference lost:** `create_task()` returns a task — if you don't hold a reference, it can be GC'd.
-
 > See `testing-patterns.md` for universal testing patterns.
-
-## Recommended Stack
-
-### Database
-> See `database.md` for universal patterns.
-- **ORM (sync):** SQLAlchemy 2.0+ — Core for complex queries, ORM for CRUD operations
-- **ORM (async):** Tortoise ORM — async-first ORM for FastAPI and other async frameworks
-- **Migrations:** Alembic (with SQLAlchemy) or Aerich (with Tortoise ORM)
-
-### Messaging
-> See `messaging-patterns.md` for universal patterns.
-- **celery:** Distributed task queue with multiple broker backends (Redis, RabbitMQ).
-- **dramatiq:** Simple, reliable task processing with automatic retries.
-
-### Observability
-> See `observability.md` for universal patterns.
-- **OTel:** Use `opentelemetry-instrumentation` packages for Flask, FastAPI, SQLAlchemy, requests/httpx
-- **Logging:** Use `structlog` or `logging` with JSON formatter
-
-## Performance Budgets
-> See `cross-cutting.md` for performance budget targets.

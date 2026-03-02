@@ -2,6 +2,9 @@
 name: incident-debugging
 description: "Systematic debugging workflow — reproduce, isolate, hypothesize, verify, fix, prevent. Includes log analysis, root cause table, bisect strategy, and post-incident review."
 scope: universal
+uses_rules:
+  - observability
+  - cross-cutting
 ---
 
 # Incident Debugging Skill

@@ -30,29 +30,11 @@ languages: []
 - **Avoid large keys:** Keep key names under 128 bytes.
 - **Versioning:** Include a version when schema changes: `v2:user:550e8400`.
 
-## Distributed Cache Considerations
-- **Key partitioning:** Co-locate related entries on the same shard using a shared partition key.
-- **Stampede prevention:** Use probabilistic early expiration or distributed locks to prevent thundering herd on popular keys.
-- **Serialization:** Prefer human-readable formats for debuggability, binary formats for performance. Be consistent per entity type.
-- **Connection pooling:** Always pool cache backend connections. Set max connections based on concurrency.
-
 ## Cache Failure Handling
 - Design for graceful degradation when cache is unavailable.
 - Fall back to source of truth -- accept higher latency over service failure.
 - Never let cache failures cascade into application outages.
 - Use circuit breakers on cache connections to avoid blocking on unresponsive backends.
-
-## Local vs Distributed
-- Use in-process cache for frequently accessed, small datasets with tolerable staleness.
-- Use distributed cache for shared state across multiple service instances.
-- Consider multi-layer caching (local, then distributed, then source) for hot data.
-- In-process caches avoid network overhead but cannot share state or survive restarts.
-
-## Eviction Policies
-- **LRU (Least Recently Used):** Default choice for most workloads.
-- **LFU (Least Frequently Used):** When access frequency matters more than recency.
-- **FIFO:** Rarely appropriate -- use only for time-ordered data.
-- Set max memory limits on every cache. Never allow unbounded growth.
 
 ## Observability
 - Monitor cache hit/miss ratio -- target above 80% for production caches.

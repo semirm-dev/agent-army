@@ -1,7 +1,10 @@
 ---
 scope: universal
 languages: []
+extends: [code-quality]
 ---
+
+> Extends `code-quality.md`. Code clarity and naming standards apply.
 
 # AI-Assisted Development Patterns
 
@@ -27,8 +30,6 @@ languages: []
 - **One assertion per test when practical.** Easier to diagnose which behavior broke.
 - **Edge cases as explicit test cases.** Not hidden in helper functions or shared fixtures.
 
-## Prompt-Friendly Code
-- **Named constants over magic numbers.** Every literal should have a meaningful name.
-- **Explicit error messages.** Include enough context to diagnose without reading the source.
-- **Self-documenting function signatures.** Parameters and return types tell the story.
-- **No implicit behavior.** Avoid init() functions, module-level side effects, hidden initialization.
+## Cross-References
+> See `code-quality.md` for naming, constants, error messages, and implicit behavior rules.
+> See `testing-patterns.md` for universal testing patterns referenced in "Test Patterns for AI Verification" above.

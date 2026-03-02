@@ -2,6 +2,8 @@
 name: cli-design
 description: "CLI tool design patterns -- flag conventions, help text structure, exit codes, error messages, output formatting, config precedence, and subcommand organization."
 scope: universal
+uses_rules:
+  - code-quality
 ---
 
 # CLI Design Skill

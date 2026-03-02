@@ -2,6 +2,8 @@
 name: caching-strategy
 description: "Cache decision trees, strategy selection, TTL guidance, invalidation picker, and stampede prevention."
 scope: universal
+uses_rules:
+  - caching-patterns
 ---
 
 # Caching Strategy Skill

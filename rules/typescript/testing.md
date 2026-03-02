@@ -1,6 +1,7 @@
 ---
 scope: language-specific
 languages: [typescript]
+extends: [testing-patterns]
 ---
 
 > Extends `testing-patterns.md`. See parent for universal patterns (naming, isolation, flaky prevention).

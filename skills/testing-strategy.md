@@ -2,6 +2,9 @@
 name: testing-strategy
 description: "Testing pyramid guidance, test type decision tree, what NOT to test, and contract testing."
 scope: universal
+uses_rules:
+  - testing-patterns
+  - cross-cutting
 ---
 
 # Testing Strategy Skill

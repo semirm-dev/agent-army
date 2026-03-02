@@ -2,6 +2,9 @@
 name: code-review-workflow
 description: "Structured code review process — multi-pass review strategy, priority checklist, PR sizing guidelines, splitting strategies, review comment format, and approval criteria."
 scope: universal
+uses_rules:
+  - git-workflow
+  - security
 ---
 
 # Code Review Workflow Skill
@@ -52,15 +55,13 @@ This is where most review time is spent. Focus on:
 
 ### Pass 3: Security and Safety
 
-Scan every changed file for:
+Run through security constraints in `rules/security.md`. For each changed file, ask:
 
-- **Input validation:** Is all external input validated at the handler boundary?
-- **SQL injection:** Are queries parameterized? Any string concatenation with user input?
-- **XSS:** Is user content escaped before rendering in HTML contexts?
-- **Auth checks:** Does every endpoint verify authentication and authorization?
-- **Secrets exposure:** Are API keys, tokens, or credentials hardcoded or logged?
-- **Data leaks:** Are internal fields (passwords, tokens, PII) excluded from API responses?
-- **Dependency safety:** Do new dependencies have known vulnerabilities?
+- Does this file handle external input, authentication, or secrets?
+- Does this file introduce or modify API responses that could leak internal data?
+- Does this file add new dependencies that need vulnerability checking?
+
+Flag any file that touches these areas for deeper security review using the rules checklist.
 
 ### Pass 4: Design and Maintainability
 

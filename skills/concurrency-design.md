@@ -2,6 +2,8 @@
 name: concurrency-design
 description: "Concurrency pattern selection — unified decision trees for parallel work, shared state protection, graceful shutdown, backpressure design, and pre-commit review."
 scope: universal
+uses_rules:
+  - concurrency
 ---
 
 # Concurrency Design Skill

@@ -2,6 +2,9 @@
 name: refactoring-patterns
 description: "Safe refactoring workflow, common patterns (extract, inline, move, rename), red flags, and pre-ship checklist."
 scope: universal
+uses_rules:
+  - code-quality
+  - testing-patterns
 ---
 
 # Refactoring Patterns Skill

@@ -2,6 +2,8 @@
 name: code-architecture
 description: "Architecture decision patterns — vertical slices vs layered, package-by-feature principles, dependency injection guidelines, interface boundaries, and split-vs-keep heuristics."
 scope: universal
+uses_rules:
+  - code-quality
 ---
 
 # Code Architecture Skill

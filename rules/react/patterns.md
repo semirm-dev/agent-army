@@ -1,6 +1,7 @@
 ---
 scope: language-specific
 languages: [react]
+extends: [code-quality, typescript/patterns]
 ---
 
 > Extends `code-quality.md`. React components use TypeScript; see `typescript/patterns.md` for TS-specific standards.
@@ -37,14 +38,7 @@ languages: [react]
 - **Lazy loading:** Use `React.lazy()` + `Suspense` for route-level code splitting.
 - **List rendering:** Use stable, unique keys (never array index). Virtualize long lists (>100 items) with `react-window` or `tanstack-virtual`.
 
-## Accessibility (WCAG 2.1 AA)
-
-Target WCAG 2.1 AA compliance. The rules below cover React-specific concerns; for general WCAG guidance (semantic HTML, color contrast ratios, alt text) refer to the standard directly.
-
-- **JSX form bindings:** Every `<input>` must have an associated `<label>` via `htmlFor` (not `for`). Use `aria-describedby` for help text and `aria-invalid` for error states.
-- **Dynamic regions:** Use `aria-live` regions for content updated by state changes (toasts, inline validation, live search results).
-- **Focus management:** Manage focus on route changes (`useEffect` + `ref.focus()`) and modal open/close. Trap focus inside modals. Use `autoFocus` sparingly and only for primary actions.
-- **Custom interactive components:** Components that replace native elements (custom dropdowns, tabs, accordions) must implement full keyboard support (`tabIndex`, `onKeyDown`, `role`, `aria-expanded`).
+- **Accessibility:** Target WCAG 2.1 AA compliance.
 
 ## Error Boundaries
 - **Use `react-error-boundary` library** (not class components). Maintains "functional components only" rule.
@@ -59,4 +53,3 @@ Target WCAG 2.1 AA compliance. The rules below cover React-specific concerns; fo
 > See `security.md` for secrets management, input validation, and injection prevention.
 > See `testing-patterns.md` for universal testing standards.
 
-For React-specific testing patterns, see `react/testing.md`.
