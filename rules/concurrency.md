@@ -23,6 +23,11 @@ languages: []
 - **Rate limiting:** Limit producers to match consumer throughput.
 - **Load shedding:** Drop or reject work when queues are full, rather than accumulating.
 
+## Worker Pools
+- Use a fixed-size pool for CPU-bound work. Size to available cores.
+- Use a larger pool for I/O-bound work. Size based on expected concurrent I/O operations, not cores.
+- Always drain worker pools on shutdown (see Graceful Shutdown).
+
 ## Graceful Shutdown
 1. **Stop accepting new work** (close listeners, stop consumers)
 2. **Drain in-flight work** (wait for active requests/tasks to complete)

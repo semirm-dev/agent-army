@@ -45,6 +45,10 @@ languages: []
 - **Soft deletes:** Use `deleted_at` timestamp instead of physical deletion when audit trail matters.
 - **Naming:** `snake_case` for tables and columns. Plural table names (`users`, `orders`). Foreign keys: `<table>_id` (e.g., `user_id`).
 
+## Read Replicas
+- Route read-only queries to replicas when available. Write queries always go to primary.
+- Account for replication lag in read-after-write scenarios. Read from primary when consistency matters.
+
 ## Technology Choices
 - **ORMs vs Raw SQL:** Pick one approach per operation. Never mix ORM and raw SQL for the same entity.
 - **Default to PostgreSQL** unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).

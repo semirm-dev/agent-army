@@ -49,7 +49,3 @@ Use a consistent envelope across all endpoints:
 - **Provide batch endpoints** for operations clients frequently call in loops (bulk create, bulk delete).
 - **Partial success.** Return per-item results so the caller knows which items succeeded and which failed.
 - **Size limits.** Enforce a maximum batch size to protect server resources. Document the limit.
-
-## RPC / Binary Protocols
-- **Schema versioning:** Always backward-compatible. Use proto field numbering or Avro schema registry.
-- **Deadline propagation:** Propagate timeouts across service boundaries. Set a default deadline on every call.

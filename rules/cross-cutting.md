@@ -40,12 +40,8 @@ Categorize all errors into three levels:
 - Generate SBOM as part of the CI/CD build stage, before the deploy stage.
 - Store SBOM artifacts alongside release artifacts and verify against known vulnerability databases before deploying to production.
 
-## Monitoring & Alerting
-- Define SLOs (Service Level Objectives) for availability and latency per service.
-- Alert on SLO violations, not on individual metric spikes.
-- Every alert must link to a runbook with investigation steps.
-- Monitor error rates by error taxonomy level (domain vs infrastructure vs system).
-- Review and tune alert thresholds quarterly to reduce noise.
+## Service Level Objectives
+- Define SLOs for availability and latency per service. SLOs are business decisions that drive alerting and observability implementation.
 
 ## Data Lifecycle
 - Classify data by sensitivity: public, internal, confidential, restricted.

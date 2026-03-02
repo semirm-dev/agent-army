@@ -23,5 +23,5 @@
 | [python/testing](python/testing.md) | language-specific (python) | testing-patterns,cross-cutting,python/patterns | Python Testing Patterns |
 | [react/patterns](react/patterns.md) | language-specific (react) | code-quality,typescript/patterns,cross-cutting,security,testing-patterns | React & Frontend Patterns |
 | [react/testing](react/testing.md) | language-specific (react) | testing-patterns,cross-cutting,react/patterns,typescript/patterns | React Testing Patterns |
-| [typescript/patterns](typescript/patterns.md) | language-specific (typescript) | code-quality,security,cross-cutting,testing-patterns | TypeScript Coding Patterns |
+| [typescript/patterns](typescript/patterns.md) | language-specific (typescript) | code-quality,security,cross-cutting,observability,testing-patterns | TypeScript Coding Patterns |
 | [typescript/testing](typescript/testing.md) | language-specific (typescript) | testing-patterns,cross-cutting,typescript/patterns | TypeScript Testing Patterns |

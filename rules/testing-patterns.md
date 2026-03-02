@@ -57,7 +57,10 @@ languages: []
 - **Isolated test state.** Each test creates its own data. No shared mutable fixtures.
 - **Explicit timeouts.** Set test timeouts to catch hangs. CI timeouts should be stricter than local.
 
+## Contract Testing
+- For service-to-service APIs, use consumer-driven contract tests (e.g., Pact) to catch breaking changes before deployment.
+
 ## Coverage
 - Run coverage as part of CI, not just locally.
-- Set coverage thresholds as CI gates. Fail the build if coverage drops below the threshold.
+- Set coverage thresholds as CI gates. Fail the build if coverage drops below the threshold. See cross-cutting for per-category numeric thresholds.
 - Prefer branch coverage over line coverage. Line coverage misses untested conditional paths.

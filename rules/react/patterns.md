@@ -45,6 +45,11 @@ uses_rules: [code-quality, typescript/patterns, cross-cutting, security, testing
 - **Color contrast:** Never use color as the sole indicator of state. Maintain minimum 4.5:1 contrast ratio for normal text, 3:1 for large text.
 - **Forms:** Every `<input>` must have an associated `<label>`. Use `aria-describedby` for help text and `aria-invalid` for error states.
 
+## Forms
+- Use a form library (React Hook Form, Formik) for forms with >3 fields or complex validation.
+- Validate on blur for individual fields, on submit for the full form. Show inline errors next to each field.
+- Use schema validation (Zod, Yup) shared between frontend and API for consistency.
+
 ## Error Boundaries
 - **Use `react-error-boundary` library** (not class components). Maintains "functional components only" rule.
 - **Wrap at route level:** Each route should have an error boundary with a fallback UI.
