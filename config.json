@@ -7,75 +7,94 @@
       "description": "Skill authoring guide"
     }
   ],
-  "plugins": [
-    { "name": "code-review", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
-    { "name": "frontend-design", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
-    { "name": "security-guidance", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
-    { "name": "code-simplifier", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
-    { "name": "superpowers", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" },
-    { "name": "context7", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official" }
-  ],
-  "rsync_excludes": [
-    "rules/",
-    "skills/",
-    "plugins/",
-    "agents/",
-    "settings.json"
-  ],
-  "settings": {
-    "defaultMode": "plan",
-    "skipDangerousModePermissionPrompt": true,
-    "statusLine": {
-      "type": "command",
-      "command": "bash ~/.claude/statusline-command.sh"
+  "public_plugins": [
+    {
+      "name": "code-review",
+      "marketplace": "claude-plugins-official",
+      "source": "anthropics/claude-plugins-official"
     },
-    "permissions_allow": [
-      "Bash(go build:*)",
-      "Bash(go test:*)",
-      "Bash(go vet:*)",
-      "Bash(go mod:*)",
-      "Bash(golangci-lint:*)",
-      "Bash(gofmt:*)",
-      "Bash(tsc:*)",
-      "Bash(npx vitest:*)",
-      "Bash(npx eslint:*)",
-      "Bash(npm test:*)",
-      "Bash(npm run build:*)",
-      "Bash(npm run test:*)",
-      "Bash(npm run lint:*)",
-      "Bash(npm run dev:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)",
-      "Bash(pytest:*)",
-      "Bash(ruff:*)",
-      "Bash(mypy:*)",
-      "Bash(pip:*)",
-      "Bash(uv:*)",
-      "Bash(make:*)",
-      "Bash(docker build:*)",
-      "Bash(docker compose:*)",
-      "Bash(docker run:*)",
-      "Bash(hadolint:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(git branch:*)",
-      "Bash(git stash:*)",
-      "Bash(git add:*)",
-      "Bash(git checkout:*)",
-      "Bash(git switch:*)",
-      "Bash(trash:*)",
-      "Bash(npm install:*)",
-      "Bash(npm ci:*)",
-      "Bash(npx prisma:*)",
-      "Bash(npx drizzle-kit:*)",
-      "Bash(poetry install:*)",
-      "Bash(poetry lock:*)",
-      "Bash(uv pip install:*)",
-      "Bash(docker exec:*)",
-      "Bash(docker compose down:*)",
-      "Bash(curl:*)",
-      "Bash(govulncheck:*)"
-    ]
+    {
+      "name": "frontend-design",
+      "marketplace": "claude-plugins-official",
+      "source": "anthropics/claude-plugins-official"
+    },
+    {
+      "name": "security-guidance",
+      "marketplace": "claude-plugins-official",
+      "source": "anthropics/claude-plugins-official"
+    },
+    {
+      "name": "code-simplifier",
+      "marketplace": "claude-plugins-official",
+      "source": "anthropics/claude-plugins-official"
+    },
+    {
+      "name": "superpowers",
+      "marketplace": "claude-plugins-official",
+      "source": "anthropics/claude-plugins-official"
+    },
+    {
+      "name": "context7",
+      "marketplace": "claude-plugins-official",
+      "source": "anthropics/claude-plugins-official"
+    }
+  ],
+  "claude": {
+    "settings": {
+      "defaultMode": "plan",
+      "skipDangerousModePermissionPrompt": true,
+      "statusLine": {
+        "type": "command",
+        "command": "bash ~/.claude/statusline-command.sh"
+      },
+      "permissions_allow": [
+        "Bash(go build:*)",
+        "Bash(go test:*)",
+        "Bash(go vet:*)",
+        "Bash(go mod:*)",
+        "Bash(golangci-lint:*)",
+        "Bash(gofmt:*)",
+        "Bash(tsc:*)",
+        "Bash(npx vitest:*)",
+        "Bash(npx eslint:*)",
+        "Bash(npm test:*)",
+        "Bash(npm run build:*)",
+        "Bash(npm run test:*)",
+        "Bash(npm run lint:*)",
+        "Bash(npm run dev:*)",
+        "Bash(python:*)",
+        "Bash(python3:*)",
+        "Bash(pytest:*)",
+        "Bash(ruff:*)",
+        "Bash(mypy:*)",
+        "Bash(pip:*)",
+        "Bash(uv:*)",
+        "Bash(make:*)",
+        "Bash(docker build:*)",
+        "Bash(docker compose:*)",
+        "Bash(docker run:*)",
+        "Bash(hadolint:*)",
+        "Bash(git status:*)",
+        "Bash(git diff:*)",
+        "Bash(git log:*)",
+        "Bash(git branch:*)",
+        "Bash(git stash:*)",
+        "Bash(git add:*)",
+        "Bash(git checkout:*)",
+        "Bash(git switch:*)",
+        "Bash(trash:*)",
+        "Bash(npm install:*)",
+        "Bash(npm ci:*)",
+        "Bash(npx prisma:*)",
+        "Bash(npx drizzle-kit:*)",
+        "Bash(poetry install:*)",
+        "Bash(poetry lock:*)",
+        "Bash(uv pip install:*)",
+        "Bash(docker exec:*)",
+        "Bash(docker compose down:*)",
+        "Bash(curl:*)",
+        "Bash(govulncheck:*)"
+      ]
+    }
   }
 }
