@@ -27,6 +27,7 @@ uses_rules: [code-quality, security, cross-cutting, observability, testing-patte
 ## Concurrency
 - **Context:** Always pass `context.Context` as the first parameter to blocking/IO operations.
 - **Context lifecycle:** Create cancellable contexts with `context.WithTimeout` or `context.WithCancel` at the entry point. Propagate the same context down the call chain -- never create a fresh `context.Background()` mid-call to bypass a parent's cancellation.
+- **Structured logging:** Use `log/slog` (Go 1.21+) for structured logging. Pass `slog.Logger` via dependency injection, not package-level globals.
 - **defer:** Use `defer` for resource cleanup. Be aware of loop and closure pitfalls (e.g., `defer` in a loop defers until function exit, not iteration end).
 
 ## Dependencies and Configuration

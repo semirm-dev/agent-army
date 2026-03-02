@@ -23,6 +23,7 @@ languages: []
 - **DRY threshold.** Extract shared logic only when a pattern repeats 3+ times. Prefer 3 similar lines over a premature abstraction.
 - **Single responsibility.** Each function does one thing. Each file has one purpose.
 - **Parameter count.** Functions with > 3 parameters should accept an options or config object instead.
+- **Dead code.** Remove unused code rather than commenting it out. Version control preserves history. If removal is uncertain, mark with `// TODO(cleanup): verify unused` and revisit.
 
 ## Comments
 - **WHY comments.** Explain business decisions, not what the code does.

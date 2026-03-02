@@ -74,6 +74,7 @@ languages: []
 - **XSS:** Context-appropriate output encoding + strict CSP. Never insert untrusted data into raw HTML.
 - **CSP:** Start with `default-src 'self'`. Add specific directives as needed. Use `report-uri` or `report-to` to detect violations before enforcing. Never use `unsafe-inline` or `unsafe-eval` in production.
 - **CSRF:** Protect all state-changing endpoints with synchronizer tokens + SameSite cookies.
+- **SSRF:** When the server fetches user-supplied URLs (webhooks, previews, imports), validate and restrict targets. Block private/internal IP ranges (127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 169.254.0.0/16). Allowlist permitted domains when possible.
 
 ## Dependency Security
 - **Scan dependencies for known vulnerabilities** as part of CI. Block merges on critical/high severity CVEs.
