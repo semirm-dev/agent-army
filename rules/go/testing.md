@@ -44,3 +44,7 @@ for _, tt := range tests {
 - `-count=1` disables test caching
 - Always use `-race` flag: `go test ./... -race`
 - Set timeouts: `go test -timeout 30s`
+
+## Cross-References
+- See `cross-cutting.md` for coverage targets and dependency audit requirements.
+- See `go/patterns.md` for Go error handling conventions used in tested code.

@@ -18,3 +18,6 @@ languages: []
 - **Rebase Policy:** Rebase only local, unshared feature branches. Never force-push shared or published branches.
 - **Branch Protection:** Require code review approval and passing CI before merge to main/trunk. No direct pushes to protected branches.
 - **Release Tagging:** Use semantic versioning tags (`vMAJOR.MINOR.PATCH`). Tag from main after merge. Use annotated tags with a changelog summary in the tag message.
+
+## Cross-References
+- See `cross-cutting.md` for dependency update policy and branch strategies for major upgrades.

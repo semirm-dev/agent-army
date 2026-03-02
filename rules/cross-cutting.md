@@ -45,7 +45,6 @@ Categorize all errors into three levels:
 - Every alert must link to a runbook with investigation steps.
 - Monitor error rates by error taxonomy level (domain vs infrastructure vs system).
 - Review and tune alert thresholds quarterly to reduce noise.
-- For alerting implementation patterns (severity tiers, runbook requirements), see `observability.md`.
 
 ## Data Lifecycle
 - Classify data by sensitivity: public, internal, confidential, restricted.
@@ -53,4 +52,7 @@ Categorize all errors into three levels:
 - Define retention policies per data class -- never retain data indefinitely without justification.
 - Anonymize or pseudonymize PII in non-production environments.
 - Log access to restricted data for audit purposes.
+
+## Cross-References
+- See `observability.md` for alerting implementation patterns, severity tiers, and runbook requirements.
 - See `security.md` for transport security and secrets management.

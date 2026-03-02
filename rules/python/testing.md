@@ -88,5 +88,5 @@ async def test_async_service(mocker) -> None:
 ```
 
 ## Cross-References
-> See `cross-cutting.md` for coverage targets and error taxonomy.
-> See `python/patterns.md` for async/concurrency patterns used in tested code.
+- See `cross-cutting.md` for coverage targets and error taxonomy.
+- See `python/patterns.md` for async/concurrency patterns used in tested code.

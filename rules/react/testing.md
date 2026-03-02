@@ -25,6 +25,6 @@ extends: [testing-patterns]
 - Assert on request payloads when testing mutation flows.
 
 ## Cross-References
-> See `cross-cutting.md` for coverage targets and error taxonomy.
-> See `react/patterns.md` for component structure, state management, and error boundary patterns.
-> See `typescript/patterns.md` for TypeScript-specific standards used in React components.
+- See `cross-cutting.md` for coverage targets and error taxonomy.
+- See `react/patterns.md` for component structure, state management, and error boundary patterns.
+- See `typescript/patterns.md` for TypeScript-specific standards used in React components.

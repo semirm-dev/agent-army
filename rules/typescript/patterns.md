@@ -21,6 +21,6 @@ extends: [code-quality]
 - **Formatting:** Use Prettier (or Biome). Enforce via pre-commit hook or CI.
 
 ## Cross-References
-> See `security.md` for secrets management, input validation, and injection prevention.
-> See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
-> See `testing-patterns.md` for universal testing patterns.
+- See `security.md` for secrets management, input validation, and injection prevention.
+- See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
+- See `testing-patterns.md` for universal testing patterns.

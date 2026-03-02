@@ -30,4 +30,8 @@ languages: []
 ## Observability
 - Monitor active concurrent task/worker count — unbounded growth indicates a leak.
 - Track queue depth and processing latency for work queues.
-- Propagate trace context across concurrent boundaries (see `observability.md`).
+- Propagate trace context across concurrent boundaries.
+
+## Cross-References
+- See `messaging-patterns.md` for queue-specific backpressure patterns.
+- See `observability.md` for trace context propagation and monitoring.

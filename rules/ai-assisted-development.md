@@ -31,5 +31,5 @@ extends: [code-quality]
 - **Edge cases as explicit test cases.** Not hidden in helper functions or shared fixtures.
 
 ## Cross-References
-> See `code-quality.md` for naming, constants, error messages, and implicit behavior rules.
-> See `testing-patterns.md` for universal testing patterns referenced in "Test Patterns for AI Verification" above.
+- See `code-quality.md` for naming, constants, error messages, and implicit behavior rules.
+- See `testing-patterns.md` for universal testing patterns referenced in "Test Patterns for AI Verification" above.

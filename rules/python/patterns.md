@@ -14,7 +14,7 @@ extends: [code-quality]
 - **Imports:** Order: stdlib → third-party → local. Use `isort` or ruff's import sorting. No wildcard imports (`from x import *`).
 - **Naming:** `snake_case` for functions/variables, `PascalCase` for classes, `UPPER_SNAKE_CASE` for constants. Prefix private with `_`.
 - **Project structure:** Package by feature, use `src/` layout for libraries. Keep `__init__.py` minimal -- only re-export public API, no logic.
-- **Virtual Environments:** Always use `uv` (preferred), `venv`, or `poetry` for dependency isolation. Never install into system Python.
+- **Virtual Environments:** Use `uv` for new projects. `venv` and `poetry` are acceptable in existing projects that already use them. Never install into system Python.
 - **Dependencies:** Pin versions in `requirements.txt` or use `pyproject.toml` with lock files. Use `uv lock`, `poetry lock`, or `pip-compile` to generate lock files.
 - **Packaging:** Always use `pyproject.toml` for new projects. `setup.py` only for legacy compatibility.
 - **Error Handling:** Use specific exception types. Never bare `except:`. Wrap with context: `raise DomainError("context") from original`.
@@ -26,7 +26,7 @@ extends: [code-quality]
 - **Context managers:** Use `with` for resource cleanup. Implement `__enter__`/`__exit__` or use `contextlib.contextmanager` / `contextlib.asynccontextmanager`.
 
 ## Cross-References
-> See `security.md` for secrets management, input validation, and injection prevention.
-> See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
-> See `observability.md` for logging standards. Use `structlog` or `logging` with JSON formatter.
-> See `testing-patterns.md` for universal testing patterns.
+- See `security.md` for secrets management, input validation, and injection prevention.
+- See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
+- See `observability.md` for logging standards. Use `structlog` or `logging` with JSON formatter.
+- See `testing-patterns.md` for universal testing patterns.

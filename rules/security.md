@@ -6,7 +6,7 @@ languages: []
 # Security Patterns
 
 ## Password Hashing
-- **Use modern adaptive hashing algorithms.** Never use general-purpose hash functions for password storage.
+- **Use modern adaptive hashing algorithms** (bcrypt, argon2id, scrypt). Never use general-purpose hash functions (MD5, SHA-1, SHA-256, PBKDF2-SHA1) for password storage.
 - **Tune cost parameters** to the maximum your hardware can sustain within acceptable login latency (~250ms).
 - **Upgrade strategy:** Re-hash on login if the cost factor has increased since the last hash.
 
@@ -36,7 +36,7 @@ languages: []
 - **Preflight caching:** Set `Access-Control-Max-Age` to reduce OPTIONS requests.
 
 ## Rate Limiting
-- **Per-IP and per-user on public endpoints.** Choose an appropriate algorithm for your use case.
+- **Per-IP and per-user on public endpoints.** Use sliding window for simplicity or token bucket for burst tolerance.
 - **Return 429** with `Retry-After` header indicating when the client can retry.
 - **Graduated limits:** Stricter for auth endpoints (login, signup, password reset).
 - **Distributed:** Use distributed state for rate limiting across multiple instances.
@@ -71,3 +71,6 @@ languages: []
 - **SQL injection:** Always use parameterized queries. See `database.md` "Query Safety" for full rules.
 - **XSS:** Context-appropriate output encoding + strict CSP. Never insert untrusted data into raw HTML.
 - **CSRF:** Protect all state-changing endpoints with synchronizer tokens + SameSite cookies.
+
+## Cross-References
+- See `database.md` for query safety and parameterized query patterns.

@@ -41,5 +41,7 @@ languages: []
 - **Every alert must have:** severity level, link to a runbook, and expected response time.
 - **Tiered severity:** Critical (pages on-call, immediate), Warning (next business day), Info (dashboard only).
 - **Alert fatigue is a failure mode.** If an alert fires regularly with no action taken, delete it or tune the threshold.
+
+## Cross-References
 - See `cross-cutting.md` for SLO definitions and alert-on-SLO-violation guidance.
-- See `infrastructure.md` for container and CI/CD patterns.
+- See `security.md` for secrets and PII handling referenced in logging rules above.

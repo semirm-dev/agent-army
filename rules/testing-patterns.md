@@ -8,7 +8,7 @@ languages: []
 ## Test Naming
 - Describe behavior, not implementation: "returns error when user not found" not "test getUserById."
 - Test names should read as documentation. A failing test name alone should tell you what broke.
-- Use a consistent naming convention per project. See language-specific files for format details.
+- Use a consistent naming convention per project.
 
 ## Test Organization
 - One test file per source file, co-located or mirrored in a tests directory.
@@ -58,4 +58,6 @@ languages: []
 - Run coverage as part of CI, not just locally.
 - Set coverage thresholds as CI gates. Fail the build if coverage drops below the threshold.
 - Prefer branch coverage over line coverage. Line coverage misses untested conditional paths.
+
+## Cross-References
 - See `cross-cutting.md` for coverage targets by code category.

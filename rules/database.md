@@ -7,7 +7,7 @@ languages: []
 
 ## Migrations
 - **Versioned, forward-only.** Never edit an already-applied migration. Create a new one.
-- **Tools:** Use the migration tool appropriate for your language stack (see language-specific database files).
+- **Tools:** Use the migration tool appropriate for your language stack.
 - **Naming:** Use timestamps: `20260225120000_create_users.sql`. Include both `up` and `down` migrations.
 - **Review:** Every migration must be reviewed for data safety. DROP/ALTER on production tables requires explicit confirmation.
 
@@ -27,7 +27,6 @@ languages: []
 - **Always parameterized.** Never string-concatenate user input into queries.
 - **Query builders/ORMs:** Use parameterized execution. Verify generated SQL in development.
 - **Avoid `SELECT *`.** List columns explicitly. Prevents schema change breakage and reduces data transfer.
-- See also `security.md` SQL Injection Prevention for the threat model.
 
 ## Indexes
 - **Index `WHERE`, `JOIN`, `ORDER BY` columns.** Review query plans with `EXPLAIN ANALYZE` for N+1 detection.
@@ -46,8 +45,10 @@ languages: []
 - **Soft deletes:** Use `deleted_at` timestamp instead of physical deletion when audit trail matters.
 - **Naming:** `snake_case` for tables and columns. Plural table names (`users`, `orders`). Foreign keys: `<table>_id` (e.g., `user_id`).
 
-## ORMs vs Raw SQL
-- **ORMs:** Pick one approach per operation. Never mix ORM and raw SQL for the same entity.
+## Technology Choices
+- **ORMs vs Raw SQL:** Pick one approach per operation. Never mix ORM and raw SQL for the same entity.
+- **Default to PostgreSQL** unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).
 
-## NoSQL
-- **NoSQL:** Default to PostgreSQL unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).
+## Cross-References
+- See `security.md` for SQL injection prevention and the threat model behind query safety.
+- See `caching-patterns.md` for cache-aside patterns that involve database reads on cache miss.

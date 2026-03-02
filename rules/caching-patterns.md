@@ -48,3 +48,7 @@ languages: []
 - **N+1 cache calls:** Batch multi-key lookups instead of individual get calls in loops.
 - **Caching errors:** Never cache error responses or null results without a short TTL (< 30s).
 - **Over-caching:** Do not cache data that changes every request or is cheap to compute.
+
+## Cross-References
+- See `observability.md` for general metrics naming conventions and alerting patterns applicable to cache monitoring.
+- See `cross-cutting.md` for performance budget targets when tuning cache latency.

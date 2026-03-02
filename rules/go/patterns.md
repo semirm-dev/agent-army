@@ -26,7 +26,7 @@ extends: [code-quality]
 - **defer:** Use `defer` for resource cleanup. Be aware of loop and closure pitfalls (e.g., `defer` in a loop defers until function exit, not iteration end).
 
 ## Cross-References
-> See `security.md` for secrets management, input validation, and injection prevention.
-> See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
-> See `observability.md` for logging standards. Use `log/slog` for structured logging.
-> See `testing-patterns.md` for universal testing patterns.
+- See `security.md` for secrets management, input validation, and injection prevention.
+- See `cross-cutting.md` for error taxonomy, coverage targets, and performance budget targets.
+- See `observability.md` for logging standards. Use `log/slog` for structured logging.
+- See `testing-patterns.md` for universal testing patterns.

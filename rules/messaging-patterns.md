@@ -62,3 +62,7 @@ languages: []
 - **Giant messages:** Keep messages small (< 256KB). Store large payloads in blob storage and pass a reference.
 - **Synchronous patterns over queues:** Don't use request-reply when a direct HTTP call is simpler and sufficient.
 - **No schema validation:** Validate event schema at producer and consumer boundaries.
+
+## Cross-References
+- See `concurrency.md` for backpressure and graceful shutdown patterns applicable to message consumers.
+- See `observability.md` for distributed tracing and correlation ID propagation across service boundaries.
