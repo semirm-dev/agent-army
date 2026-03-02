@@ -5,11 +5,13 @@
 | Skill | Uses Rules | Summary |
 |-------|-----------|---------|
 | [api-designer](api-designer.md) | api-design,cross-cutting,security | API Designer |
-| [caching-strategy](caching-strategy.md) | caching-patterns,observability,cross-cutting | Caching Strategy Skill |
-| [containerization](containerization.md) | infrastructure,observability,security | Containerization Skill |
-| [data-modeling](data-modeling.md) | database | Data Modeling Skill |
+| [caching-strategy](caching-strategy.md) | caching-patterns,observability,cross-cutting,security | Caching Strategy Skill |
+| [concurrency](concurrency.md) | concurrency,cross-cutting,observability | Concurrency Skill |
+| [containerization](containerization.md) | infrastructure,observability,security,cross-cutting | Containerization Skill |
+| [data-modeling](data-modeling.md) | database,cross-cutting,security | Data Modeling Skill |
+| [messaging-patterns](messaging-patterns.md) | messaging-patterns,cross-cutting,observability | Messaging Patterns Skill |
 | [observability-setup](observability-setup.md) | observability,cross-cutting | Observability Setup Skill |
-| [performance-audit](performance-audit.md) | cross-cutting,database,observability | Performance Audit Skill |
+| [performance-audit](performance-audit.md) | cross-cutting,database,observability,infrastructure | Performance Audit Skill |
 | [refactoring-patterns](refactoring-patterns.md) | code-quality,testing-patterns,cross-cutting | Refactoring Patterns Skill |
 | [security-hardening](security-hardening.md) | security,cross-cutting,api-design | Security Hardening Skill |
 | [testing-strategy](testing-strategy.md) | testing-patterns,cross-cutting | Testing Strategy Skill |

@@ -6,6 +6,7 @@ uses_rules:
   - infrastructure
   - observability
   - security
+  - cross-cutting
 ---
 
 # Containerization Skill

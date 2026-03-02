@@ -6,6 +6,7 @@ uses_rules:
   - cross-cutting
   - database
   - observability
+  - infrastructure
 ---
 
 # Performance Audit Skill

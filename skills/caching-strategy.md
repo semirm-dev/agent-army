@@ -6,6 +6,7 @@ uses_rules:
   - caching-patterns
   - observability
   - cross-cutting
+  - security
 ---
 
 # Caching Strategy Skill

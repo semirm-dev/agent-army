@@ -23,21 +23,16 @@
     { "name": "typescript/testing", "scope": "language-specific", "languages": ["typescript"], "uses_rules": ["testing-patterns", "cross-cutting", "typescript/patterns"], "path": "rules/typescript/testing.md" }
   ],
   "skills": [
-    { "name": "api-designer", "scope": "universal", "uses_rules": ["api-design"], "path": "skills/api-designer.md" },
-    { "name": "caching-strategy", "scope": "universal", "uses_rules": ["caching-patterns"], "path": "skills/caching-strategy.md" },
-    { "name": "cli-design", "scope": "universal", "uses_rules": ["code-quality"], "path": "skills/cli-design.md" },
-    { "name": "code-architecture", "scope": "universal", "uses_rules": ["code-quality"], "path": "skills/code-architecture.md" },
-    { "name": "code-review-workflow", "scope": "universal", "uses_rules": ["git-workflow", "security"], "path": "skills/code-review-workflow.md" },
-    { "name": "concurrency-design", "scope": "universal", "uses_rules": ["concurrency"], "path": "skills/concurrency-design.md" },
-    { "name": "containerization", "scope": "universal", "uses_rules": ["infrastructure", "observability", "security"], "path": "skills/containerization.md" },
-    { "name": "data-modeling", "scope": "universal", "uses_rules": ["database"], "path": "skills/data-modeling.md" },
-    { "name": "error-handling", "scope": "universal", "uses_rules": ["cross-cutting"], "path": "skills/error-handling.md" },
-    { "name": "event-driven-design", "scope": "universal", "uses_rules": ["messaging-patterns", "concurrency"], "path": "skills/event-driven-design.md" },
-    { "name": "incident-debugging", "scope": "universal", "uses_rules": ["observability", "cross-cutting"], "path": "skills/incident-debugging.md" },
+    { "name": "api-designer", "scope": "universal", "uses_rules": ["api-design", "cross-cutting", "security"], "path": "skills/api-designer.md" },
+    { "name": "caching-strategy", "scope": "universal", "uses_rules": ["caching-patterns", "observability", "cross-cutting", "security"], "path": "skills/caching-strategy.md" },
+    { "name": "concurrency", "scope": "universal", "uses_rules": ["concurrency", "cross-cutting", "observability"], "path": "skills/concurrency.md" },
+    { "name": "containerization", "scope": "universal", "uses_rules": ["infrastructure", "observability", "security", "cross-cutting"], "path": "skills/containerization.md" },
+    { "name": "data-modeling", "scope": "universal", "uses_rules": ["database", "cross-cutting", "security"], "path": "skills/data-modeling.md" },
+    { "name": "messaging-patterns", "scope": "universal", "uses_rules": ["messaging-patterns", "cross-cutting", "observability"], "path": "skills/messaging-patterns.md" },
     { "name": "observability-setup", "scope": "universal", "uses_rules": ["observability", "cross-cutting"], "path": "skills/observability-setup.md" },
-    { "name": "performance-audit", "scope": "universal", "uses_rules": ["cross-cutting", "database"], "path": "skills/performance-audit.md" },
-    { "name": "refactoring-patterns", "scope": "universal", "uses_rules": ["code-quality", "testing-patterns"], "path": "skills/refactoring-patterns.md" },
-    { "name": "security-hardening", "scope": "universal", "uses_rules": ["security"], "path": "skills/security-hardening.md" },
+    { "name": "performance-audit", "scope": "universal", "uses_rules": ["cross-cutting", "database", "observability", "infrastructure"], "path": "skills/performance-audit.md" },
+    { "name": "refactoring-patterns", "scope": "universal", "uses_rules": ["code-quality", "testing-patterns", "cross-cutting"], "path": "skills/refactoring-patterns.md" },
+    { "name": "security-hardening", "scope": "universal", "uses_rules": ["security", "cross-cutting", "api-design"], "path": "skills/security-hardening.md" },
     { "name": "testing-strategy", "scope": "universal", "uses_rules": ["testing-patterns", "cross-cutting"], "path": "skills/testing-strategy.md" }
   ]
 }

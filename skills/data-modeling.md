@@ -4,6 +4,8 @@ description: Data modeling workflow — SQL vs NoSQL decision tree, normalizatio
 scope: universal
 uses_rules:
   - database
+  - cross-cutting
+  - security
 ---
 
 # Data Modeling Skill
