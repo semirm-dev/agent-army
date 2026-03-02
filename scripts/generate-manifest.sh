@@ -234,7 +234,7 @@ done < <(find "$SKILLS_DIR" -name '*.md' | sort)
     [ "$i" -eq "$last_rule" ] && comma=""
 
     langs="${rule_languages[$i]}"
-    uses_rules="${rule_uses_rules[$i]}"
+    uses_rules="$(resolve_uses_rules "${rule_uses_rules[$i]}")"
 
     # Build optional JSON fields
     optional=""

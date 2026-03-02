@@ -9,18 +9,18 @@
     { "name": "database", "scope": "universal", "path": "rules/database.md" },
     { "name": "git-workflow", "scope": "universal", "path": "rules/git-workflow.md" },
     { "name": "go/patterns", "scope": "language-specific", "languages": ["go"], "uses_rules": ["code-quality", "security", "cross-cutting", "observability", "testing-patterns"], "path": "rules/go/patterns.md" },
-    { "name": "go/testing", "scope": "language-specific", "languages": ["go"], "uses_rules": ["testing-patterns", "cross-cutting", "go/patterns"], "path": "rules/go/testing.md" },
+    { "name": "go/testing", "scope": "language-specific", "languages": ["go"], "uses_rules": ["testing-patterns", "cross-cutting", "go/patterns", "code-quality", "security", "observability"], "path": "rules/go/testing.md" },
     { "name": "infrastructure", "scope": "universal", "path": "rules/infrastructure.md" },
     { "name": "messaging-patterns", "scope": "universal", "path": "rules/messaging-patterns.md" },
     { "name": "observability", "scope": "universal", "path": "rules/observability.md" },
     { "name": "python/patterns", "scope": "language-specific", "languages": ["python"], "uses_rules": ["code-quality", "security", "cross-cutting", "observability", "testing-patterns"], "path": "rules/python/patterns.md" },
-    { "name": "python/testing", "scope": "language-specific", "languages": ["python"], "uses_rules": ["testing-patterns", "cross-cutting", "python/patterns"], "path": "rules/python/testing.md" },
-    { "name": "react/patterns", "scope": "language-specific", "languages": ["react"], "uses_rules": ["code-quality", "typescript/patterns", "cross-cutting", "security", "testing-patterns"], "path": "rules/react/patterns.md" },
-    { "name": "react/testing", "scope": "language-specific", "languages": ["react"], "uses_rules": ["testing-patterns", "cross-cutting", "react/patterns", "typescript/patterns"], "path": "rules/react/testing.md" },
+    { "name": "python/testing", "scope": "language-specific", "languages": ["python"], "uses_rules": ["testing-patterns", "cross-cutting", "python/patterns", "code-quality", "security", "observability"], "path": "rules/python/testing.md" },
+    { "name": "react/patterns", "scope": "language-specific", "languages": ["react"], "uses_rules": ["code-quality", "typescript/patterns", "cross-cutting", "security", "testing-patterns", "observability"], "path": "rules/react/patterns.md" },
+    { "name": "react/testing", "scope": "language-specific", "languages": ["react"], "uses_rules": ["testing-patterns", "cross-cutting", "react/patterns", "typescript/patterns", "code-quality", "security", "observability"], "path": "rules/react/testing.md" },
     { "name": "security", "scope": "universal", "path": "rules/security.md" },
     { "name": "testing-patterns", "scope": "universal", "path": "rules/testing-patterns.md" },
     { "name": "typescript/patterns", "scope": "language-specific", "languages": ["typescript"], "uses_rules": ["code-quality", "security", "cross-cutting", "observability", "testing-patterns"], "path": "rules/typescript/patterns.md" },
-    { "name": "typescript/testing", "scope": "language-specific", "languages": ["typescript"], "uses_rules": ["testing-patterns", "cross-cutting", "typescript/patterns"], "path": "rules/typescript/testing.md" }
+    { "name": "typescript/testing", "scope": "language-specific", "languages": ["typescript"], "uses_rules": ["testing-patterns", "cross-cutting", "typescript/patterns", "code-quality", "security", "observability"], "path": "rules/typescript/testing.md" }
   ],
   "skills": [
     { "name": "api-designer", "scope": "universal", "uses_rules": ["api-design", "cross-cutting", "security"], "path": "skills/api-designer.md" },
