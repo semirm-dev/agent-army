@@ -34,3 +34,4 @@ uses_rules: [code-quality, security, cross-cutting, observability, testing-patte
 - **Configuration:** Use environment variables, config files, or functional options.
 - **init():** Avoid `init()` functions -- they make testing difficult and create hidden dependencies. Document if truly unavoidable.
 - **Global state:** Avoid package-level `var` for mutable state. Prefer dependency injection.
+- **Build tags:** Use `//go:build` constraints for platform-specific code and to separate integration tests (`//go:build integration`).

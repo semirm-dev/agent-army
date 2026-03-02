@@ -1,6 +1,6 @@
 ---
 name: concurrency
-description: Race condition prevention, deadlock avoidance, backpressure, and graceful shutdown
+description: Race condition prevention, deadlock avoidance, backpressure, distributed coordination, and graceful shutdown
 scope: universal
 languages: []
 ---
@@ -34,6 +34,12 @@ languages: []
 2. **Drain in-flight work** (wait for active requests/tasks to complete)
 3. **Timeout** (force-cancel remaining work after deadline)
 4. **Release resources** (database connections, file handles, network sockets, message queue connections). Flush write buffers and pending logs.
+
+## Distributed Coordination
+- **Distributed locks:** Use lease-based locks with automatic expiry (e.g., Redis `SET NX EX`, database advisory locks). Never hold a distributed lock without a TTL.
+- **Fencing tokens:** When using distributed locks to protect resources, use monotonically increasing fencing tokens to detect stale lock holders. A lock alone does not guarantee mutual exclusion across network partitions.
+- **Leader election:** Use a coordination service or database-backed election for singleton tasks (scheduled jobs, queue consumers). Ensure failover when the leader dies.
+- **Idempotency over coordination:** Prefer designing operations to be idempotent rather than relying on distributed locks. Locks are a last resort for coordination.
 
 ## Observability
 - Monitor active concurrent task/worker count — unbounded growth indicates a leak.

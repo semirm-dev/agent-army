@@ -35,5 +35,8 @@ Categorize all errors into three levels:
 - Store SBOM artifacts alongside release artifacts and verify against known vulnerability databases before deploying to production.
 
 ## Data Lifecycle
-- Classify data by sensitivity: public, internal, confidential, restricted.
-- Define retention policies per data class -- never retain data indefinitely without justification.
+- Classify data by sensitivity: public, internal, confidential, restricted. Apply controls proportional to classification.
+- **Retention policies:** Define per data class. Automate enforcement -- scheduled jobs to purge or archive expired data. Never retain data indefinitely without justification.
+- **PII handling:** Identify all fields containing personally identifiable information. Support deletion and anonymization requests (GDPR right-to-erasure, CCPA). Track PII across replicas, caches, backups, and logs.
+- **Data deletion:** Soft-delete first (recoverable), hard-delete after retention window. Verify deletion propagates to derived stores (caches, search indexes, analytics pipelines).
+- **Audit trail:** Log data access and mutations for confidential and restricted data. Include who, what, when, and from where.

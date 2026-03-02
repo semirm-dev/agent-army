@@ -1,6 +1,6 @@
 ---
 name: database
-description: Migrations, connection pooling, transactions, query safety, indexes, and schema conventions
+description: Migrations, connection pooling, transactions, query safety, indexes, schema conventions, and backup recovery
 scope: universal
 languages: []
 ---
@@ -45,6 +45,13 @@ languages: []
 - **Audit columns:** `created_at` and `updated_at` on every table. Set `created_at` at insert, update `updated_at` via trigger or application.
 - **Soft deletes:** Use `deleted_at` timestamp instead of physical deletion when audit trail matters.
 - **Naming:** `snake_case` for tables and columns. Plural table names (`users`, `orders`). Foreign keys: `<table>_id` (e.g., `user_id`).
+
+## Backup & Recovery
+- **Automated backups:** Schedule regular backups (daily minimum for production). Use the database's native backup tooling (e.g., `pg_dump`, managed service snapshots).
+- **Point-in-time recovery:** Enable WAL archiving or equivalent continuous backup for production databases. Know your Recovery Point Objective (RPO).
+- **Test restores regularly.** A backup that has never been restored is not a backup. Run restore drills quarterly at minimum.
+- **Store backups off-site.** Keep copies in a separate region or account from the primary database. Encrypt backups at rest.
+- **Retention:** Keep daily backups for 7 days, weekly for 4 weeks, monthly for 12 months. Adjust based on compliance requirements.
 
 ## Read Replicas
 - Route read-only queries to replicas when available. Write queries always go to primary.

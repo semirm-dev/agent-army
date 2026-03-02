@@ -1,6 +1,6 @@
 ---
 name: infrastructure
-description: Container best practices, image scanning, secrets handling, and CI/CD pipelines
+description: Container best practices, image scanning, secrets handling, CI/CD pipelines, and deployment strategies
 scope: universal
 languages: []
 ---
@@ -33,3 +33,11 @@ languages: []
 - **Image tagging:** Tag images with the commit SHA. Never rely on `latest` for deployment — it is ambiguous and not rollback-friendly.
 - **Dependency caching:** Cache dependency downloads (modules, packages) across pipeline runs to reduce build times.
 - **Artifact signing:** Sign container images and verify signatures before deployment to prevent supply chain tampering.
+
+## Deployment Strategy
+- **Default to rolling updates.** Replace instances incrementally, verifying health at each step. Zero-downtime for stateless services.
+- **Blue/green deployments:** Use for high-risk releases or when instant rollback is required. Run both versions simultaneously, switch traffic atomically.
+- **Canary deployments:** Route a small percentage of traffic (1-5%) to the new version first. Monitor error rate and latency before full rollout.
+- **Rollback:** Every deployment must have a documented rollback path. For container deployments, rollback means redeploying the previous image tag (commit SHA). Verify rollback works before relying on it.
+- **Post-deploy verification:** Run smoke tests or synthetic checks against the new deployment. Verify health check endpoints return healthy before routing production traffic.
+- **Database migrations and deploys are separate steps.** Apply backward-compatible migrations before deploying new code. Never couple a breaking migration with the deploy that requires it.

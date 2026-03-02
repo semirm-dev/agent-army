@@ -23,6 +23,13 @@ uses_rules: [code-quality, security, cross-cutting, observability, testing-patte
 - Use specific exception types. Never bare `except:`. Wrap with context: `raise DomainError("context") from original`.
 - **Context managers:** Use `with` for resource cleanup. Implement `__enter__`/`__exit__` or use `contextlib.contextmanager` / `contextlib.asynccontextmanager`.
 
+## Async Patterns
+- **Use `async`/`await` consistently.** Never mix blocking calls into async code without offloading to a thread pool (`asyncio.to_thread` or `loop.run_in_executor`).
+- **Structured concurrency:** Use `asyncio.TaskGroup` (3.11+) to manage concurrent tasks with proper cancellation and error propagation.
+- **Timeouts:** Set explicit timeouts on all async I/O operations (`asyncio.wait_for`, `asyncio.timeout`). Never await indefinitely.
+- **Graceful shutdown:** Handle `SIGTERM`/`SIGINT` to cancel in-flight tasks and close connections cleanly.
+- **Avoid global event loop manipulation.** Never call `asyncio.get_event_loop()` in library code. Accept the loop or use `asyncio.run()` at the entry point only.
+
 ## Dependencies and Tooling
 - **Virtual Environments:** Use `uv` for new projects. `venv` and `poetry` are acceptable in existing projects that already use them. Never install into system Python.
 - **Dependencies:** Pin versions in `requirements.txt` or use `pyproject.toml` with lock files. Use `uv lock`, `poetry lock`, or `pip-compile` to generate lock files.

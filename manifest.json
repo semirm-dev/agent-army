@@ -19,7 +19,7 @@
     { "name": "react/testing", "scope": "language-specific", "languages": ["react"], "uses_rules": ["testing-patterns", "cross-cutting", "react/patterns", "typescript/patterns"], "path": "rules/react/testing.md" },
     { "name": "security", "scope": "universal", "path": "rules/security.md" },
     { "name": "testing-patterns", "scope": "universal", "path": "rules/testing-patterns.md" },
-    { "name": "typescript/patterns", "scope": "language-specific", "languages": ["typescript"], "uses_rules": ["code-quality", "security", "cross-cutting", "testing-patterns"], "path": "rules/typescript/patterns.md" },
+    { "name": "typescript/patterns", "scope": "language-specific", "languages": ["typescript"], "uses_rules": ["code-quality", "security", "cross-cutting", "observability", "testing-patterns"], "path": "rules/typescript/patterns.md" },
     { "name": "typescript/testing", "scope": "language-specific", "languages": ["typescript"], "uses_rules": ["testing-patterns", "cross-cutting", "typescript/patterns"], "path": "rules/typescript/testing.md" }
   ],
   "skills": [

@@ -15,8 +15,8 @@ uses_rules: [code-quality, typescript/patterns, cross-cutting, security, testing
 - **Props:** Destructure in function signature. Define prop types as a named interface above the component.
 
 ## State Management
-- **Server state:** Use TanStack Query (React Query) for server data. For existing projects using different libraries, prefer consistency over migration unless a migration is planned. Never manually manage loading/error/data states for API calls.
-- **Client state:** Use Zustand for global client state. For existing projects using different libraries, prefer consistency over migration unless a migration is planned. Use `useState` for local component state. Use Context only for truly global, rarely-changing values (theme, locale, auth user).
+- **Server state:** Use a dedicated server-state library (e.g., TanStack Query) for all server data. Prefer consistency with the existing project's choice over migration. Never manually manage loading/error/data states for API calls.
+- **Client state:** Use a lightweight global state library (e.g., Zustand) for shared client state. Prefer consistency with the existing project's choice over migration. Use `useState` for local component state. Use Context only for truly global, rarely-changing values (theme, locale, auth user).
 - **Derived state:** Compute from existing state inline or with `useMemo`. Never use `useEffect` to sync derived state — this is the most common React anti-pattern.
 - **URL state:** Use URL search params for filterable/shareable UI state (filters, pagination, sort order).
 
