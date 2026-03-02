@@ -2,6 +2,7 @@
 name: api-designer
 description: API style selection, REST resource design, versioning strategy, pagination decision tree, error format guidance, GraphQL patterns, and RPC streaming.
 scope: universal
+languages: []
 uses_rules:
   - api-design
   - cross-cutting

@@ -2,6 +2,7 @@
 name: data-modeling
 description: Data modeling workflow — SQL vs NoSQL decision tree, normalization guidance, schema design steps, index strategy selection, relationship modeling, and zero-downtime migration strategy.
 scope: universal
+languages: []
 uses_rules:
   - database
   - cross-cutting

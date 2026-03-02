@@ -2,6 +2,7 @@
 name: concurrency
 description: Concurrency decision trees — race condition prevention, deadlock avoidance, worker pool sizing, backpressure design, structured concurrency, graceful shutdown, and distributed coordination.
 scope: universal
+languages: []
 uses_rules:
   - concurrency
   - cross-cutting

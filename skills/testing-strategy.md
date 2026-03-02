@@ -2,6 +2,7 @@
 name: testing-strategy
 description: Testing pyramid guidance, test type decision tree, what NOT to test, contract testing, test data management, CI integration, property-based testing, and performance testing.
 scope: universal
+languages: []
 uses_rules:
   - testing-patterns
   - cross-cutting

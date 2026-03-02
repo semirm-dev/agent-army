@@ -2,6 +2,7 @@
 name: containerization
 description: Container and CI/CD workflow — Dockerfile design decisions, Docker Compose for development, CI/CD caching strategies, deployment gates, image security, and health check configuration.
 scope: universal
+languages: []
 uses_rules:
   - infrastructure
   - observability
