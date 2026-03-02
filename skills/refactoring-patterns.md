@@ -1,10 +1,11 @@
 ---
 name: refactoring-patterns
-description: "Safe refactoring workflow, common patterns (extract, inline, move, rename), red flags, and pre-ship checklist."
+description: Safe refactoring workflow, common patterns (extract, inline, move, rename), red flags, and pre-ship checklist.
 scope: universal
 uses_rules:
   - code-quality
   - testing-patterns
+  - cross-cutting
 ---
 
 # Refactoring Patterns Skill
@@ -17,8 +18,6 @@ Invoke this skill when:
 - During tech debt sprints or cleanup tasks
 - A function exceeds 30 lines and needs decomposition
 - Renaming, moving, or reorganizing code across files or packages
-
-> See `rules/cross-cutting.md` for code clarity and structure standards.
 
 ## The Golden Rule
 

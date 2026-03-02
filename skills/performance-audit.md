@@ -1,6 +1,6 @@
 ---
 name: performance-audit
-description: "Performance investigation workflow — profiling cycle, decision trees, query plan analysis, bundle auditing, benchmark methodology, and reporting template."
+description: Performance investigation workflow — profiling cycle, decision trees, query plan analysis, bundle auditing, benchmark methodology, and reporting template.
 scope: universal
 uses_rules:
   - cross-cutting
@@ -19,11 +19,7 @@ Invoke this skill when:
 - Running a pre-launch performance review
 - Investigating a performance regression between releases
 
-> See `rules/cross-cutting.md` for performance budget targets and `rules/database.md` for query plan analysis.
-
 ## Performance Budget Reference
-
-> See `rules/cross-cutting.md` "Performance Budget Targets" for API reads/writes, DB query, frontend LCP, JS bundle, and service startup budgets.
 
 If a target is missed, investigate before shipping. Document exceptions with justification.
 
@@ -124,8 +120,6 @@ Use this workflow for any query that misses the database performance budget.
 4. Re-run `EXPLAIN ANALYZE` to confirm improvement
 5. Benchmark under concurrent load (single-query timing can be misleading)
 
-> See also `rules/database.md` for query plan analysis fundamentals.
-
 ### Red Flags and Fixes
 
 | Red Flag | What It Means | Fix |
@@ -136,8 +130,6 @@ Use this workflow for any query that misses the database performance budget.
 | Rows Removed by Filter >> rows returned | Index exists but not selective enough | Add composite index, use partial index |
 | Hash Join with high bucket count | Large hash table in memory | Check join conditions, add index for nested loop path |
 | Bitmap Heap Scan with many recheck rows | Index returns too many candidates | Narrow the query filter, use composite index |
-
-> See `rules/database.md` for `EXPLAIN ANALYZE` workflow and red flag patterns.
 
 ## Frontend Bundle Audit
 

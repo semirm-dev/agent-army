@@ -1,6 +1,6 @@
 ---
 name: containerization
-description: "Container and CI/CD workflow — Dockerfile design decisions, Docker Compose for development, CI/CD caching strategies, deployment gates, image security, and health check configuration."
+description: Container and CI/CD workflow — Dockerfile design decisions, Docker Compose for development, CI/CD caching strategies, deployment gates, image security, and health check configuration.
 scope: universal
 uses_rules:
   - infrastructure
@@ -19,8 +19,6 @@ Invoke this skill when:
 - Designing or modifying a CI/CD pipeline
 - Auditing container images for security issues
 - Configuring health checks for containers or orchestrators
-
-> See `rules/observability.md` for container best practices (non-root, pinned images, minimal base, multi-stage builds), CI/CD pipeline ordering, and image tagging.
 
 ## Dockerfile Design Decision Tree
 
@@ -80,7 +78,7 @@ Cache dependency directories keyed on lockfile hash for faster CI builds:
 | Build output / artifacts | Source hash or commit SHA |
 | Docker layer cache | Export/import build cache or use registry cache |
 
-> Consult your language's CI documentation for the specific cache paths.
+Consult your language's CI documentation for the specific cache paths.
 
 ### Deployment Gates
 
@@ -121,8 +119,6 @@ Configure three probe types for container orchestrators:
 - **Liveness (`/healthz`):** Is the process alive and not deadlocked? Failure triggers a restart. Keep this check cheap -- do not call external dependencies.
 - **Readiness (`/readyz`):** Can this instance serve traffic? Check database connectivity, cache availability, and other critical dependencies. Failure removes the instance from service endpoints.
 - **Startup probe:** Use for slow-starting applications (JVM warmup, large model loading, migration on boot). The startup probe runs first. Liveness and readiness probes do not start until the startup probe succeeds.
-
-> See `rules/observability.md` for health check endpoint definitions and implementation details.
 
 ### Health Endpoint Implementation
 

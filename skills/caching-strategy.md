@@ -1,6 +1,6 @@
 ---
 name: caching-strategy
-description: "Cache decision trees, strategy selection, TTL guidance, invalidation picker, and stampede prevention."
+description: Cache decision trees, strategy selection, TTL guidance, invalidation picker, and stampede prevention.
 scope: universal
 uses_rules:
   - caching-patterns
@@ -17,8 +17,6 @@ Invoke this skill when:
 - Planning cache invalidation for a feature
 - Debugging stale data or cache-related bugs
 - Preventing cache stampede on high-traffic keys
-
-> See `rules/caching-patterns.md` for strategy comparison table, key design conventions, distributed cache considerations, and anti-patterns.
 
 ## Cache-or-Not Decision Tree
 
@@ -56,8 +54,6 @@ Still unsure? Ask: "What happens if a user sees data that is N seconds old?"
 - Security-sensitive data where staleness causes authorization bugs
 
 ## Strategy Selection
-
-> See `rules/caching-patterns.md` for detailed strategy definitions (cache-aside, write-through, write-behind).
 
 ```
 What is the dominant access pattern?
@@ -120,8 +116,6 @@ How critical is data freshness?
 | Event-based | Medium | Near real-time | Pub/sub or message queue |
 | Tag-based | Medium | On-demand for bulk | Tag tracking in cache |
 | Event + TTL | Medium-High | Near real-time + safety net | Pub/sub + cache |
-
-> See `rules/caching-patterns.md` for event-based invalidation implementation details.
 
 ## Stampede Prevention
 

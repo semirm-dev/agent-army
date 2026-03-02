@@ -6,15 +6,8 @@
 |-------|-----------|---------|
 | [api-designer](api-designer.md) | api-design | API Designer |
 | [caching-strategy](caching-strategy.md) | caching-patterns | Caching Strategy Skill |
-| [cli-design](cli-design.md) | code-quality | CLI Design Skill |
-| [code-architecture](code-architecture.md) | code-quality | Code Architecture Skill |
-| [code-review-workflow](code-review-workflow.md) | git-workflow,security | Code Review Workflow Skill |
-| [concurrency-design](concurrency-design.md) | concurrency | Concurrency Design Skill |
 | [containerization](containerization.md) | infrastructure,observability,security | Containerization Skill |
 | [data-modeling](data-modeling.md) | database | Data Modeling Skill |
-| [error-handling](error-handling.md) | cross-cutting | Error Handling |
-| [event-driven-design](event-driven-design.md) | messaging-patterns,concurrency | Event-Driven Design Skill |
-| [incident-debugging](incident-debugging.md) | observability,cross-cutting | Incident Debugging Skill |
 | [observability-setup](observability-setup.md) | observability,cross-cutting | Observability Setup Skill |
 | [performance-audit](performance-audit.md) | cross-cutting,database | Performance Audit Skill |
 | [refactoring-patterns](refactoring-patterns.md) | code-quality,testing-patterns | Refactoring Patterns Skill |

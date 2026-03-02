@@ -1,6 +1,6 @@
 ---
 name: data-modeling
-description: "Data modeling workflow — SQL vs NoSQL decision tree, normalization guidance, schema design steps, index strategy selection, relationship modeling, and zero-downtime migration strategy."
+description: Data modeling workflow — SQL vs NoSQL decision tree, normalization guidance, schema design steps, index strategy selection, relationship modeling, and zero-downtime migration strategy.
 scope: universal
 uses_rules:
   - database
@@ -17,8 +17,6 @@ Invoke this skill when:
 - Adding or reviewing indexes on existing tables
 - Reviewing schema design for a new feature
 - Planning a database migration (adding columns, changing types, splitting tables)
-
-> See `rules/database.md` for schema naming conventions, SQL syntax examples, index design, composite ordering, migration safety rules, and anti-patterns.
 
 ## SQL vs NoSQL Decision Tree
 
@@ -115,11 +113,7 @@ Is this a distributed system (multiple databases, microservices)?
   +-- NO  --> BIGINT / SERIAL
 ```
 
-> See `rules/database.md` "Schema Conventions" for primary key selection guidelines.
-
 ### Steps 4-7: Naming, Audit Columns, Constraints, Indexes
-
-> See `rules/database.md` "Schema Conventions" for naming conventions, audit column definitions, and constraint guidance.
 
 - Add `created_at` and `updated_at` to every table. Add `deleted_at` for soft deletes.
 - Apply constraints: `NOT NULL`, `UNIQUE` on natural keys, `CHECK` for value ranges, `FOREIGN KEY` for relationships, `DEFAULT` where sensible.
@@ -132,9 +126,7 @@ Is this a distributed system (multiple databases, microservices)?
 - **Read-heavy tables:** more indexes acceptable — cover common query patterns, consider covering indexes
 - **Write-heavy tables:** fewer, targeted indexes — each index slows writes
 
-After creating indexes, verify usage with query plan analysis. Check for sequential scans on large tables, nested loops with high loop count, and external sort spills.
-
-> See `rules/database.md` for `EXPLAIN ANALYZE` workflow, red flag patterns, and composite index ordering.
+After creating indexes, verify usage with query plan analysis. For `EXPLAIN ANALYZE` workflow, red flag patterns, and fixes, see the `performance-audit` skill.
 
 ## Relationship Modeling
 
@@ -149,8 +141,6 @@ Do the two entities always exist together?
   +-- NO  --> Separate tables with FK + UNIQUE constraint
               The "optional" side holds the FK
 ```
-
-> See `rules/database.md` for schema examples and naming conventions.
 
 ### One-to-Many (1:N)
 
@@ -169,8 +159,6 @@ For hierarchical data (categories, org charts, comment threads), use a self-refe
 Avoid polymorphic FKs (`commentable_type` + `commentable_id`) — they break referential integrity and prevent FK constraint enforcement. Prefer separate nullable FK columns or separate junction tables instead.
 
 ### Soft Deletes
-
-> See `rules/database.md` for soft delete conventions, partial index patterns, and query patterns.
 
 ## Zero-Downtime Migration Strategy
 

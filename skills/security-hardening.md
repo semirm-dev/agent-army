@@ -1,6 +1,6 @@
 ---
 name: security-hardening
-description: "Security implementation workflows -- auth flow selection, JWT vs session decision, input validation checklist, secrets management, CORS decision tree, and rate limiting strategy."
+description: Security implementation workflows -- auth flow selection, JWT vs session decision, input validation checklist, secrets management, CORS decision tree, and rate limiting strategy.
 scope: universal
 uses_rules:
   - security
@@ -17,8 +17,6 @@ Invoke this skill when:
 - Managing secrets (env vars, vaults, CI/CD injection)
 - Adding rate limiting to public endpoints
 - Conducting a security review of existing code
-
-> See `rules/security.md` for token storage matrix, input sanitization by context, CORS configuration, rate limit implementation, and session management patterns.
 
 ## Auth Implementation Decision Tree
 
@@ -38,18 +36,14 @@ What type of client needs authentication?
         YES --> Use Authorization Code + PKCE (HTTP-only cookies)
 ```
 
-> See `rules/security.md` for token storage by client type.
-
 ### JWT vs Session Decision
 
 ```
 Do you need stateless auth across multiple services?
   YES --> JWT (access token)
           Pair with server-stored refresh token.
-          > See rules/security.md for token configuration.
   NO  --> Server-side sessions
           Session ID in cookie, data server-side.
-          > See rules/security.md for session management.
 ```
 
 ## Input Validation Workflow
@@ -59,15 +53,13 @@ Do you need stateless auth across multiple services?
 Run through this checklist for every handler/controller that accepts external input:
 
 1. [ ] Validate at the handler boundary -- never trust input past this layer
-2. [ ] Apply input sanitization rules from `rules/security.md` (allowlists, size limits, type/range/format validation)
+2. [ ] Apply input sanitization (allowlists, size limits, type/range/format validation)
 3. [ ] Reject unexpected fields -- do not silently accept unknown keys
 4. [ ] Return 400 with specific field errors -- tell the caller what failed
 
 ## Secrets Management Checklist
 
-> See `rules/security.md` for secrets management fundamentals (no hardcoded secrets, .gitignore, rotation, logging).
-
-1. [ ] All items in `rules/security.md` secrets management section verified
+1. [ ] No hardcoded secrets; all secrets loaded from environment or secret manager
 2. [ ] Different secrets per environment (dev, staging, production) -- never share across environments
 3. [ ] Access to production secrets restricted to minimum required personnel
 
@@ -76,7 +68,7 @@ Run through this checklist for every handler/controller that accepts external in
 ```
 Is this a single-service deployment or local dev?
   YES --> Environment variables are sufficient
-  |       Load via validated config module, not raw process.env / os.Getenv
+  |       Load via a validated config module, not raw environment variable access
   |
   NO --> Multiple services sharing secrets?
     YES --> Use a secrets manager (Vault, AWS SM, GCP SM)

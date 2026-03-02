@@ -1,6 +1,6 @@
 ---
 name: observability-setup
-description: "Observability implementation workflow -- maturity decision tree, log level guide, health endpoint patterns, metrics RED/USE selection, and alert design."
+description: Observability implementation workflow -- maturity decision tree, log level guide, health endpoint patterns, metrics RED/USE selection, and alert design.
 scope: universal
 uses_rules:
   - observability
@@ -19,8 +19,6 @@ Invoke this skill when:
 - Integrating OpenTelemetry into a project
 - Debugging production issues and improving signal quality
 - Designing alerting rules or dashboards
-
-> See `rules/observability.md` for structured logging field requirements, OTel SDK setup per language, context propagation, collector architecture, and metrics naming conventions.
 
 ## Observability Maturity Decision Tree
 
@@ -77,22 +75,16 @@ Is this a normal business operation?
   NO  --> DEBUG (dev only, never enable in production by default)
 ```
 
-> See `rules/observability.md` for common log level mistakes and structured logging field requirements.
-
 Use your language's structured logging library.
 
 ## Health Endpoint Patterns
 
-> See `rules/observability.md` for liveness vs readiness definitions, endpoint responsibilities, and probe behavior.
+For health check implementation details, orchestrator probe configuration, and the full checklist, see the `containerization` skill.
 
-### Health Endpoint Checklist
-
-1. [ ] `/healthz` returns 200 with no dependency checks
-2. [ ] `/readyz` checks all required dependencies with a timeout (2-5s)
-3. [ ] Neither endpoint requires authentication
-4. [ ] Both return JSON with a `status` field
-5. [ ] Kubernetes/orchestrator probes are configured to use the correct endpoint
-6. [ ] Readiness check does not cascade (checking only direct dependencies)
+Key points for observability maturity:
+- `/healthz` returns 200 with no dependency checks (liveness)
+- `/readyz` checks critical dependencies with a timeout (readiness)
+- Neither endpoint requires authentication
 
 ## Metrics Selection Guide
 
@@ -147,10 +139,6 @@ GOOD: Alert when write error rate > 1% for 2 minutes
 ```
 
 Exception: alert on resource exhaustion when it is the direct cause of user-facing impact (disk full causing write failures).
-
-> See `rules/observability.md` for required alert fields (severity, runbook, response time, threshold justification).
-
-> See `rules/observability.md` for alert severity level definitions.
 
 ### Alert Fatigue Prevention
 
