@@ -44,7 +44,7 @@ languages: []
 
 ## Schema Conventions
 - **Primary keys:** UUID for distributed systems, BIGINT/SERIAL for single-database systems.
-- **Timestamps:** Use `timestamptz` for all date/time columns. Never `timestamp` without timezone.
+- **Timestamps:** Use timestamp with timezone for all date/time columns. Never store timestamps without timezone.
 - **Audit columns:** `created_at` and `updated_at` on every table. Set `created_at` at insert, update `updated_at` via trigger or application.
 - **Soft deletes:** Use `deleted_at` timestamp instead of physical deletion when audit trail matters.
 - **Naming:** `snake_case` for tables and columns. Plural table names (`users`, `orders`). Foreign keys: `<table>_id` (e.g., `user_id`).

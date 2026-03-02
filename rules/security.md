@@ -66,7 +66,7 @@ languages: []
 - **HSTS:** Set `Strict-Transport-Security` header with a long max-age and `includeSubDomains`.
 - **Minimum TLS version:** TLS 1.2 minimum, prefer TLS 1.3. Disable older protocols and weak cipher suites.
 - **Certificate validation:** Always validate certificates. Never disable certificate checks, even in staging.
-- **Certificate pinning:** Pin certificates or public keys for mobile clients calling known backends to prevent MITM attacks. Implement a rotation strategy to avoid bricking clients on certificate renewal. **Trade-off:** Failed rotation bricks clients until an app update ships. Evaluate whether your threat model justifies the operational risk.
+- **Certificate pinning:** Pin certificates or public keys for mobile clients calling known backends to prevent MITM attacks. Implement a rotation strategy. Trade-off: failed rotation bricks clients -- evaluate whether your threat model justifies the operational risk.
 
 ## Injection & Output Safety
 - **SQL injection:** Always use parameterized queries. Never string-concatenate user input into queries.

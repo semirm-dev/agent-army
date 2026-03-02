@@ -24,7 +24,7 @@ Use a consistent envelope across all endpoints:
 - **Request Validation:** Validate at the handler boundary. Return 400 with specific field errors. Never trust client input past the handler layer.
 - **Idempotency:** POST endpoints that create resources should support idempotency keys. PUT and DELETE must be idempotent by definition.
 - **Content-Type enforcement:** Require `Content-Type` header on all requests with a body. Reject requests with unsupported media types (415).
-- **Documentation:** Maintain a machine-readable API spec (e.g., OpenAPI) for all public APIs. Generate from code annotations where possible. Keep spec in sync with implementation -- stale docs are worse than no docs.
+- **Documentation:** Maintain a machine-readable API spec (e.g., OpenAPI) for all public APIs. Generate from code annotations where possible. Keep spec in sync with implementation.
 
 ## Caching Headers
 

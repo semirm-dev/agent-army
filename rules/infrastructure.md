@@ -33,6 +33,7 @@ languages: []
 - **Image tagging:** Tag images with the commit SHA. Never rely on `latest` for deployment — it is ambiguous and not rollback-friendly.
 - **Dependency caching:** Cache dependency downloads (modules, packages) across pipeline runs to reduce build times.
 - **Artifact signing:** Sign container images and verify signatures before deployment to prevent supply chain tampering.
+- **SBOM:** Generate a Software Bill of Materials (CycloneDX or SPDX) in the build stage. Store alongside release artifacts. Verify against vulnerability databases before production deploy.
 
 ## Deployment Strategy
 - **Default to rolling updates.** Replace instances incrementally, verifying health at each step. Zero-downtime for stateless services.
