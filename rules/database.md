@@ -67,5 +67,5 @@ languages: []
 - Log query execution plans for queries that exceed performance budgets.
 
 ## Technology Choices
+- **SQL vs NoSQL:** Choose based on query patterns, consistency requirements, and schema flexibility needs. Document the rationale.
 - **ORMs vs Raw SQL:** Pick one approach per entity. Never mix ORM and raw SQL queries for the same table.
-- **Default to PostgreSQL** unless you have a specific reason for NoSQL (massive scale, flexible schema, sub-millisecond reads).

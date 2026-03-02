@@ -1,6 +1,6 @@
 ---
 name: cross-cutting
-description: Error taxonomy, dependency policy, performance budgets, and data lifecycle
+description: Error taxonomy, dependency policy, and performance budgets
 scope: universal
 languages: []
 ---
@@ -30,10 +30,3 @@ Default targets. Adjust per-project based on domain requirements.
 - **LCP:** < 2.5s on 4G. Measure with Lighthouse CI.
 - **INP:** < 200ms. Profile with Chrome DevTools.
 - **Bundle size:** < 200KB gzipped initial load. Code-split routes.
-
-## Data Lifecycle
-- Classify data by sensitivity: public, internal, confidential, restricted. Apply controls proportional to classification.
-- **Retention policies:** Define per data class. Automate enforcement -- scheduled jobs to purge or archive expired data. Never retain data indefinitely without justification.
-- **PII handling:** Identify all fields containing personally identifiable information. Support deletion and anonymization requests (GDPR right-to-erasure, CCPA). Track PII across replicas, caches, backups, and logs.
-- **Data deletion:** Soft-delete first (recoverable), hard-delete after retention window. Verify deletion propagates to derived stores (caches, search indexes, analytics pipelines).
-- **Audit trail:** Log data access and mutations for confidential and restricted data. Include who, what, when, and from where.

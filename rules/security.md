@@ -1,6 +1,6 @@
 ---
 name: security
-description: Authentication, authorization, CORS, rate limiting, input sanitization, and secrets management
+description: Authentication, authorization, CORS, rate limiting, input sanitization, secrets management, and data lifecycle
 scope: universal
 languages: []
 ---
@@ -74,6 +74,13 @@ languages: []
 - **CSP:** Start with `default-src 'self'`. Add specific directives as needed. Use `report-uri` or `report-to` to detect violations before enforcing. Never use `unsafe-inline` or `unsafe-eval` in production.
 - **CSRF:** Protect all state-changing endpoints with synchronizer tokens + SameSite cookies.
 - **SSRF:** When the server fetches user-supplied URLs (webhooks, previews, imports), validate and restrict targets. Block private/internal IP ranges (127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 169.254.0.0/16). Allowlist permitted domains when possible.
+
+## Data Lifecycle
+- Classify data by sensitivity: public, internal, confidential, restricted. Apply controls proportional to classification.
+- **Retention policies:** Define per data class. Automate enforcement -- scheduled jobs to purge or archive expired data. Never retain data indefinitely without justification.
+- **PII handling:** Identify all fields containing personally identifiable information. Support deletion and anonymization requests (GDPR right-to-erasure, CCPA). Track PII across replicas, caches, backups, and logs.
+- **Data deletion:** Soft-delete first (recoverable), hard-delete after retention window. Verify deletion propagates to derived stores (caches, search indexes, analytics pipelines).
+- **Audit trail:** Log data access and mutations for confidential and restricted data. Include who, what, when, and from where.
 
 ## Dependency Security
 - **Scan dependencies for known vulnerabilities** as part of CI. Block merges on critical/high severity CVEs.
