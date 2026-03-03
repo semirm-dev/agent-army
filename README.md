@@ -174,5 +174,4 @@ delegates_to: []
 
 ## TODO
 
-- [x] Migrate shell scripts to Python package (`src/agent_army/`)
 - [ ] Add a way to add new rules/skills/agents/plugins from the CLI
