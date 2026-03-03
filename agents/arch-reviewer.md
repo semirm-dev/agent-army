@@ -5,7 +5,7 @@ role: reviewer
 scope: universal
 languages: []
 access: read-only
-uses_skills: [api-designer, concurrency, refactoring-patterns]
+uses_skills: [api-designer, refactoring-patterns]
 uses_rules: []
 uses_plugins: [code-review, security-guidance, context7]
 delegates_to: [type-design-analyzer]
@@ -28,7 +28,7 @@ The orchestrator activates you when architectural review is needed — typically
 - Run dependency analysis commands (Go: `go list`, `go mod graph`; TypeScript: `madge --circular`, `npx depcruise`; Python: `pipdeptree`)
 - Cannot modify any files
 
-API design standards, error taxonomy, and concurrency patterns are loaded via skills.
+API design standards and error taxonomy are loaded via skills.
 
 Invoke the `api-designer` skill when reviewing API surface area, endpoint design, or error format conventions. Invoke the `refactoring-patterns` skill when suggesting structural refactoring.
 

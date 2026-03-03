@@ -8,7 +8,7 @@ access: read-only
 uses_skills: []
 uses_rules: []
 uses_plugins: []
-delegates_to: [comment-analyzer]
+delegates_to: []
 ---
 
 # Type Design Analyzer Agent
@@ -27,10 +27,6 @@ The orchestrator activates you when types, interfaces, or domain models are intr
 - Search for type usages, consistency across the codebase, and similar patterns
 - Run read-only type checking commands (`tsc --noEmit`, `go build ./...`)
 - Cannot modify any files
-
-## Standards
-
-Delegate to `comment-analyzer` when verifying that type-level documentation (JSDoc, Godoc, docstrings) accurately describes type invariants and constraints.
 
 ## Checklist
 

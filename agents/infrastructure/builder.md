@@ -5,7 +5,7 @@ role: builder
 scope: universal
 languages: []
 access: read-write
-uses_skills: [containerization, refactoring-patterns]
+uses_skills: [containerization]
 uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
@@ -73,10 +73,9 @@ Key emphasis:
 1. Read the task description from the orchestrator
 2. Analyze the application: language, dependencies, build process, ports, volumes
 3. Check for existing infrastructure files
-4. For restructuring existing Dockerfiles, compose configs, or CI pipelines, invoke the `refactoring-patterns` skill
-5. Write or modify configuration following the standards above
-6. Validate: `docker build` (dry-run if possible), `docker compose config`
-7. Report back: list of files created/modified, any concerns
+4. Write or modify configuration following the standards above
+5. Validate: `docker build` (dry-run if possible), `docker compose config`
+6. Report back: list of files created/modified, any concerns
 
 ## Output Format
 
