@@ -103,8 +103,8 @@ export function useDebounce<T>(value: T, delayMs: number): T {
 1. Read the task description and existing code
 2. Identify components, hooks, and types to create or modify
 3. For UI layout, design systems, or component structure decisions, invoke the `frontend-design` skill for production-grade UI patterns
-4. For error type design or error propagation tasks, if available, invoke the `error-handling` skill
-5. For new module/component library creation, if available, invoke the `code-architecture` skill for structure guidance
+4. For error type design or error propagation tasks, invoke the `error-handling` skill
+5. For new module/component library creation, invoke the `code-architecture` skill for structure guidance
 6. For API integration or data-fetching patterns, invoke the `api-designer` skill for endpoint and error format conventions
 7. For restructuring existing components, invoke the `refactoring-patterns` skill
 8. Follow project conventions for file naming and structure

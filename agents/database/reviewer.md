@@ -90,9 +90,9 @@ Database patterns and security standards are loaded via skills.
 ## Workflow
 
 1. Read the orchestrator's description of what was changed
-2. For migration reviews, if available, invoke the `migration-safety` skill for the structured safety checklist
-3. For schema design reviews, if available, load the `database-schema-designer` skill for normalization, indexing, and constraint patterns
-4. For error handling in repository/store code, if available, invoke the `error-handling` skill for taxonomy and propagation patterns
+2. For migration reviews, invoke the `migration-safety` skill for the structured safety checklist
+3. For schema design reviews, load the `database-schema-designer` skill for normalization, indexing, and constraint patterns
+4. For error handling in repository/store code, invoke the `error-handling` skill for taxonomy and propagation patterns
 5. When suggesting data access code restructuring, invoke the `refactoring-patterns` skill
 6. Read every changed migration, query, and schema file
 7. Read surrounding context: existing migrations, model definitions, repository layer
