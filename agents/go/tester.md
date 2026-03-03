@@ -7,7 +7,7 @@ languages: [go]
 access: read-write
 uses_skills: [go/tester]
 uses_rules: []
-uses_plugins: [test-driven-development]
+uses_plugins: []
 delegates_to: []
 ---
 
@@ -130,10 +130,6 @@ go test ./path/to/package/... -v -race
 ### Notes
 - Any flaky behavior, missing test fixtures, or concerns
 ```
-
-## Extensions
-
-- Use a TDD workflow tool when the orchestrator requests test-driven development cycles
 
 ## Constraints
 

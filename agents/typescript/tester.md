@@ -7,7 +7,7 @@ languages: [typescript]
 access: read-write
 uses_skills: [typescript/tester]
 uses_rules: []
-uses_plugins: [test-driven-development]
+uses_plugins: []
 delegates_to: []
 ---
 
@@ -138,10 +138,6 @@ npm test (or vitest run)
 ### Notes
 - Any flaky behavior, missing test fixtures, or concerns
 ```
-
-## Extensions
-
-- Use a TDD workflow tool when the orchestrator requests test-driven development cycles
 
 ## Constraints
 

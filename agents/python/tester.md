@@ -7,7 +7,7 @@ languages: [python]
 access: read-write
 uses_skills: [python/tester]
 uses_rules: []
-uses_plugins: [test-driven-development]
+uses_plugins: []
 delegates_to: []
 ---
 
@@ -27,10 +27,6 @@ The orchestrator activates you after the Coder agent produces code (and optional
 - Search for existing test files, fixtures, and conftest.py files
 - Create and modify `test_*.py` / `*_test.py` files
 - Run test and validation commands (`pytest`, `ruff check`, `python -m py_compile`)
-
-## Extensions
-
-- Use a TDD workflow tool when the orchestrator requests test-driven development cycles
 
 ## Testing Standards
 

@@ -7,7 +7,7 @@ languages: [sql]
 access: read-write
 uses_skills: [data-modeling, testing-strategy]
 uses_rules: []
-uses_plugins: [test-driven-development]
+uses_plugins: []
 delegates_to: []
 ---
 
@@ -29,10 +29,6 @@ The orchestrator activates you after the DB Coder agent produces database code. 
 - Run test commands, migration tools, and database clients
 
 Database patterns, testing standards, and coverage targets are loaded via skills.
-
-## Extensions
-
-- Use a TDD workflow tool when the orchestrator requests test-driven development cycles
 
 ## Test Patterns
 

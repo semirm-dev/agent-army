@@ -7,7 +7,7 @@ languages: [react]
 access: read-write
 uses_skills: [react/tester]
 uses_rules: []
-uses_plugins: [test-driven-development]
+uses_plugins: []
 delegates_to: []
 ---
 
@@ -27,10 +27,6 @@ The orchestrator activates you after the React Coder agent produces code (and op
 - Search for existing test files, test helpers, and MSW handlers
 - Create and modify `.test.tsx`, `.test.ts` files
 - Run test and type checking commands (`vitest`, `jest`, `tsc`)
-
-## Extensions
-
-- Use a TDD workflow tool when the orchestrator requests test-driven development cycles
 
 ## Testing Standards
 
