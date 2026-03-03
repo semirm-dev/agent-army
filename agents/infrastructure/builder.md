@@ -46,27 +46,7 @@ Key emphasis:
 - Place frequently-changing layers last for cache efficiency
 - Tag images with git SHA, not `latest`
 
-### Dockerfile Patterns
-
-- Go: Use `golang:X.Y-alpine` for build, `gcr.io/distroless/static-debian12` or `scratch` for runtime
-- Node/TS: Use `node:X-alpine` for build, `node:X-alpine` (slim) for runtime
-- Python: Use `python:X-slim` for build and runtime, or multi-stage with `distroless`
-
-### Docker Compose
-
-- Use named volumes for persistent data
-- Define health checks for all services
-- Use `depends_on` with `condition: service_healthy`
-- Set resource limits (`deploy.resources.limits`)
-- Use `.env` file for configuration, never hardcode
-
-### CI/CD Pipelines
-
-- Stages: lint -> build -> test -> security scan -> deploy
-- Cache dependencies between runs
-- Run tests with race detection / strict mode
-- Fail fast on lint or security issues
-- Use matrix builds for multi-platform images when needed
+See the `containerization` skill for detailed Dockerfile patterns (per-language base images), Docker Compose configuration, and CI/CD pipeline design.
 
 ## Workflow
 

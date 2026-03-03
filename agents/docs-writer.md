@@ -36,7 +36,7 @@ Delegate to `comment-analyzer` when generating code-level documentation (JSDoc, 
 
 ## Standards
 
-API documentation patterns and git workflow conventions are loaded via skills and rules.
+API documentation patterns are loaded via the `api-designer` skill. Git conventions are loaded via the `git-workflow` rule.
 
 ## Document Types
 
@@ -83,7 +83,7 @@ API documentation patterns and git workflow conventions are loaded via skills an
 1. Read the task description from the orchestrator
 2. Read source code, configs, and existing docs to understand the subject
 3. Identify the right document type (README, ADR, API docs, etc.)
-4. For API documentation, load the `api-designer` skill for canonical error formats, pagination patterns, and endpoint naming conventions
+4. For API documentation, if available, load the `api-designer` skill for canonical error formats, pagination patterns, and endpoint naming conventions
 5. Write the documentation following the patterns above
 6. Cross-reference with existing docs to avoid duplication
 7. Report what was created/modified

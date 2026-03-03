@@ -86,8 +86,8 @@ Delegate to `type-design-analyzer` when reviewing type boundaries, interface seg
 1. Read the orchestrator's description of what to review
 2. Map the package/module structure (list directories, read module definitions)
 3. Analyze dependency graph (imports, go.mod, package.json, requirements.txt)
-4. For API surface area, endpoint design, or error format reviews, invoke the `api-designer` skill
-5. When suggesting structural refactoring, invoke the `refactoring-patterns` skill
+4. For API surface area, endpoint design, or error format reviews, if available, invoke the `api-designer` skill
+5. When suggesting structural refactoring, if available, invoke the `refactoring-patterns` skill
 6. Check for circular dependencies
 7. Review public API surface of each package
 8. Walk through the review checklist

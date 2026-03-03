@@ -28,7 +28,7 @@ The orchestrator activates you after the Infrastructure Builder agent produces i
 - Create and modify test scripts or validation configs
 - Run build, compose, and validation commands (`docker build`, `docker compose up`, health check validation)
 
-Infrastructure patterns, testing standards, and coverage targets are loaded via skills.
+Infrastructure patterns are loaded via the `containerization` skill. Testing standards and coverage targets are loaded via the `testing-strategy` skill.
 
 ## Validation Checklist
 

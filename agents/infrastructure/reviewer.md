@@ -28,7 +28,7 @@ The orchestrator activates you after the Infrastructure Builder agent produces c
 - Run read-only analysis commands (`hadolint`, `docker compose config --quiet`)
 - Cannot modify any files
 
-Infrastructure and security standards are loaded via skills.
+Infrastructure and security standards are loaded via the `containerization` skill.
 
 ## Extensions
 
@@ -78,7 +78,7 @@ Infrastructure and security standards are loaded via skills.
 1. Read the orchestrator's description of what was changed
 2. Read every changed infrastructure file
 3. Read surrounding config for context (related Dockerfiles, compose overrides, CI files)
-4. When suggesting infrastructure config restructuring, invoke the `refactoring-patterns` skill
+4. When suggesting infrastructure config restructuring, if available, invoke the `refactoring-patterns` skill
 5. Run `hadolint` (if available) on Dockerfiles
 6. Run `docker compose config --quiet` to validate compose files
 7. Walk through the review checklist
