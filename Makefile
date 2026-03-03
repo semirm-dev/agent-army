@@ -1,4 +1,4 @@
-.PHONY: help setup manifest edit-deps resolve-deps new-rule new-skill new-agent test
+.PHONY: help setup manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test
 
 PYTHON := src/.venv/bin/python3
 SYSTEM_PYTHON := $(shell command -v python3.14 || echo python3)
@@ -22,6 +22,8 @@ help: ## Show available targets
 	@echo "  new-skill      Scaffold a new skill with interactive prompts."
 	@echo ""
 	@echo "  new-agent      Scaffold a new agent with interactive prompts."
+	@echo ""
+	@echo "  bootstrap      Generate model-specific rules, skills, and agents for Claude Code or Cursor."
 	@echo ""
 	@echo "  test           Run the Python test suite."
 	@echo ""
@@ -51,6 +53,9 @@ new-skill: | $(PYTHON) ## Scaffold a new skill
 
 new-agent: | $(PYTHON) ## Scaffold a new agent
 	$(PYTHON) -m agent_army new agent
+
+bootstrap: | $(PYTHON) ## Generate model-specific rules, skills, and agents
+	$(PYTHON) -m agent_army bootstrap
 
 test: | $(PYTHON) ## Run tests
 	cd src && .venv/bin/pytest tests/ -v

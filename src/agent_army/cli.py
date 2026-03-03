@@ -6,6 +6,7 @@ Usage::
     python -m agent_army resolve           # validate refs + fix redundancies
     python -m agent_army edit              # interactive dependency editor
     python -m agent_army new rule|skill|agent  # scaffold a new entity
+    python -m agent_army bootstrap         # generate model-specific output
 """
 
 from __future__ import annotations
@@ -94,6 +95,13 @@ def main_new(root: Path, entity_type: str) -> None:
     scaffold_flow(root, entity_type)
 
 
+def main_bootstrap(root: Path) -> None:
+    """Generate model-specific rules, skills, and agents."""
+    from agent_army.bootstrap import main_bootstrap as run_bootstrap
+
+    run_bootstrap(root)
+
+
 def main() -> None:
     """Parse arguments and dispatch to subcommand."""
     parser = argparse.ArgumentParser(
@@ -105,6 +113,7 @@ def main() -> None:
     sub.add_parser("manifest", help="Regenerate manifest.json")
     sub.add_parser("resolve", help="Validate refs and fix redundancies")
     sub.add_parser("edit", help="Interactive dependency editor")
+    sub.add_parser("bootstrap", help="Generate model-specific rules, skills, and agents")
 
     new_parser = sub.add_parser("new", help="Scaffold a new rule, skill, or agent")
     new_sub = new_parser.add_subparsers(dest="new_type")
@@ -130,5 +139,6 @@ def main() -> None:
         "manifest": main_manifest,
         "resolve": main_resolve,
         "edit": main_edit,
+        "bootstrap": main_bootstrap,
     }
     dispatch[args.command](root)
