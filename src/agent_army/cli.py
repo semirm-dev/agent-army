@@ -2,9 +2,10 @@
 
 Usage::
 
-    python -m agent_army manifest   # regenerate manifest.json
-    python -m agent_army resolve    # validate refs + fix redundancies
-    python -m agent_army edit       # interactive dependency editor
+    python -m agent_army manifest          # regenerate manifest.json
+    python -m agent_army resolve           # validate refs + fix redundancies
+    python -m agent_army edit              # interactive dependency editor
+    python -m agent_army new rule|skill|agent  # scaffold a new entity
 """
 
 from __future__ import annotations
@@ -86,6 +87,13 @@ def main_edit(root: Path) -> None:
     edit_flow(root)
 
 
+def main_new(root: Path, entity_type: str) -> None:
+    """Scaffold a new rule, skill, or agent."""
+    from agent_army.scaffold import scaffold_flow
+
+    scaffold_flow(root, entity_type)
+
+
 def main() -> None:
     """Parse arguments and dispatch to subcommand."""
     parser = argparse.ArgumentParser(
@@ -98,12 +106,25 @@ def main() -> None:
     sub.add_parser("resolve", help="Validate refs and fix redundancies")
     sub.add_parser("edit", help="Interactive dependency editor")
 
+    new_parser = sub.add_parser("new", help="Scaffold a new rule, skill, or agent")
+    new_sub = new_parser.add_subparsers(dest="new_type")
+    new_sub.add_parser("rule", help="Create a new rule")
+    new_sub.add_parser("skill", help="Create a new skill")
+    new_sub.add_parser("agent", help="Create a new agent")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
         sys.exit(1)
 
     root = _find_root()
+
+    if args.command == "new":
+        if not args.new_type:
+            new_parser.print_help()
+            sys.exit(1)
+        main_new(root, args.new_type)
+        return
 
     dispatch = {
         "manifest": main_manifest,

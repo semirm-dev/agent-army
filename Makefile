@@ -1,4 +1,4 @@
-.PHONY: help setup manifest edit-deps resolve-deps test
+.PHONY: help setup manifest edit-deps resolve-deps new-rule new-skill new-agent test
 
 PYTHON := src/.venv/bin/python3
 SYSTEM_PYTHON := $(shell command -v python3.14 || echo python3)
@@ -16,6 +16,12 @@ help: ## Show available targets
 	@echo "  resolve-deps   Validate all dependency references (uses_rules, uses_skills, uses_plugins,"
 	@echo "                 delegates_to) across rules/, skills/, and agents/. Detect and remove redundant"
 	@echo "                 uses_rules and delegates_to entries covered by transitive dependencies."
+	@echo ""
+	@echo "  new-rule       Scaffold a new rule with interactive prompts."
+	@echo ""
+	@echo "  new-skill      Scaffold a new skill with interactive prompts."
+	@echo ""
+	@echo "  new-agent      Scaffold a new agent with interactive prompts."
 	@echo ""
 	@echo "  test           Run the Python test suite."
 	@echo ""
@@ -36,6 +42,15 @@ edit-deps: | $(PYTHON) ## Add or remove dependency entries interactively
 
 resolve-deps: | $(PYTHON) ## Validate all dependency references and remove redundancies
 	$(PYTHON) -m agent_army resolve
+
+new-rule: | $(PYTHON) ## Scaffold a new rule
+	$(PYTHON) -m agent_army new rule
+
+new-skill: | $(PYTHON) ## Scaffold a new skill
+	$(PYTHON) -m agent_army new skill
+
+new-agent: | $(PYTHON) ## Scaffold a new agent
+	$(PYTHON) -m agent_army new agent
 
 test: | $(PYTHON) ## Run tests
 	cd src && .venv/bin/pytest tests/ -v

@@ -67,6 +67,47 @@ def select_multi(prompt: str, items: list[str]) -> list[str]:
         # Re-prompt (error already printed by _parse_multi_choice or implicit)
 
 
+def prompt_with_default(prompt: str, default: str) -> str:
+    """Prompt for text input with a default value shown in brackets.
+
+    Returns the default when the user enters empty input.
+    """
+    raw = input(f"{prompt} [{default}]: ")
+    stripped = raw.strip()
+    return stripped if stripped else default
+
+
+def select_one_with_default(prompt: str, items: list[str], default: str) -> str:
+    """Numbered menu with a default item marked by ``(*)``.
+
+    Pressing Enter without input selects the default.
+    """
+    _print_numbered_menu_with_default(items, default)
+    while True:
+        raw = input(f"{prompt} ")
+        if raw.strip() == "":
+            return default
+        choice = _parse_int(raw)
+        if choice is not None and 1 <= choice <= len(items):
+            return items[choice - 1]
+        print(f"Invalid choice. Enter a number between 1 and {len(items)}, or press Enter for default.")
+
+
+def select_multi_optional(prompt: str, items: list[str]) -> list[str]:
+    """Numbered menu allowing empty selection (returns ``[]`` on Enter).
+
+    Otherwise behaves like :func:`select_multi`.
+    """
+    _print_numbered_menu(items)
+    while True:
+        raw = input(f"{prompt} (comma-separated, or Enter to skip): ")
+        if raw.strip() == "":
+            return []
+        selected = _parse_multi_choice(raw, len(items))
+        if selected is not None and len(selected) > 0:
+            return [items[i - 1] for i in selected]
+
+
 def edit_flow(root: Path) -> None:
     """Full interactive edit flow matching edit-deps.sh."""
     print("=== Edit Dependencies ===")
@@ -123,6 +164,15 @@ def _print_numbered_menu(items: list[str]) -> None:
     print()
     for i, item in enumerate(items, start=1):
         print(f"  {i}) {item}")
+    print()
+
+
+def _print_numbered_menu_with_default(items: list[str], default: str) -> None:
+    """Print a numbered list marking the default item with ``(*)``."""
+    print()
+    for i, item in enumerate(items, start=1):
+        marker = " (*)" if item == default else ""
+        print(f"  {i}) {item}{marker}")
     print()
 
 
