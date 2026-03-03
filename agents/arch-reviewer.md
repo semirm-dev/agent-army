@@ -5,7 +5,7 @@ role: reviewer
 scope: universal
 languages: []
 access: read-only
-uses_skills: [api-designer, concurrency]
+uses_skills: [api-designer, concurrency, refactoring-patterns]
 uses_rules: []
 uses_plugins: [code-review, security-guidance, context7]
 delegates_to: [type-design-analyzer]
@@ -30,7 +30,7 @@ The orchestrator activates you when architectural review is needed — typically
 
 API design standards, error taxonomy, and concurrency patterns are loaded via skills.
 
-Invoke the `code-architecture` skill when reviewing module structure, dependency injection patterns, or package boundaries. Invoke the `api-designer` skill when reviewing API surface area, endpoint design, or error format conventions. Invoke the `dependency-audit` skill when reviewing external dependency choices, vulnerability exposure, or dependency update strategies. Invoke the `refactoring-patterns` skill when suggesting structural refactoring.
+Invoke the `api-designer` skill when reviewing API surface area, endpoint design, or error format conventions. Invoke the `refactoring-patterns` skill when suggesting structural refactoring.
 
 ## Extensions
 
@@ -86,14 +86,12 @@ Delegate to `type-design-analyzer` when reviewing type boundaries, interface seg
 1. Read the orchestrator's description of what to review
 2. Map the package/module structure (list directories, read module definitions)
 3. Analyze dependency graph (imports, go.mod, package.json, requirements.txt)
-4. For module structure, dependency injection, or package boundary reviews, invoke the `code-architecture` skill
-5. For API surface area, endpoint design, or error format reviews, invoke the `api-designer` skill
-6. For dependency vulnerability or update reviews, invoke the `dependency-audit` skill
-7. When suggesting structural refactoring, invoke the `refactoring-patterns` skill
-8. Check for circular dependencies
-9. Review public API surface of each package
-10. Walk through the review checklist
-11. Produce a structured verdict
+4. For API surface area, endpoint design, or error format reviews, invoke the `api-designer` skill
+5. When suggesting structural refactoring, invoke the `refactoring-patterns` skill
+6. Check for circular dependencies
+7. Review public API surface of each package
+8. Walk through the review checklist
+9. Produce a structured verdict
 
 ## Output Format
 

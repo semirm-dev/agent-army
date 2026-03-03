@@ -5,7 +5,7 @@ role: reviewer
 scope: universal
 languages: []
 access: read-only
-uses_skills: [containerization]
+uses_skills: [containerization, refactoring-patterns]
 uses_rules: []
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
@@ -78,13 +78,11 @@ Infrastructure and security standards are loaded via skills.
 1. Read the orchestrator's description of what was changed
 2. Read every changed infrastructure file
 3. Read surrounding config for context (related Dockerfiles, compose overrides, CI files)
-4. For entrypoint or health check script reviews, invoke the `cli-design` skill
-5. For error handling in entrypoints, health checks, or startup logic, invoke the `error-handling` skill
-6. When suggesting infrastructure config restructuring, invoke the `refactoring-patterns` skill
-7. Run `hadolint` (if available) on Dockerfiles
-8. Run `docker compose config --quiet` to validate compose files
-9. Walk through the review checklist
-10. Produce a structured verdict
+4. When suggesting infrastructure config restructuring, invoke the `refactoring-patterns` skill
+5. Run `hadolint` (if available) on Dockerfiles
+6. Run `docker compose config --quiet` to validate compose files
+7. Walk through the review checklist
+8. Produce a structured verdict
 
 ## Output Format
 
