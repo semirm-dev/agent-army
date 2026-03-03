@@ -55,14 +55,7 @@ Regenerate with `make manifest`.
 
 ## Make Commands
 
-| Command | Description |
-|---------|-------------|
-| `make help` | Show available targets. |
-| `make setup` | Create venv and install the package (editable + dev deps). |
-| `make manifest` | Scan `rules/`, `skills/`, and `agents/` frontmatter and regenerate `manifest.json`. Resolves `uses_rules` and `delegates_to` transitively, including rules inherited through skills. |
-| `make edit-deps` | Interactively add or remove dependency entries (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) on any rule, skill, or agent file. Rewrites YAML frontmatter in-place, then auto-regenerates the manifest. |
-| `make resolve-deps` | Validate all dependency references (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) across `rules/`, `skills/`, and `agents/`. Detect and remove redundant entries covered by transitive dependencies. |
-| `make test` | Run the Python test suite. |
+Run `make help` to see all available targets.
 
 ## Development
 
