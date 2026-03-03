@@ -336,22 +336,22 @@ class TestResolveCollision:
 class TestRuleToClaude:
     """_rule_to_claude() — transforms rules for Claude Code output."""
 
-    def test_strips_frontmatter_adds_sync(self, bootstrap_tree: Path) -> None:
+    def test_strips_frontmatter(self, bootstrap_tree: Path) -> None:
         from agent_army.loader import load_rules
         rules = load_rules(bootstrap_tree)
         security = next(r for r in rules if r.name == "security")
         result = _rule_to_claude(bootstrap_tree, security)
-        assert result.startswith("<!-- Sync: security from agent-army repo -->")
         assert "# Security Patterns" in result
         assert "name: security" not in result
+        assert "<!-- Sync:" not in result
 
     def test_go_rule(self, bootstrap_tree: Path) -> None:
         from agent_army.loader import load_rules
         rules = load_rules(bootstrap_tree)
         go = next(r for r in rules if r.name == "go/patterns")
         result = _rule_to_claude(bootstrap_tree, go)
-        assert "<!-- Sync: go/patterns from agent-army repo -->" in result
         assert "# Go Coding Patterns" in result
+        assert "<!-- Sync:" not in result
 
 
 class TestRuleToCursor:
@@ -510,7 +510,7 @@ class TestGenerateAll:
         _generate_all(bootstrap_tree, dest, security, [], [], is_claude=True)
 
         content = (dest / "rules" / "security.md").read_text()
-        assert "<!-- Sync:" in content
+        assert "<!-- Sync:" not in content
         assert "# Security Patterns" in content
 
     def test_cursor_rule_content(self, bootstrap_tree: Path, tmp_path: Path) -> None:

@@ -290,12 +290,10 @@ def _generate_all(
 def _rule_to_claude(root: Path, rule: Rule) -> str:
     """Transform a rule for Claude Code output.
 
-    Strips repo frontmatter, prepends sync comment, keeps body.
+    Strips repo frontmatter, keeps body.
     """
     body = _extract_body(root / rule.path)
-    flat = _flatten_name(rule.name)
-    sync = f"<!-- Sync: {rule.name} from agent-army repo -->\n\n"
-    return sync + body
+    return body
 
 
 def _rule_to_cursor(root: Path, rule: Rule) -> str:
