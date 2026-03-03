@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# generate-manifest.sh — Generate manifest.json from rules/ and skills/ frontmatter.
+# generate-manifest.sh — Generate manifest.json from rules/, skills/, and agents/ frontmatter.
 # Idempotent: safe to re-run. Overwrites manifest.json each time.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RULES_DIR="$REPO_ROOT/rules"
 SKILLS_DIR="$REPO_ROOT/skills"
+AGENTS_DIR="$REPO_ROOT/agents"
 
 # --- Helpers ---
 
@@ -222,6 +223,70 @@ while IFS= read -r file; do
   skill_paths+=("skills/$relpath")
 done < <(find "$SKILLS_DIR" -name '*.md' | sort)
 
+# --- Collect agents ---
+
+declare -a agent_names=()
+declare -a agent_roles=()
+declare -a agent_scopes=()
+declare -a agent_languages=()
+declare -a agent_accesses=()
+declare -a agent_uses_skills=()
+declare -a agent_uses_rules=()
+declare -a agent_uses_plugins=()
+declare -a agent_delegates_to=()
+declare -a agent_paths=()
+
+while IFS= read -r file; do
+  relpath="${file#"$AGENTS_DIR/"}"
+
+  fm="$(get_frontmatter < "$file")"
+  name="$(extract_fm_value "name" "$fm")"
+  [ -z "$name" ] && name="${relpath%.md}"
+
+  role="$(extract_fm_value "role" "$fm")"
+  scope="$(extract_fm_value "scope" "$fm")"
+  [ -z "$scope" ] && scope="universal"
+
+  access="$(extract_fm_value "access" "$fm")"
+  [ -z "$access" ] && access="read-write"
+
+  langs="$(extract_fm_list "languages" "$fm" | paste -sd ',' - || true)"
+  u_skills="$(extract_fm_list "uses_skills" "$fm" | paste -sd ',' - || true)"
+  u_rules="$(extract_fm_list "uses_rules" "$fm" | paste -sd ',' - || true)"
+  u_plugins="$(extract_fm_list "uses_plugins" "$fm" | paste -sd ',' - || true)"
+  delegates="$(extract_fm_list "delegates_to" "$fm" | paste -sd ',' - || true)"
+
+  agent_names+=("$name")
+  agent_roles+=("$role")
+  agent_scopes+=("$scope")
+  agent_languages+=("$langs")
+  agent_accesses+=("$access")
+  agent_uses_skills+=("$u_skills")
+  agent_uses_rules+=("$u_rules")
+  agent_uses_plugins+=("$u_plugins")
+  agent_delegates_to+=("$delegates")
+  agent_paths+=("agents/$relpath")
+done < <(find "$AGENTS_DIR" -name '*.md' | sort)
+
+# --- Helper: build a JSON array string from a comma-separated list ---
+_csv_to_json_array() {
+  local csv="$1"
+  local json="["
+  local first=1
+  if [ -n "$csv" ]; then
+    IFS=',' read -ra arr <<< "$csv"
+    for item in "${arr[@]}"; do
+      item="$(echo "$item" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+      [ -z "$item" ] && continue
+      [ "$first" -eq 0 ] && json+=", "
+      json+="\"$(json_escape "$item")\""
+      first=0
+    done
+  fi
+  json+="]"
+  printf '%s' "$json"
+}
+
 # --- Generate manifest.json ---
 
 {
@@ -240,33 +305,11 @@ done < <(find "$SKILLS_DIR" -name '*.md' | sort)
     optional=""
 
     if [ "${rule_scopes[$i]}" = "language-specific" ] && [ -n "$langs" ]; then
-      lang_json="["
-      first=1
-      IFS=',' read -ra lang_arr <<< "$langs"
-      for l in "${lang_arr[@]}"; do
-        l="$(echo "$l" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
-        [ -z "$l" ] && continue
-        [ "$first" -eq 0 ] && lang_json+=", "
-        lang_json+="\"$(json_escape "$l")\""
-        first=0
-      done
-      lang_json+="]"
-      optional+=", \"languages\": ${lang_json}"
+      optional+=", \"languages\": $(_csv_to_json_array "$langs")"
     fi
 
     if [ -n "$uses_rules" ]; then
-      ur_json="["
-      first=1
-      IFS=',' read -ra ur_arr <<< "$uses_rules"
-      for u in "${ur_arr[@]}"; do
-        u="$(echo "$u" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
-        [ -z "$u" ] && continue
-        [ "$first" -eq 0 ] && ur_json+=", "
-        ur_json+="\"$(json_escape "$u")\""
-        first=0
-      done
-      ur_json+="]"
-      optional+=", \"uses_rules\": ${ur_json}"
+      optional+=", \"uses_rules\": $(_csv_to_json_array "$uses_rules")"
     fi
 
     echo "    { \"name\": \"$(json_escape "${rule_names[$i]}")\", \"scope\": \"$(json_escape "${rule_scopes[$i]}")\"${optional}, \"path\": \"$(json_escape "${rule_paths[$i]}")\" }${comma}"
@@ -287,35 +330,34 @@ done < <(find "$SKILLS_DIR" -name '*.md' | sort)
     optional=""
 
     if [ "${skill_scopes[$i]}" = "language-specific" ] && [ -n "$langs" ]; then
-      lang_json="["
-      first=1
-      IFS=',' read -ra lang_arr <<< "$langs"
-      for l in "${lang_arr[@]}"; do
-        l="$(echo "$l" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
-        [ -z "$l" ] && continue
-        [ "$first" -eq 0 ] && lang_json+=", "
-        lang_json+="\"$(json_escape "$l")\""
-        first=0
-      done
-      lang_json+="]"
-      optional+=", \"languages\": ${lang_json}"
+      optional+=", \"languages\": $(_csv_to_json_array "$langs")"
     fi
 
-    uses_json="["
-    first=1
-    if [ -n "$uses" ]; then
-      IFS=',' read -ra uses_arr <<< "$uses"
-      for u in "${uses_arr[@]}"; do
-        u="$(echo "$u" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
-        [ -z "$u" ] && continue
-        [ "$first" -eq 0 ] && uses_json+=", "
-        uses_json+="\"$(json_escape "$u")\""
-        first=0
-      done
-    fi
-    uses_json+="]"
+    echo "    { \"name\": \"$(json_escape "${skill_names[$i]}")\", \"scope\": \"$(json_escape "${skill_scopes[$i]}")\"${optional}, \"uses_rules\": $(_csv_to_json_array "$uses"), \"path\": \"$(json_escape "${skill_paths[$i]}")\" }${comma}"
+  done
 
-    echo "    { \"name\": \"$(json_escape "${skill_names[$i]}")\", \"scope\": \"$(json_escape "${skill_scopes[$i]}")\"${optional}, \"uses_rules\": ${uses_json}, \"path\": \"$(json_escape "${skill_paths[$i]}")\" }${comma}"
+  echo '  ],'
+  echo '  "agents": ['
+
+  last_agent=$(( ${#agent_names[@]} - 1 ))
+  for i in "${!agent_names[@]}"; do
+    comma=","
+    [ "$i" -eq "$last_agent" ] && comma=""
+
+    langs="${agent_languages[$i]}"
+    u_skills="${agent_uses_skills[$i]}"
+    u_rules="${agent_uses_rules[$i]}"
+    u_plugins="${agent_uses_plugins[$i]}"
+    delegates="${agent_delegates_to[$i]}"
+
+    # Build optional JSON fields
+    optional=""
+
+    if [ -n "$langs" ]; then
+      optional+=", \"languages\": $(_csv_to_json_array "$langs")"
+    fi
+
+    echo "    { \"name\": \"$(json_escape "${agent_names[$i]}")\", \"role\": \"$(json_escape "${agent_roles[$i]}")\", \"scope\": \"$(json_escape "${agent_scopes[$i]}")\", \"access\": \"$(json_escape "${agent_accesses[$i]}")\"${optional}, \"uses_skills\": $(_csv_to_json_array "$u_skills"), \"uses_rules\": $(_csv_to_json_array "$u_rules"), \"uses_plugins\": $(_csv_to_json_array "$u_plugins"), \"delegates_to\": $(_csv_to_json_array "$delegates"), \"path\": \"$(json_escape "${agent_paths[$i]}")\" }${comma}"
   done
 
   echo '  ]'

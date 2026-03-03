@@ -18,9 +18,9 @@ Examples: `api-designer`, `caching-strategy`, `go/coder`, `react/tester`
 
 ### Agents (`agents/`)
 
-Prompt templates for specialized AI roles. Define a role (coder, reviewer, tester), available tools, and behavioral instructions. Agents invoke skills and follow rules when activated.
+Prompt templates for specialized AI roles. Grouped by language/domain in subdirectories, with cross-cutting agents at the root. Platform-agnostic — no tool names, model references, or IDE-specific paths. Agents declare `uses_skills` (which transitively bring rules) and `uses_plugins` for extensions.
 
-Examples: `go-coder`, `ts-reviewer`, `py-tester`, `docker-builder`
+Examples: `go/coder`, `typescript/reviewer`, `python/tester`, `infrastructure/builder`, `arch-reviewer`
 
 ## How They Relate
 
@@ -31,23 +31,25 @@ Agents      → specialized roles that invoke skills and follow rules  (the "who
 ```
 
 ```
-┌─────────┐     uses_rules     ┌─────────┐     invokes     ┌─────────┐
+┌─────────┐     uses_rules     ┌─────────┐   uses_skills   ┌─────────┐
 │  Rules  │◄───────────────────│ Skills  │◄────────────────│ Agents  │
 └─────────┘                    └─────────┘                 └─────────┘
-  api-design                     api-designer                go-coder
-  security                       go/coder                    ts-reviewer
-  go/patterns                    react/tester                py-tester
+  api-design                     api-designer                go/coder
+  security                       go/coder                    typescript/reviewer
+  go/patterns                    react/tester                python/tester
 ```
 
 ## Manifest (`manifest.json`)
 
-Auto-generated index of all rules and skills. Each entry lists:
+Auto-generated index of all rules, skills, and agents. Each entry lists:
 
-- **name** — identifier (e.g., `go/patterns`, `api-designer`)
+- **name** — identifier (e.g., `go/patterns`, `api-designer`, `go/coder`)
 - **scope** — `universal` or `language-specific`
 - **languages** — applicable languages (for language-specific entries)
 - **uses_rules** — resolved dependencies (transitive — includes indirect dependencies)
 - **path** — file path relative to the repo root
+
+Agent entries additionally include: **role**, **access**, **uses_skills**, **uses_plugins**, **delegates_to**.
 
 Regenerate with `make manifest`.
 
@@ -55,7 +57,7 @@ Regenerate with `make manifest`.
 
 | Command | Description |
 |---------|-------------|
-| `make manifest` | Regenerate `manifest.json` from `rules/` and `skills/` frontmatter |
+| `make manifest` | Regenerate `manifest.json` from `rules/`, `skills/`, and `agents/` frontmatter |
 | `make edit-rules` | Interactively add/remove `uses_rules` entries on any rule or skill |
 | `make resolve-rules` | Detect and remove redundant `uses_rules` entries (already covered transitively) |
 
@@ -95,13 +97,19 @@ uses_rules: [api-design, cross-cutting, security]
 
 ```yaml
 ---
-name: go-coder
+name: go/coder
 description: "Senior Go engineer. Writes production-grade Go code following project patterns."
-tools: Read, Write, Edit, Bash, Glob, Grep
-model: inherit
+role: coder
+scope: language-specific
+languages: [go]
+access: read-write
+uses_skills: [go/coder]
+uses_rules: []
+uses_plugins: [code-simplifier, context7]
+delegates_to: []
 ---
 
-# Role
+# Go Coder Agent
 ...
 ```
 
