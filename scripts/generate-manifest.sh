@@ -192,6 +192,85 @@ resolve_uses_rules() {
   printf '%s' "$result"
 }
 
+# Look up delegates_to for an agent name by searching the parallel arrays.
+_agent_delegates() {
+  local name="$1"
+  for j in "${!agent_names[@]}"; do
+    if [ "${agent_names[$j]}" = "$name" ]; then
+      printf '%s' "${agent_delegates_to[$j]}"
+      return
+    fi
+  done
+}
+
+# Transitively resolve delegates_to via BFS.
+# Takes a comma-separated list of agent names, returns a deduplicated
+# comma-separated list including all transitive delegations.
+resolve_delegates_to() {
+  local input="$1"
+  [ -z "$input" ] && return
+
+  local visited=""
+  local result=""
+  local queue=""
+
+  queue="$input"
+
+  while [ -n "$queue" ]; do
+    local current
+    current="$(echo "$queue" | cut -d',' -f1 | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+    local rest
+    rest="$(echo "$queue" | cut -d',' -f2- -s)"
+    queue="$rest"
+
+    [ -z "$current" ] && continue
+
+    local already=0
+    if [ -n "$visited" ]; then
+      IFS=',' read -ra vis_arr <<< "$visited"
+      for v in "${vis_arr[@]}"; do
+        if [ "$v" = "$current" ]; then
+          already=1
+          break
+        fi
+      done
+    fi
+    [ "$already" -eq 1 ] && continue
+
+    if [ -n "$visited" ]; then
+      visited="${visited},${current}"
+    else
+      visited="$current"
+    fi
+    if [ -n "$result" ]; then
+      result="${result},${current}"
+    else
+      result="$current"
+    fi
+
+    local deps
+    deps="$(_agent_delegates "$current")"
+    if [ -n "$deps" ] && [ -n "$queue" ]; then
+      queue="${queue},${deps}"
+    elif [ -n "$deps" ]; then
+      queue="$deps"
+    fi
+  done
+
+  printf '%s' "$result"
+}
+
+# Look up uses_rules for a skill name by searching the parallel arrays.
+_skill_rules() {
+  local name="$1"
+  for j in "${!skill_names[@]}"; do
+    if [ "${skill_names[$j]}" = "$name" ]; then
+      printf '%s' "${skill_uses_rules[$j]}"
+      return
+    fi
+  done
+}
+
 # --- Collect skills ---
 
 declare -a skill_names=()
@@ -346,9 +425,27 @@ _csv_to_json_array() {
 
     langs="${agent_languages[$i]}"
     u_skills="${agent_uses_skills[$i]}"
-    u_rules="${agent_uses_rules[$i]}"
+    # Collect rules from agent's skills
+    skill_rules_merged=""
+    if [ -n "$u_skills" ]; then
+      IFS=',' read -ra sk_arr <<< "$u_skills"
+      for sk in "${sk_arr[@]}"; do
+        sk="$(echo "$sk" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+        sr="$(_skill_rules "$sk")"
+        if [ -n "$sr" ]; then
+          [ -n "$skill_rules_merged" ] && skill_rules_merged="${skill_rules_merged},${sr}" || skill_rules_merged="$sr"
+        fi
+      done
+    fi
+
+    # Merge agent's own rules with rules from skills, then resolve transitively
+    combined_rules="${agent_uses_rules[$i]}"
+    if [ -n "$skill_rules_merged" ]; then
+      [ -n "$combined_rules" ] && combined_rules="${combined_rules},${skill_rules_merged}" || combined_rules="$skill_rules_merged"
+    fi
+    u_rules="$(resolve_uses_rules "$combined_rules")"
     u_plugins="${agent_uses_plugins[$i]}"
-    delegates="${agent_delegates_to[$i]}"
+    delegates="$(resolve_delegates_to "${agent_delegates_to[$i]}")"
 
     # Build optional JSON fields
     optional=""
