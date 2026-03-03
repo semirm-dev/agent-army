@@ -59,7 +59,7 @@ Regenerate with `make manifest`.
 |---------|-------------|
 | `make manifest` | Scan `rules/`, `skills/`, and `agents/` frontmatter and regenerate `manifest.json`. Resolves `uses_rules` and `delegates_to` transitively, including rules inherited through skills. |
 | `make edit-rules` | Interactively add or remove `uses_rules` entries on any rule, skill, or agent file. Rewrites YAML frontmatter in-place, then auto-regenerates the manifest. |
-| `make resolve-rules` | Detect and remove redundant `uses_rules` entries that are already covered by transitive dependencies, keeping frontmatter minimal. |
+| `make resolve-deps` | Validate all dependency references (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) across `rules/`, `skills/`, and `agents/`. Detect and remove redundant entries covered by transitive dependencies. |
 
 ## File Format
 

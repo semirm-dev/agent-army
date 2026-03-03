@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib-deps.sh — Shared dependency library for uses_rules resolution.
+# lib-deps.sh — Shared dependency library for dependency resolution.
 # Source this file; do not execute directly.
 #
 # Provides:
@@ -7,10 +7,18 @@
 #   extract_fm_value()         — extract scalar value from frontmatter
 #   extract_fm_list()          — extract list value from frontmatter
 #   write_uses_rules()         — rewrite uses_rules line in a file
+#   write_delegates_to()       — rewrite delegates_to line in a file
 #   load_rule_deps()           — scan rules/*.md, populate _LIB_RULE_NAMES / _LIB_RULE_USES_RULES
+#   load_skill_names()         — scan skills/*.md, populate _LIB_SKILL_NAMES
+#   load_agent_data()          — scan agents/*.md, populate _LIB_AGENT_NAMES / _LIB_AGENT_DELEGATES_TO
+#   load_known_plugins()       — parse config.json, populate _LIB_KNOWN_PLUGINS
 #   _lib_rule_deps()           — lookup deps for a rule name
-#   lib_resolve_uses_rules()   — BFS transitive resolution
-#   find_redundant_rules()     — detect entries covered transitively by another entry
+#   _lib_agent_delegates()     — lookup delegates for an agent name
+#   lib_resolve_uses_rules()   — BFS transitive resolution for uses_rules
+#   lib_resolve_delegates_to() — BFS transitive resolution for delegates_to
+#   find_redundant_rules()     — detect uses_rules entries covered transitively
+#   find_redundant_delegates() — detect delegates_to entries covered transitively
+#   validate_refs_exist()      — check that refs exist in a valid-names list
 
 # Guard against direct execution
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
@@ -107,6 +115,37 @@ write_uses_rules() {
         { print }
       ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
     fi
+  fi
+}
+
+# Rewrite delegates_to line in a file.
+# Usage: write_delegates_to <file> <comma-separated-agents>
+# If agents is empty, sets delegates_to: [].
+write_delegates_to() {
+  local file="$1" agents="$2"
+
+  local new_val
+  if [ -z "$agents" ]; then
+    new_val="delegates_to: []"
+  else
+    new_val="delegates_to: [$agents]"
+  fi
+
+  local has_line
+  has_line=$(awk '/^---$/{c++;next} c==1 && /^delegates_to:/{print "yes";exit}' "$file")
+
+  if [ "$has_line" = "yes" ]; then
+    awk -v newval="$new_val" '
+      /^---$/ { c++; print; next }
+      c == 1 && /^delegates_to:/ { print newval; next }
+      { print }
+    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+  else
+    awk -v newval="$new_val" '
+      /^---$/ { c++ }
+      c == 2 { print newval; c = 3 }
+      { print }
+    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
   fi
 }
 
@@ -247,5 +286,206 @@ find_redundant_rules() {
         fi
       done
     done
+  done
+}
+
+# --- Skill name loading ---
+
+declare -a _LIB_SKILL_NAMES=()
+
+# Scan skills/**/*.md and populate _LIB_SKILL_NAMES array.
+load_skill_names() {
+  _LIB_SKILL_NAMES=()
+
+  local skills_dir="$_LIB_REPO_ROOT/skills"
+
+  while IFS= read -r file; do
+    local relpath="${file#"$skills_dir/"}"
+    local name="${relpath%.md}"
+    _LIB_SKILL_NAMES+=("$name")
+  done < <(find "$skills_dir" -name '*.md' | sort)
+}
+
+# --- Agent data loading ---
+
+declare -a _LIB_AGENT_NAMES=()
+declare -a _LIB_AGENT_DELEGATES_TO=()
+
+# Scan agents/**/*.md and populate _LIB_AGENT_NAMES / _LIB_AGENT_DELEGATES_TO arrays.
+load_agent_data() {
+  _LIB_AGENT_NAMES=()
+  _LIB_AGENT_DELEGATES_TO=()
+
+  local agents_dir="$_LIB_REPO_ROOT/agents"
+
+  while IFS= read -r file; do
+    local relpath="${file#"$agents_dir/"}"
+    local name="${relpath%.md}"
+    local fm
+    fm="$(get_frontmatter < "$file")"
+    local delegates
+    delegates="$(extract_fm_list "delegates_to" "$fm" | paste -sd ',' - || true)"
+
+    _LIB_AGENT_NAMES+=("$name")
+    _LIB_AGENT_DELEGATES_TO+=("$delegates")
+  done < <(find "$agents_dir" -name '*.md' | sort)
+}
+
+# Lookup delegates for an agent name from loaded arrays.
+_lib_agent_delegates() {
+  local name="$1"
+  for j in "${!_LIB_AGENT_NAMES[@]}"; do
+    if [ "${_LIB_AGENT_NAMES[$j]}" = "$name" ]; then
+      printf '%s' "${_LIB_AGENT_DELEGATES_TO[$j]}"
+      return
+    fi
+  done
+}
+
+# --- Known plugins loading ---
+
+declare -a _LIB_KNOWN_PLUGINS=()
+
+# Parse config.json public_plugins[].name via python3, populate _LIB_KNOWN_PLUGINS.
+load_known_plugins() {
+  _LIB_KNOWN_PLUGINS=()
+
+  local config_file="$_LIB_REPO_ROOT/config.json"
+  [ -f "$config_file" ] || return
+
+  local names
+  names="$(python3 -c "
+import json, sys
+with open('$config_file') as f:
+    cfg = json.load(f)
+for p in cfg.get('public_plugins', []):
+    print(p['name'])
+" 2>/dev/null || true)"
+
+  while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    _LIB_KNOWN_PLUGINS+=("$name")
+  done <<< "$names"
+}
+
+# --- delegates_to transitive resolution ---
+
+# BFS transitive resolution of delegates_to.
+# Takes a comma-separated list, returns deduplicated comma-separated list
+# including all transitive delegations.
+lib_resolve_delegates_to() {
+  local input="$1"
+  [ -z "$input" ] && return
+
+  local visited=""
+  local result=""
+  local queue="$input"
+
+  while [ -n "$queue" ]; do
+    local current
+    current="$(echo "$queue" | cut -d',' -f1 | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+    local rest
+    rest="$(echo "$queue" | cut -d',' -f2- -s)"
+    queue="$rest"
+
+    [ -z "$current" ] && continue
+
+    local already=0
+    if [ -n "$visited" ]; then
+      IFS=',' read -ra vis_arr <<< "$visited"
+      for v in "${vis_arr[@]}"; do
+        if [ "$v" = "$current" ]; then
+          already=1
+          break
+        fi
+      done
+    fi
+    [ "$already" -eq 1 ] && continue
+
+    if [ -n "$visited" ]; then
+      visited="${visited},${current}"
+    else
+      visited="$current"
+    fi
+    if [ -n "$result" ]; then
+      result="${result},${current}"
+    else
+      result="$current"
+    fi
+
+    local deps
+    deps="$(_lib_agent_delegates "$current")"
+    if [ -n "$deps" ] && [ -n "$queue" ]; then
+      queue="${queue},${deps}"
+    elif [ -n "$deps" ]; then
+      queue="$deps"
+    fi
+  done
+
+  printf '%s' "$result"
+}
+
+# --- delegates_to redundancy detection ---
+
+# For each agent A in a comma-separated list, check if any *other* agent O
+# in the same list has A in its transitive closure.
+# Output: one "redundant|covered_by" line per redundant entry.
+find_redundant_delegates() {
+  local csv="$1"
+  [ -z "$csv" ] && return
+
+  local -a entries=()
+  IFS=',' read -ra entries <<< "$csv"
+  for i in "${!entries[@]}"; do
+    entries[$i]="$(echo "${entries[$i]}" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+  done
+
+  for i in "${!entries[@]}"; do
+    local target="${entries[$i]}"
+
+    for j in "${!entries[@]}"; do
+      [ "$i" = "$j" ] && continue
+      local other="${entries[$j]}"
+
+      local other_deps
+      other_deps="$(lib_resolve_delegates_to "$other")"
+      [ -z "$other_deps" ] && continue
+
+      IFS=',' read -ra dep_arr <<< "$other_deps"
+      for d in "${dep_arr[@]}"; do
+        d="$(echo "$d" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+        if [ "$d" = "$target" ]; then
+          echo "${target}|${other}"
+          break 2
+        fi
+      done
+    done
+  done
+}
+
+# --- Reference validation ---
+
+# Check that each ref in a comma-separated list exists in a valid-names array.
+# Usage: validate_refs_exist "ref1,ref2" "valid1 valid2 valid3" "context_label"
+# Prints one line per missing ref: "ref_name"
+validate_refs_exist() {
+  local refs_csv="$1" valid_names="$2"
+  [ -z "$refs_csv" ] && return
+
+  IFS=',' read -ra refs <<< "$refs_csv"
+  for ref in "${refs[@]}"; do
+    ref="$(echo "$ref" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+    [ -z "$ref" ] && continue
+
+    local found=0
+    for valid in $valid_names; do
+      if [ "$ref" = "$valid" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      echo "$ref"
+    fi
   done
 }
