@@ -5,7 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [sql]
 access: read-only
-uses_skills: [data-modeling, security-hardening]
+uses_skills: [data-modeling, security-hardening, migration-safety, database-schema-designer, error-handling, refactoring-patterns]
 uses_rules: []
 uses_plugins: [code-review, security-guidance]
 delegates_to: []

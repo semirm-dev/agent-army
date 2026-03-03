@@ -5,7 +5,7 @@ role: tester
 scope: language-specific
 languages: [go]
 access: read-write
-uses_skills: [go/tester]
+uses_skills: [go/tester, testing-strategy]
 uses_rules: []
 uses_plugins: []
 delegates_to: []

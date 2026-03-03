@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [go]
 access: read-write
-uses_skills: [go/coder]
+uses_skills: [go/coder, error-handling, code-architecture, api-designer, refactoring-patterns]
 uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []

@@ -5,7 +5,7 @@ role: tester
 scope: language-specific
 languages: [typescript]
 access: read-write
-uses_skills: [typescript/tester]
+uses_skills: [typescript/tester, testing-strategy]
 uses_rules: []
 uses_plugins: []
 delegates_to: []

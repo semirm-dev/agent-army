@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [sql]
 access: read-write
-uses_skills: [data-modeling]
+uses_skills: [data-modeling, database-schema-designer, migration-safety, error-handling, code-architecture, refactoring-patterns]
 uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []

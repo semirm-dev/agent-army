@@ -5,7 +5,7 @@ role: tester
 scope: language-specific
 languages: [react]
 access: read-write
-uses_skills: [react/tester]
+uses_skills: [react/tester, testing-strategy]
 uses_rules: []
 uses_plugins: []
 delegates_to: []

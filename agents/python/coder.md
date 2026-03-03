@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [python]
 access: read-write
-uses_skills: [python/coder]
+uses_skills: [python/coder, error-handling, code-architecture, api-designer, refactoring-patterns]
 uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []

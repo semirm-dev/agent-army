@@ -5,7 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [python]
 access: read-only
-uses_skills: [python/reviewer, concurrency]
+uses_skills: [python/reviewer, concurrency, error-handling, api-designer]
 uses_rules: []
 uses_plugins: [code-review, security-guidance]
 delegates_to: []

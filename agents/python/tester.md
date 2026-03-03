@@ -5,7 +5,7 @@ role: tester
 scope: language-specific
 languages: [python]
 access: read-write
-uses_skills: [python/tester]
+uses_skills: [python/tester, testing-strategy]
 uses_rules: []
 uses_plugins: []
 delegates_to: []

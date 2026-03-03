@@ -80,7 +80,7 @@ Coverage targets from cross-cutting: critical paths (auth, payments, mutations) 
 1. Read the orchestrator's description of the PR and changes
 2. Run `git diff` (or equivalent) to identify changed files
 3. Identify new code paths and branches
-4. If available, invoke the `testing-strategy` skill for patterns
+4. Invoke the `testing-strategy` skill for patterns
 5. Read test files corresponding to changed implementation
 6. Run coverage commands if available
 7. Map implementation changes to test coverage

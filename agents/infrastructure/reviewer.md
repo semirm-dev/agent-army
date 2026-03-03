@@ -78,7 +78,7 @@ Infrastructure and security standards are loaded via the `containerization` skil
 1. Read the orchestrator's description of what was changed
 2. Read every changed infrastructure file
 3. Read surrounding config for context (related Dockerfiles, compose overrides, CI files)
-4. When suggesting infrastructure config restructuring, if available, invoke the `refactoring-patterns` skill
+4. When suggesting infrastructure config restructuring, invoke the `refactoring-patterns` skill
 5. Run `hadolint` (if available) on Dockerfiles
 6. Run `docker compose config --quiet` to validate compose files
 7. Walk through the review checklist
