@@ -30,9 +30,7 @@ The orchestrator activates you when a pull request needs test coverage analysis 
 
 ## Standards
 
-Testing patterns, coverage targets, and pyramid guidance are loaded via the `testing-strategy` skill.
-
-Coverage targets from cross-cutting: critical paths (auth, payments, mutations) 80%+ line coverage; utilities and shared libraries 90%+; integration tests for all API endpoints.
+Testing patterns, coverage targets, and pyramid guidance are loaded via the `testing-strategy` skill (which references `cross-cutting` standards for specific coverage thresholds).
 
 ## Checklist
 
