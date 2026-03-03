@@ -12,8 +12,9 @@ import re
 from pathlib import Path
 
 from agent_army.frontmatter import parse_frontmatter
+from agent_army.graph import resolve_transitive
 from agent_army.loader import load_agents, load_rules, load_skills
-from agent_army.models import Agent, Rule
+from agent_army.models import Agent, Rule, Skill
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -85,18 +86,70 @@ def main_bootstrap(root: Path) -> None:
         # Step 2: Destination
         dest = _select_destination(target)
 
-        # Step 3: Load and select entities
+        # Step 3: Load all entities
         rules = load_rules(root)
         skills = load_skills(root)
         agents = load_agents(root)
 
-        selected_rules = _select_entities("rules", [r.name for r in rules])
-        selected_skills = _select_entities("skills", [s.name for s in skills])
-        selected_agents = _select_entities("agents", [a.name for a in agents])
+        all_rule_names = [r.name for r in rules]
+        all_skill_names = [s.name for s in skills]
+        all_skill_set = set(all_skill_names)
 
-        rule_objs = [r for r in rules if r.name in set(selected_rules)]
-        skill_objs = [s for s in skills if s.name in set(selected_skills)]
-        agent_objs = [a for a in agents if a.name in set(selected_agents)]
+        # Build lookup maps for dependency resolution
+        rule_lookup: dict[str, list[str]] = {r.name: r.uses_rules for r in rules}
+
+        # Step 4: Select agents (primary entry point)
+        selected_agent_names = _select_entities("agents", [a.name for a in agents])
+        agent_objs = [a for a in agents if a.name in set(selected_agent_names)]
+
+        # Step 5: Auto-compute required skills from agents' uses_skills
+        auto_skill_names: list[str] = []
+        seen_skills: set[str] = set()
+        for agent in agent_objs:
+            for skill_name in agent.uses_skills:
+                if skill_name not in seen_skills and skill_name in all_skill_set:
+                    auto_skill_names.append(skill_name)
+                    seen_skills.add(skill_name)
+
+        # Step 6: Offer additional skill selection
+        final_skill_names = _select_additional_entities(
+            "skills", auto_skill_names, all_skill_names,
+        )
+
+        # Step 7: Auto-compute required rules transitively
+        rule_seeds: list[str] = []
+        seen_rules: set[str] = set()
+
+        # From selected skills' uses_rules
+        skill_objs = [s for s in skills if s.name in set(final_skill_names)]
+        for skill in skill_objs:
+            for rule_name in skill.uses_rules:
+                if rule_name not in seen_rules:
+                    rule_seeds.append(rule_name)
+                    seen_rules.add(rule_name)
+
+        # From agents' direct uses_rules
+        for agent in agent_objs:
+            for rule_name in agent.uses_rules:
+                if rule_name not in seen_rules:
+                    rule_seeds.append(rule_name)
+                    seen_rules.add(rule_name)
+
+        # Resolve transitively and filter to existing rules
+        existing_rule_set = set(all_rule_names)
+        auto_rule_names = [
+            r for r in resolve_transitive(
+                rule_seeds, lambda name: rule_lookup.get(name, []),
+            )
+            if r in existing_rule_set
+        ]
+
+        # Step 8: Offer additional rule selection
+        final_rule_names = _select_additional_entities(
+            "rules", auto_rule_names, all_rule_names,
+        )
+
+        rule_objs = [r for r in rules if r.name in set(final_rule_names)]
 
         total = len(rule_objs) + len(skill_objs) + len(agent_objs)
         if total == 0:
@@ -224,6 +277,77 @@ def _select_entities(entity_type: str, names: list[str]) -> list[str]:
                 break
 
         if valid and selected:
+            return selected
+
+
+def _select_additional_entities(
+    entity_type: str,
+    auto_names: list[str],
+    all_names: list[str],
+) -> list[str]:
+    """Show auto-resolved items, offer optional selection from remaining pool.
+
+    Args:
+        entity_type: Display label (e.g. "skills", "rules").
+        auto_names: Names auto-resolved from dependency graph.
+        all_names: All available names of this entity type.
+
+    Returns:
+        Final list of selected names (auto + any user-added extras).
+    """
+    auto_set = set(auto_names)
+    remaining = [n for n in all_names if n not in auto_set]
+
+    if not auto_names and not remaining:
+        return []
+
+    if auto_names and not remaining:
+        print(f"\n  Auto-included {entity_type}: {', '.join(auto_names)}")
+        print(f"  All available {entity_type} are already included.")
+        return list(auto_names)
+
+    if auto_names:
+        print(f"\n  Auto-included {entity_type}: {', '.join(auto_names)}")
+    else:
+        print(f"\n  No auto-included {entity_type}.")
+
+    print(f"\n  Additional {entity_type} available:")
+    for i, name in enumerate(remaining, 1):
+        print(f"    {i}) {name}")
+    print()
+
+    if auto_names:
+        prompt = f"Add extra {entity_type}? (comma-separated, Enter for none, 'all' for all): "
+    else:
+        prompt = f"Select {entity_type}? (comma-separated, Enter for none, 'all' for all): "
+
+    while True:
+        raw = input(prompt).strip()
+
+        if raw == "":
+            return list(auto_names)
+
+        if raw.lower() == "all":
+            return list(auto_names) + remaining
+
+        parts = [p.strip() for p in raw.split(",")]
+        selected = list(auto_names)
+        valid = True
+        for part in parts:
+            try:
+                idx = int(part)
+                if 1 <= idx <= len(remaining):
+                    selected.append(remaining[idx - 1])
+                else:
+                    print(f"Invalid number: {part}")
+                    valid = False
+                    break
+            except ValueError:
+                print(f"Invalid number: {part}")
+                valid = False
+                break
+
+        if valid:
             return selected
 
 

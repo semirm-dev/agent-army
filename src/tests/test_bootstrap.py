@@ -17,6 +17,7 @@ from agent_army.bootstrap import (
     _resolve_collision,
     _rule_to_claude,
     _rule_to_cursor,
+    _select_additional_entities,
     _agent_to_claude,
     _agent_to_cursor,
     _generate_all,
@@ -538,23 +539,96 @@ class TestGenerateAll:
 # ---------------------------------------------------------------------------
 
 
-class TestMainBootstrap:
-    """Full flow tests with monkeypatched input."""
+class TestSelectAdditionalEntities:
+    """_select_additional_entities() — auto-resolved + optional extras."""
 
-    def test_claude_local_all(
+    def test_empty_auto_empty_pool(self) -> None:
+        """No auto-resolved, no available → returns empty, no prompt."""
+        result = _select_additional_entities("skills", [], [])
+        assert result == []
+
+    def test_all_auto_resolved(
+        self, capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """All available are auto-resolved → returns auto, no prompt."""
+        result = _select_additional_entities(
+            "skills", ["a", "b"], ["a", "b"],
+        )
+        assert result == ["a", "b"]
+        captured = capsys.readouterr()
+        assert "All available skills are already included" in captured.out
+
+    def test_user_adds_extras(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """User adds extras via comma-separated numbers."""
+        monkeypatch.setattr("builtins.input", lambda _: "1,2")
+        result = _select_additional_entities(
+            "rules", ["auto-a"], ["auto-a", "extra-b", "extra-c"],
+        )
+        assert result == ["auto-a", "extra-b", "extra-c"]
+
+    def test_user_skips_extras(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """User presses Enter → no extras added."""
+        monkeypatch.setattr("builtins.input", lambda _: "")
+        result = _select_additional_entities(
+            "rules", ["auto-a"], ["auto-a", "extra-b"],
+        )
+        assert result == ["auto-a"]
+
+    def test_user_selects_all(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """User types 'all' → auto + all remaining."""
+        monkeypatch.setattr("builtins.input", lambda _: "all")
+        result = _select_additional_entities(
+            "skills", ["auto-a"], ["auto-a", "extra-b", "extra-c"],
+        )
+        assert result == ["auto-a", "extra-b", "extra-c"]
+
+    def test_no_auto_user_picks_from_pool(
+        self, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """No auto-resolved, user picks from full pool."""
+        monkeypatch.setattr("builtins.input", lambda _: "2")
+        result = _select_additional_entities(
+            "skills", [], ["skill-a", "skill-b"],
+        )
+        assert result == ["skill-b"]
+        captured = capsys.readouterr()
+        assert "No auto-included skills" in captured.out
+
+
+class TestMainBootstrap:
+    """Full flow tests with monkeypatched input.
+
+    New flow: target → destination → agents → auto-skills → extra-skills
+    → auto-rules → extra-rules → preview → confirm.
+
+    Fixture entities (sorted by path):
+      rules:  [api-design, go/patterns, security]
+      skills: [error-handling, go/coder]
+      agents: [arch-reviewer, go/coder]
+    """
+
+    def test_claude_all_agents_auto_deps(
         self,
         bootstrap_tree: Path,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        """Generate all entities for Claude Code to a local directory."""
+        """All agents → auto skills (all included) → auto rules + skip extras."""
+        # go/coder agent uses_skills=[go/coder, error-handling] → covers all skills
+        # auto rules: go/patterns, security (transitive); remaining: api-design
         monkeypatch.chdir(bootstrap_tree)
         responses = iter([
             "1",   # target: Claude Code
             "1",   # destination: local
-            "",    # rules: all
-            "",    # skills: all
             "",    # agents: all
+            "",    # extra rules: none (Enter skips)
             "y",   # confirm
         ])
         monkeypatch.setattr("builtins.input", lambda _: next(responses))
@@ -565,21 +639,23 @@ class TestMainBootstrap:
         assert (dest / "rules").is_dir()
         assert (dest / "skills").is_dir()
         assert (dest / "agents").is_dir()
+        # 2 auto rules (go/patterns, security), 2 skills, 2 agents
+        rule_files = list((dest / "rules").glob("*.md"))
+        assert len(rule_files) == 2
 
-    def test_cursor_local_all(
+    def test_cursor_all_agents_auto_deps(
         self,
         bootstrap_tree: Path,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        """Generate all entities for Cursor to a local directory."""
+        """Same flow for Cursor target — .mdc rules output."""
         monkeypatch.chdir(bootstrap_tree)
         responses = iter([
             "2",   # target: Cursor
             "1",   # destination: local
-            "",    # rules: all
-            "",    # skills: all
             "",    # agents: all
+            "",    # extra rules: none
             "y",   # confirm
         ])
         monkeypatch.setattr("builtins.input", lambda _: next(responses))
@@ -589,23 +665,24 @@ class TestMainBootstrap:
         dest = bootstrap_tree / ".cursor"
         assert (dest / "rules").is_dir()
         mdc_files = list((dest / "rules").glob("*.mdc"))
-        assert len(mdc_files) == 3  # 3 rules in fixture
+        assert len(mdc_files) == 2  # auto-resolved rules only
 
-    def test_selective_entities(
+    def test_selective_agent_with_extras(
         self,
         bootstrap_tree: Path,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        """Select specific rules, skip skills, select one agent."""
+        """Select go/coder agent, add api-design rule as extra."""
+        # go/coder (agent #2) → auto skills [go/coder, error-handling] (all)
+        # auto rules: go/patterns, security; remaining: api-design
         monkeypatch.chdir(bootstrap_tree)
         responses = iter([
-            "1",      # target: Claude Code
-            "1",      # destination: local
-            "1",      # rules: just first
-            "none",   # skills: skip
-            "1",      # agents: just first
-            "y",      # confirm
+            "1",   # target: Claude Code
+            "1",   # destination: local
+            "2",   # agents: go/coder
+            "1",   # extra rules: add api-design
+            "y",   # confirm
         ])
         monkeypatch.setattr("builtins.input", lambda _: next(responses))
 
@@ -613,7 +690,36 @@ class TestMainBootstrap:
 
         dest = bootstrap_tree / ".claude"
         rule_files = list((dest / "rules").glob("*.md"))
-        assert len(rule_files) == 1
+        assert len(rule_files) == 3  # auto (2) + extra (1)
+        agent_files = list((dest / "agents").glob("*.md"))
+        assert len(agent_files) == 1
+
+    def test_agent_direct_rules(
+        self,
+        bootstrap_tree: Path,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """arch-reviewer has uses_rules=[security] but no uses_skills."""
+        # arch-reviewer (agent #1) → auto skills: none
+        # remaining skills: [error-handling, go/coder] → user skips
+        # auto rules from agent: [security]; remaining: [api-design, go/patterns]
+        monkeypatch.chdir(bootstrap_tree)
+        responses = iter([
+            "1",   # target: Claude Code
+            "1",   # destination: local
+            "1",   # agents: arch-reviewer
+            "",    # skills: skip (Enter = no extras, auto is empty)
+            "",    # extra rules: skip
+            "y",   # confirm
+        ])
+        monkeypatch.setattr("builtins.input", lambda _: next(responses))
+
+        main_bootstrap(bootstrap_tree)
+
+        dest = bootstrap_tree / ".claude"
+        rule_files = list((dest / "rules").glob("*.md"))
+        assert len(rule_files) == 1  # security only
         assert not (dest / "skills").exists()
         agent_files = list((dest / "agents").glob("*.md"))
         assert len(agent_files) == 1
@@ -630,9 +736,8 @@ class TestMainBootstrap:
         responses = iter([
             "1",   # target: Claude Code
             "1",   # destination: local
-            "",    # rules: all
-            "",    # skills: all
             "",    # agents: all
+            "",    # extra rules: none
             "n",   # decline
         ])
         monkeypatch.setattr("builtins.input", lambda _: next(responses))
@@ -644,20 +749,54 @@ class TestMainBootstrap:
         captured = capsys.readouterr()
         assert "Aborted" in captured.out
 
-    def test_none_selected(
+    def test_none_agents_standalone_selection(
+        self,
+        bootstrap_tree: Path,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """No agents → user manually picks standalone skills and rules."""
+        # No agents → auto skills empty, pool=[error-handling, go/coder]
+        # User picks error-handling (1)
+        # Auto rules from error-handling: [security]; remaining: [api-design, go/patterns]
+        # User skips extras
+        monkeypatch.chdir(bootstrap_tree)
+        responses = iter([
+            "1",      # target: Claude Code
+            "1",      # destination: local
+            "none",   # agents: skip
+            "1",      # skills: pick error-handling
+            "",       # extra rules: skip
+            "y",      # confirm
+        ])
+        monkeypatch.setattr("builtins.input", lambda _: next(responses))
+
+        main_bootstrap(bootstrap_tree)
+
+        dest = bootstrap_tree / ".claude"
+        rule_files = list((dest / "rules").glob("*.md"))
+        assert len(rule_files) == 1  # security
+        skill_dirs = list((dest / "skills").iterdir())
+        assert len(skill_dirs) == 1  # error-handling
+        assert not (dest / "agents").exists()
+
+    def test_none_selected_at_all(
         self,
         bootstrap_tree: Path,
         monkeypatch: pytest.MonkeyPatch,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        """Selecting 'none' for all entity types exits early."""
+        """No agents, no skills, no rules → early exit."""
+        # No agents → auto skills empty, pool=[error-handling, go/coder]
+        # User skips skills (Enter) → auto rules empty, pool=[api-design, ...]
+        # User skips rules (Enter) → total=0
         monkeypatch.chdir(bootstrap_tree)
         responses = iter([
             "1",      # target: Claude Code
             "1",      # destination: local
-            "none",   # rules: skip
-            "none",   # skills: skip
             "none",   # agents: skip
+            "",       # skills: skip (Enter = no extras)
+            "",       # rules: skip (Enter = no extras)
         ])
         monkeypatch.setattr("builtins.input", lambda _: next(responses))
 
@@ -675,13 +814,14 @@ class TestMainBootstrap:
         """Generate to a custom output directory."""
         custom_dest = tmp_path / "custom-output"
         monkeypatch.chdir(bootstrap_tree)
+        # Pick arch-reviewer (1) → no auto skills → skip → auto rule security → skip extras
         responses = iter([
             "1",                    # target: Claude Code
             "3",                    # destination: custom
             str(custom_dest),       # custom path
-            "1",                    # rules: first only
-            "none",                 # skills: skip
-            "none",                 # agents: skip
+            "1",                    # agents: arch-reviewer
+            "",                     # skills: skip (Enter)
+            "",                     # extra rules: skip
             "y",                    # confirm
         ])
         monkeypatch.setattr("builtins.input", lambda _: next(responses))
