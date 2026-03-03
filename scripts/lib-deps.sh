@@ -7,9 +7,14 @@
 #   extract_fm_value()         — extract scalar value from frontmatter
 #   extract_fm_list()          — extract list value from frontmatter
 #   write_uses_rules()         — rewrite uses_rules line in a file
+#   write_uses_skills()        — rewrite uses_skills line in a file
+#   write_uses_plugins()       — rewrite uses_plugins line in a file
 #   write_delegates_to()       — rewrite delegates_to line in a file
 #   load_rule_deps()           — scan rules/*.md, populate _LIB_RULE_NAMES / _LIB_RULE_USES_RULES
-#   load_skill_names()         — scan skills/*.md, populate _LIB_SKILL_NAMES
+#   load_skill_names()         — scan skills/*.md, populate _LIB_SKILL_NAMES / _LIB_SKILL_USES_RULES
+#   _lib_skill_rule_deps()     — lookup uses_rules for a skill name
+#   lib_rules_covered_by_skills()      — transitive rule closure from a set of skills
+#   find_rules_redundant_via_skills()  — detect rules already covered by an entity's skills
 #   load_agent_data()          — scan agents/*.md, populate _LIB_AGENT_NAMES / _LIB_AGENT_DELEGATES_TO
 #   load_known_plugins()       — parse config.json, populate _LIB_KNOWN_PLUGINS
 #   _lib_rule_deps()           — lookup deps for a rule name
@@ -138,6 +143,68 @@ write_delegates_to() {
     awk -v newval="$new_val" '
       /^---$/ { c++; print; next }
       c == 1 && /^delegates_to:/ { print newval; next }
+      { print }
+    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+  else
+    awk -v newval="$new_val" '
+      /^---$/ { c++ }
+      c == 2 { print newval; c = 3 }
+      { print }
+    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+  fi
+}
+
+# Rewrite uses_skills line in a file.
+# Usage: write_uses_skills <file> <comma-separated-skills>
+# If skills is empty, sets uses_skills: [].
+write_uses_skills() {
+  local file="$1" skills="$2"
+
+  local new_val
+  if [ -z "$skills" ]; then
+    new_val="uses_skills: []"
+  else
+    new_val="uses_skills: [$skills]"
+  fi
+
+  local has_line
+  has_line=$(awk '/^---$/{c++;next} c==1 && /^uses_skills:/{print "yes";exit}' "$file")
+
+  if [ "$has_line" = "yes" ]; then
+    awk -v newval="$new_val" '
+      /^---$/ { c++; print; next }
+      c == 1 && /^uses_skills:/ { print newval; next }
+      { print }
+    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+  else
+    awk -v newval="$new_val" '
+      /^---$/ { c++ }
+      c == 2 { print newval; c = 3 }
+      { print }
+    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+  fi
+}
+
+# Rewrite uses_plugins line in a file.
+# Usage: write_uses_plugins <file> <comma-separated-plugins>
+# If plugins is empty, sets uses_plugins: [].
+write_uses_plugins() {
+  local file="$1" plugins="$2"
+
+  local new_val
+  if [ -z "$plugins" ]; then
+    new_val="uses_plugins: []"
+  else
+    new_val="uses_plugins: [$plugins]"
+  fi
+
+  local has_line
+  has_line=$(awk '/^---$/{c++;next} c==1 && /^uses_plugins:/{print "yes";exit}' "$file")
+
+  if [ "$has_line" = "yes" ]; then
+    awk -v newval="$new_val" '
+      /^---$/ { c++; print; next }
+      c == 1 && /^uses_plugins:/ { print newval; next }
       { print }
     ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
   else
@@ -292,18 +359,111 @@ find_redundant_rules() {
 # --- Skill name loading ---
 
 declare -a _LIB_SKILL_NAMES=()
+declare -a _LIB_SKILL_USES_RULES=()
 
-# Scan skills/**/*.md and populate _LIB_SKILL_NAMES array.
+# Scan skills/**/*.md and populate _LIB_SKILL_NAMES / _LIB_SKILL_USES_RULES arrays.
 load_skill_names() {
   _LIB_SKILL_NAMES=()
+  _LIB_SKILL_USES_RULES=()
 
   local skills_dir="$_LIB_REPO_ROOT/skills"
 
   while IFS= read -r file; do
     local relpath="${file#"$skills_dir/"}"
     local name="${relpath%.md}"
+    local fm
+    fm="$(get_frontmatter < "$file")"
+    local uses
+    uses="$(extract_fm_list "uses_rules" "$fm" | paste -sd ',' - || true)"
+
     _LIB_SKILL_NAMES+=("$name")
+    _LIB_SKILL_USES_RULES+=("$uses")
   done < <(find "$skills_dir" -name '*.md' | sort)
+}
+
+# Lookup uses_rules for a skill name from loaded arrays.
+_lib_skill_rule_deps() {
+  local name="$1"
+  for j in "${!_LIB_SKILL_NAMES[@]}"; do
+    if [ "${_LIB_SKILL_NAMES[$j]}" = "$name" ]; then
+      printf '%s' "${_LIB_SKILL_USES_RULES[$j]}"
+      return
+    fi
+  done
+}
+
+# Compute the full transitive closure of rules covered by a set of skills.
+# Takes a comma-csv of skill names. For each skill, collects its uses_rules,
+# then runs lib_resolve_uses_rules() on the union to get all transitive deps.
+# Returns comma-csv of all rules transitively covered by the skill set.
+lib_rules_covered_by_skills() {
+  local skills_csv="$1"
+  [ -z "$skills_csv" ] && return
+
+  local union=""
+  IFS=',' read -ra skill_arr <<< "$skills_csv"
+  for skill in "${skill_arr[@]}"; do
+    skill="$(echo "$skill" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+    [ -z "$skill" ] && continue
+
+    local skill_rules
+    skill_rules="$(_lib_skill_rule_deps "$skill")"
+    [ -z "$skill_rules" ] && continue
+
+    if [ -n "$union" ]; then
+      union="${union},${skill_rules}"
+    else
+      union="$skill_rules"
+    fi
+  done
+
+  [ -z "$union" ] && return
+
+  lib_resolve_uses_rules "$union"
+}
+
+# Detect rules in an entity's uses_rules that are already transitively covered
+# by the entity's uses_skills.
+# Takes: rules_csv (entity's uses_rules), skills_csv (entity's uses_skills).
+# Output: one "redundant|skill_name(→chain)" line per redundant entry.
+find_rules_redundant_via_skills() {
+  local rules_csv="$1" skills_csv="$2"
+  [ -z "$rules_csv" ] || [ -z "$skills_csv" ] && return
+
+  local covered
+  covered="$(lib_rules_covered_by_skills "$skills_csv")"
+  [ -z "$covered" ] && return
+
+  IFS=',' read -ra rule_arr <<< "$rules_csv"
+  for rule in "${rule_arr[@]}"; do
+    rule="$(echo "$rule" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+    [ -z "$rule" ] && continue
+
+    # Check if this rule appears in the covered set
+    IFS=',' read -ra cov_arr <<< "$covered"
+    for cov in "${cov_arr[@]}"; do
+      cov="$(echo "$cov" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+      if [ "$cov" = "$rule" ]; then
+        # Find which skill(s) provide this rule
+        IFS=',' read -ra sk_arr <<< "$skills_csv"
+        for sk in "${sk_arr[@]}"; do
+          sk="$(echo "$sk" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+          local sk_covered
+          sk_covered="$(lib_resolve_uses_rules "$(_lib_skill_rule_deps "$sk")")"
+          [ -z "$sk_covered" ] && continue
+          IFS=',' read -ra sk_cov_arr <<< "$sk_covered"
+          for sc in "${sk_cov_arr[@]}"; do
+            sc="$(echo "$sc" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+            if [ "$sc" = "$rule" ]; then
+              echo "${rule}|skill ${sk}"
+              break 3
+            fi
+          done
+        done
+        break
+      fi
+    done
+  done
 }
 
 # --- Agent data loading ---

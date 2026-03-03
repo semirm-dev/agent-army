@@ -225,9 +225,86 @@ scan_delegates_to_redundancies() {
   done < <(find "$AGENTS_DIR" -name '*.md' | sort)
 }
 
+scan_agent_skill_rule_redundancies() {
+  while IFS= read -r file; do
+    local relpath="${file#"$AGENTS_DIR/"}"
+    local fm
+    fm="$(get_frontmatter < "$file")"
+    local uses_rules
+    uses_rules="$(extract_fm_list "uses_rules" "$fm" | paste -sd ',' - || true)"
+    [ -z "$uses_rules" ] && continue
+
+    local uses_skills
+    uses_skills="$(extract_fm_list "uses_skills" "$fm" | paste -sd ',' - || true)"
+    [ -z "$uses_skills" ] && continue
+
+    local redundancies
+    redundancies="$(find_rules_redundant_via_skills "$uses_rules" "$uses_skills")"
+    [ -z "$redundancies" ] && continue
+
+    local -a redundant_names=()
+    local -a reasons=()
+    while IFS='|' read -r rname covered; do
+      redundant_names+=("$rname")
+      reasons+=("\"$rname\" covered by $covered")
+    done <<< "$redundancies"
+
+    IFS=',' read -ra orig_arr <<< "$uses_rules"
+    local -a cleaned=()
+    for entry in "${orig_arr[@]}"; do
+      entry="$(echo "$entry" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+      local is_redundant=0
+      for rn in "${redundant_names[@]}"; do
+        [ "$entry" = "$rn" ] && is_redundant=1 && break
+      done
+      [ "$is_redundant" -eq 0 ] && cleaned+=("$entry")
+    done
+
+    local cleaned_csv=""
+    for c in ${cleaned[@]+"${cleaned[@]}"}; do
+      if [ -z "$cleaned_csv" ]; then cleaned_csv="$c"; else cleaned_csv="$cleaned_csv, $c"; fi
+    done
+
+    # Check if this file+field already has a fix entry from rule-to-rule scan
+    local already_fixed=0
+    for i in ${!fix_paths[@]+"${!fix_paths[@]}"}; do
+      if [ "${fix_paths[$i]}" = "$file" ] && [ "${fix_field[$i]}" = "uses_rules" ]; then
+        # Merge: apply skill-transitive removals on top of existing cleaned result
+        local existing_after="${fix_after[$i]}"
+        local merged_after=""
+        IFS=',' read -ra ea_arr <<< "$existing_after"
+        for entry in "${ea_arr[@]}"; do
+          entry="$(echo "$entry" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+          local is_redundant=0
+          for rn in "${redundant_names[@]}"; do
+            [ "$entry" = "$rn" ] && is_redundant=1 && break
+          done
+          if [ "$is_redundant" -eq 0 ]; then
+            if [ -z "$merged_after" ]; then merged_after="$entry"; else merged_after="$merged_after, $entry"; fi
+          fi
+        done
+        fix_after[$i]="$merged_after"
+        fix_removed[$i]="${fix_removed[$i]};$(printf '%s\n' "${reasons[@]}" | paste -sd ';' -)"
+        already_fixed=1
+        break
+      fi
+    done
+
+    if [ "$already_fixed" -eq 0 ]; then
+      fix_labels+=("agents/${relpath}")
+      fix_field+=("uses_rules")
+      fix_paths+=("$file")
+      fix_before+=("$uses_rules")
+      fix_after+=("$cleaned_csv")
+      fix_removed+=("$(printf '%s\n' "${reasons[@]}" | paste -sd ';' -)")
+    fi
+  done < <(find "$AGENTS_DIR" -name '*.md' | sort)
+}
+
 scan_uses_rules_redundancies "$RULES_DIR" "rules/"
 scan_uses_rules_redundancies "$SKILLS_DIR" "skills/"
 scan_uses_rules_redundancies "$AGENTS_DIR" "agents/"
+scan_agent_skill_rule_redundancies
 scan_delegates_to_redundancies
 
 # =====================================================================

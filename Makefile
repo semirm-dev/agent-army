@@ -1,4 +1,4 @@
-.PHONY: help manifest edit-rules resolve-deps
+.PHONY: help manifest edit-deps resolve-deps
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -6,7 +6,8 @@ help: ## Show available targets
 	@echo "  manifest       Scan rules/, skills/, and agents/ frontmatter and regenerate manifest.json."
 	@echo "                 Resolves uses_rules and delegates_to transitively, including rules inherited from skills."
 	@echo ""
-	@echo "  edit-rules     Interactively add or remove uses_rules entries on any rule, skill, or agent file."
+	@echo "  edit-deps      Interactively add or remove dependency entries (uses_rules, uses_skills,"
+	@echo "                 uses_plugins, delegates_to) on any rule, skill, or agent file."
 	@echo "                 Rewrites YAML frontmatter in-place, then auto-regenerates the manifest."
 	@echo ""
 	@echo "  resolve-deps   Validate all dependency references (uses_rules, uses_skills, uses_plugins,"
@@ -16,8 +17,8 @@ help: ## Show available targets
 manifest: ## Generate manifest
 	bash scripts/generate-manifest.sh
 
-edit-rules: ## Add or remove uses_rules entries interactively
-	bash scripts/edit-uses-rules.sh
+edit-deps: ## Add or remove dependency entries interactively
+	bash scripts/edit-deps.sh
 
 resolve-deps: ## Validate all dependency references and remove redundancies
 	bash scripts/resolve-deps.sh
