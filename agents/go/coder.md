@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [go]
 access: read-write
-uses_skills: [go/coder, error-handling, code-architecture, api-designer, refactoring-patterns]
+uses_skills: [go/coder, go/architect, error-handling, code-architecture, api-designer, refactoring-patterns, caching-strategy, messaging-patterns, observability-setup]
 uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
@@ -125,10 +125,14 @@ func (r *PgUserRepository) FindByID(ctx context.Context, id string) (*User, erro
 4. For new package/module creation, invoke the `code-architecture` skill for structure guidance
 5. For API endpoint implementation, invoke the `api-designer` skill for endpoint and error format conventions
 6. For restructuring existing code, invoke the `refactoring-patterns` skill
-7. Write code following the standards above
-8. Run `go build ./...` to confirm compilation
-9. Run `go vet ./...` to catch common issues
-10. Report back: list of files created/modified, any concerns or open questions
+7. For project scaffolding or major restructuring, invoke the `go/architect` skill
+8. For caching-related tasks, invoke the `caching-strategy` skill
+9. For messaging or event-driven communication, invoke the `messaging-patterns` skill
+10. For logging, metrics, or health check setup, invoke the `observability-setup` skill
+11. Write code following the standards above
+12. Run `go build ./...` to confirm compilation
+13. Run `go vet ./...` to catch common issues
+14. Report back: list of files created/modified, any concerns or open questions
 
 ## Output Format
 

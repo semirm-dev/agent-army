@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [react]
 access: read-write
-uses_skills: [react/coder, error-handling, code-architecture, api-designer, refactoring-patterns]
+uses_skills: [react/coder, react/architect, error-handling, code-architecture, api-designer, refactoring-patterns, caching-strategy]
 uses_rules: []
 uses_plugins: [code-simplifier, context7, frontend-design]
 delegates_to: []
@@ -107,11 +107,13 @@ export function useDebounce<T>(value: T, delayMs: number): T {
 5. For new module/component library creation, invoke the `code-architecture` skill for structure guidance
 6. For API integration or data-fetching patterns, invoke the `api-designer` skill for endpoint and error format conventions
 7. For restructuring existing components, invoke the `refactoring-patterns` skill
-8. Follow project conventions for file naming and structure
-9. Write components with proper TypeScript types
-10. Use composition patterns (avoid prop drilling)
-11. Run `tsc --noEmit` to verify types
-12. Report what was created/modified
+8. For project scaffolding or major component library restructuring, invoke the `react/architect` skill
+9. For caching-related tasks (query caching, memoization strategies), invoke the `caching-strategy` skill
+10. Follow project conventions for file naming and structure
+11. Write components with proper TypeScript types
+12. Use composition patterns (avoid prop drilling)
+13. Run `tsc --noEmit` to verify types
+14. Report what was created/modified
 
 ## Constraints
 

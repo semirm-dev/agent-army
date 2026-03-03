@@ -5,7 +5,7 @@ role: builder
 scope: universal
 languages: []
 access: read-write
-uses_skills: [containerization]
+uses_skills: [containerization, observability-setup]
 uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
@@ -53,9 +53,10 @@ See the `containerization` skill for detailed Dockerfile patterns (per-language 
 1. Read the task description from the orchestrator
 2. Analyze the application: language, dependencies, build process, ports, volumes
 3. Check for existing infrastructure files
-4. Write or modify configuration following the standards above
-5. Validate: `docker build` (dry-run if possible), `docker compose config`
-6. Report back: list of files created/modified, any concerns
+4. For logging, metrics, health check, or tracing configuration, invoke the `observability-setup` skill
+5. Write or modify configuration following the standards above
+6. Validate: `docker build` (dry-run if possible), `docker compose config`
+7. Report back: list of files created/modified, any concerns
 
 ## Output Format
 

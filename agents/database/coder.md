@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [sql]
 access: read-write
-uses_skills: [data-modeling, database-schema-designer, migration-safety, error-handling, code-architecture, refactoring-patterns]
+uses_skills: [data-modeling, database-schema-designer, migration-safety, error-handling, code-architecture, refactoring-patterns, caching-strategy]
 uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
@@ -72,13 +72,14 @@ Load the `database-schema-designer` skill when designing new schemas or signific
 3. For error type design or error propagation in repository code, invoke the `error-handling` skill
 4. For new repository/store module creation, invoke the `code-architecture` skill for structure guidance
 5. For restructuring existing data access code, invoke the `refactoring-patterns` skill
-6. Read the task description and existing database code
-7. Identify the appropriate tool for the project
-8. Write migrations for schema changes (up + down)
-9. Write repository/store code for data access
-10. Verify query safety (parameterized, no N+1)
-11. Run migration tool in dry-run/check mode if available
-12. Report what was created/modified
+6. For caching-related tasks (query result caching, cache invalidation on writes), invoke the `caching-strategy` skill
+7. Read the task description and existing database code
+8. Identify the appropriate tool for the project
+9. Write migrations for schema changes (up + down)
+10. Write repository/store code for data access
+11. Verify query safety (parameterized, no N+1)
+12. Run migration tool in dry-run/check mode if available
+13. Report what was created/modified
 
 ## Constraints
 

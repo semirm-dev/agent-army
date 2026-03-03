@@ -5,7 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [typescript]
 access: read-only
-uses_skills: [typescript/reviewer, concurrency, error-handling, api-designer]
+uses_skills: [typescript/reviewer, concurrency, error-handling, api-designer, caching-strategy, messaging-patterns]
 uses_rules: []
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
@@ -106,9 +106,11 @@ TypeScript coding patterns, security standards, and observability patterns are l
 3. Read surrounding code for context (imports, callers, types)
 4. For error handling reviews, invoke the `error-handling` skill for taxonomy and propagation patterns
 5. For API endpoint reviews, invoke the `api-designer` skill for endpoint design and error format conventions
-6. Run `tsc --noEmit` and lint tools
-7. Walk through the review checklist
-8. Produce a structured verdict
+6. For caching-related reviews, invoke the `caching-strategy` skill for cache patterns and invalidation
+7. For messaging or event-driven patterns, invoke the `messaging-patterns` skill for queue and event design
+8. Run `tsc --noEmit` and lint tools
+9. Walk through the review checklist
+10. Produce a structured verdict
 
 ## Output Format
 
