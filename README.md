@@ -100,29 +100,6 @@ python -m agent_army resolve    # validate refs + fix redundancies
 python -m agent_army edit       # interactive dependency editor
 ```
 
-## Project Structure
-
-```
-src/
-├── agent_army/
-│   ├── cli.py          # CLI entry point and subcommand dispatch
-│   ├── models.py       # Data models for rules, skills, agents
-│   ├── loader.py       # Load and parse markdown files from rules/, skills/, agents/
-│   ├── frontmatter.py  # YAML frontmatter parsing and rewriting
-│   ├── graph.py        # Dependency graph and transitive resolution
-│   ├── manifest.py     # manifest.json generation
-│   ├── resolver.py     # Validate references and detect redundancies
-│   └── editor.py       # Interactive dependency editor
-└── tests/
-    ├── conftest.py
-    ├── test_frontmatter.py
-    ├── test_graph.py
-    ├── test_loader.py
-    ├── test_manifest.py
-    ├── test_resolver.py
-    └── test_editor.py
-```
-
 ## File Format
 
 ### Rule
