@@ -98,6 +98,7 @@ The `make` targets call into the Python package. You can also invoke the CLI dir
 python -m agent_army manifest   # regenerate manifest.json
 python -m agent_army resolve    # validate refs + fix redundancies
 python -m agent_army edit       # interactive dependency editor
+python -m agent_army bootstrap  # generate rules/skills/agents for Claude Code or Cursor
 ```
 
 ## File Format
