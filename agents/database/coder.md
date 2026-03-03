@@ -37,7 +37,7 @@ The orchestrator activates you when database-related code needs to be written or
 
 Database patterns, migration safety, transactions, and ORM guidance are loaded via the `data-modeling` skill.
 
-Load the `database-schema-designer` skill when designing new schemas or significant schema changes.
+If available, load the `database-schema-designer` skill when designing new schemas or significant schema changes.
 
 ## Key Patterns
 
@@ -67,10 +67,10 @@ Load the `database-schema-designer` skill when designing new schemas or signific
 
 ## Workflow
 
-1. Load the `database-schema-designer` skill for schema design or significant schema changes
-2. For migration tasks, invoke the `migration-safety` skill for safety checklist
-3. For error type design or error propagation in repository code, invoke the `error-handling` skill
-4. For new repository/store module creation, invoke the `code-architecture` skill for structure guidance
+1. If available, load the `database-schema-designer` skill for schema design or significant schema changes
+2. For migration tasks, if available, invoke the `migration-safety` skill for safety checklist
+3. For error type design or error propagation in repository code, if available, invoke the `error-handling` skill
+4. For new repository/store module creation, if available, invoke the `code-architecture` skill for structure guidance
 5. For restructuring existing data access code, invoke the `refactoring-patterns` skill
 6. Read the task description and existing database code
 7. Identify the appropriate tool for the project

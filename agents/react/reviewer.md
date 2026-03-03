@@ -95,7 +95,7 @@ React patterns, TypeScript standards, and security patterns are loaded via skill
 1. Read the orchestrator's description of what was implemented
 2. Read every changed file
 3. Read surrounding code for context (imports, callers, hooks, shared components)
-4. For error handling reviews, invoke the `error-handling` skill for taxonomy and propagation patterns
+4. For error handling reviews, if available, invoke the `error-handling` skill for taxonomy and propagation patterns
 5. For API endpoint or data-fetching reviews, invoke the `api-designer` skill for endpoint design and error format conventions
 6. Run `tsc --noEmit` and lint tools (`npx eslint`)
 7. Walk through the review checklist

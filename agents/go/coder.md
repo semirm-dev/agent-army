@@ -121,8 +121,8 @@ func (r *PgUserRepository) FindByID(ctx context.Context, id string) (*User, erro
 
 1. Read the task description from the orchestrator
 2. Explore the codebase: find related packages, interfaces, and existing patterns
-3. For error type design or error propagation tasks, invoke the `error-handling` skill
-4. For new package/module creation, invoke the `code-architecture` skill for structure guidance
+3. For error type design or error propagation tasks, if available, invoke the `error-handling` skill
+4. For new package/module creation, if available, invoke the `code-architecture` skill for structure guidance
 5. For API endpoint implementation, invoke the `api-designer` skill for endpoint and error format conventions
 6. For restructuring existing code, invoke the `refactoring-patterns` skill
 7. Write code following the standards above
