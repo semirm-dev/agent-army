@@ -93,33 +93,32 @@ extract_fm_list() {
 
 # Rewrite uses_rules line in a file.
 # Usage: write_uses_rules <file> <comma-separated-rules>
-# If rules is empty, removes the uses_rules line entirely.
+# If rules is empty, sets uses_rules: [].
 write_uses_rules() {
   local file="$1" rules="$2"
 
+  local new_val
   if [ -z "$rules" ]; then
-    awk '
+    new_val="uses_rules: []"
+  else
+    new_val="uses_rules: [$rules]"
+  fi
+
+  local has_line
+  has_line=$(awk '/^---$/{c++;next} c==1 && /^uses_rules:/{print "yes";exit}' "$file")
+
+  if [ "$has_line" = "yes" ]; then
+    awk -v newval="$new_val" '
       /^---$/ { c++; print; next }
-      c == 1 && /^uses_rules:/ { next }
+      c == 1 && /^uses_rules:/ { print newval; next }
       { print }
     ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
   else
-    local has_line
-    has_line=$(awk '/^---$/{c++;next} c==1 && /^uses_rules:/{print "yes";exit}' "$file")
-
-    if [ "$has_line" = "yes" ]; then
-      awk -v newval="uses_rules: [$rules]" '
-        /^---$/ { c++; print; next }
-        c == 1 && /^uses_rules:/ { print newval; next }
-        { print }
-      ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-    else
-      awk -v newval="uses_rules: [$rules]" '
-        /^---$/ { c++ }
-        c == 2 { print newval; c = 3 }
-        { print }
-      ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-    fi
+    awk -v newval="$new_val" '
+      /^---$/ { c++ }
+      c == 2 { print newval; c = 3 }
+      { print }
+    ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
   fi
 }
 
