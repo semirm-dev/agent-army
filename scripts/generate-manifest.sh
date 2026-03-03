@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: AI_DELETION_REVIEW — Replaced by src/agent_army/manifest.py
 # generate-manifest.sh — Generate manifest.json from rules/, skills/, and agents/ frontmatter.
 # Idempotent: safe to re-run. Overwrites manifest.json each time.
 set -euo pipefail

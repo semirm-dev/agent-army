@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: AI_DELETION_REVIEW — Replaced by src/agent_army/ (models, frontmatter, loader, graph, resolver)
 # lib-deps.sh — Shared dependency library for dependency resolution.
 # Source this file; do not execute directly.
 #

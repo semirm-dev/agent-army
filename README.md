@@ -60,6 +60,65 @@ Regenerate with `make manifest`.
 | `make manifest` | Scan `rules/`, `skills/`, and `agents/` frontmatter and regenerate `manifest.json`. Resolves `uses_rules` and `delegates_to` transitively, including rules inherited through skills. |
 | `make edit-deps` | Interactively add or remove dependency entries (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) on any rule, skill, or agent file. Rewrites YAML frontmatter in-place, then auto-regenerates the manifest. |
 | `make resolve-deps` | Validate all dependency references (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) across `rules/`, `skills/`, and `agents/`. Detect and remove redundant entries covered by transitive dependencies. |
+| `make test` | Run the Python test suite. |
+
+## Development
+
+### Prerequisites
+
+- Python 3.14+
+
+### Setup
+
+```bash
+cd src
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+**Note:** Editable installs require pip 21.3+ (for PEP 660). If you see "editable mode currently requires a setuptools-based build", run `pip install --upgrade pip` first.
+
+### Running Tests
+
+```bash
+make test
+# or directly:
+cd src && .venv/bin/pytest tests/ -v
+```
+
+### CLI Usage
+
+The `make` targets call into the Python package. You can also invoke the CLI directly:
+
+```bash
+python -m agent_army manifest   # regenerate manifest.json
+python -m agent_army resolve    # validate refs + fix redundancies
+python -m agent_army edit       # interactive dependency editor
+```
+
+## Project Structure
+
+```
+src/
+├── agent_army/
+│   ├── cli.py          # CLI entry point and subcommand dispatch
+│   ├── models.py       # Data models for rules, skills, agents
+│   ├── loader.py       # Load and parse markdown files from rules/, skills/, agents/
+│   ├── frontmatter.py  # YAML frontmatter parsing and rewriting
+│   ├── graph.py        # Dependency graph and transitive resolution
+│   ├── manifest.py     # manifest.json generation
+│   ├── resolver.py     # Validate references and detect redundancies
+│   └── editor.py       # Interactive dependency editor
+└── tests/
+    ├── conftest.py
+    ├── test_frontmatter.py
+    ├── test_graph.py
+    ├── test_loader.py
+    ├── test_manifest.py
+    ├── test_resolver.py
+    └── test_editor.py
+```
 
 ## File Format
 
@@ -115,4 +174,5 @@ delegates_to: []
 
 ## TODO
 
+- [x] Migrate shell scripts to Python package (`src/agent_army/`)
 - [ ] Add a way to add new rules/skills/agents/plugins from the CLI

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: AI_DELETION_REVIEW — Replaced by src/agent_army/editor.py + cli.py
 # edit-deps.sh — Interactive CLI for adding/removing dependency entries.
 # Supports uses_rules, uses_skills, uses_plugins, delegates_to across
 # rules, skills, and agents. Rewrites YAML frontmatter in-place, then

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: AI_DELETION_REVIEW — Replaced by src/agent_army/resolver.py + cli.py
 # resolve-deps.sh — Validate all dependency references and remove redundancies.
 # Checks uses_rules, uses_skills, uses_plugins, delegates_to across rules/, skills/, agents/.
 set -euo pipefail
