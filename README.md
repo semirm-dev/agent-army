@@ -57,6 +57,8 @@ Regenerate with `make manifest`.
 
 | Command | Description |
 |---------|-------------|
+| `make help` | Show available targets. |
+| `make setup` | Create venv and install the package (editable + dev deps). |
 | `make manifest` | Scan `rules/`, `skills/`, and `agents/` frontmatter and regenerate `manifest.json`. Resolves `uses_rules` and `delegates_to` transitively, including rules inherited through skills. |
 | `make edit-deps` | Interactively add or remove dependency entries (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) on any rule, skill, or agent file. Rewrites YAML frontmatter in-place, then auto-regenerates the manifest. |
 | `make resolve-deps` | Validate all dependency references (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) across `rules/`, `skills/`, and `agents/`. Detect and remove redundant entries covered by transitive dependencies. |
@@ -71,6 +73,13 @@ Regenerate with `make manifest`.
 ### Setup
 
 ```bash
+make setup
+```
+
+<details>
+<summary>Manual setup (if make is unavailable)</summary>
+
+```bash
 cd src
 python3 -m venv .venv
 source .venv/bin/activate
@@ -78,6 +87,7 @@ pip install -e ".[dev]"
 ```
 
 **Note:** Editable installs require pip 21.3+ (for PEP 660). If you see "editable mode currently requires a setuptools-based build", run `pip install --upgrade pip` first.
+</details>
 
 ### Running Tests
 
