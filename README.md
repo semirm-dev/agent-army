@@ -170,11 +170,3 @@ uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
-
-# Go Coder Agent
-...
-```
-
-## TODO
-
-- [ ] Add a way to add new rules/skills/agents/plugins from the CLI
