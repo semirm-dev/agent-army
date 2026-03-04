@@ -26,7 +26,7 @@ func NewRootCmd() *cobra.Command {
 func findRoot() string {
 	cwd, _ := os.Getwd()
 	for _, candidate := range []string{cwd, filepath.Dir(cwd), filepath.Dir(filepath.Dir(cwd))} {
-		if isDir(filepath.Join(candidate, "rules")) {
+		if isDir(filepath.Join(candidate, "spec", "rules")) {
 			return candidate
 		}
 	}

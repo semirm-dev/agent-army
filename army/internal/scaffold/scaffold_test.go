@@ -12,7 +12,7 @@ import (
 
 func TestScaffoldRule(t *testing.T) {
 	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "rules"), 0755)
+	os.MkdirAll(filepath.Join(root, "spec", "rules"), 0755)
 
 	// name → description(enter=default) → scope(enter=universal) → no deps available → confirm(y)
 	p := tui.NewFakePrompter(
@@ -27,7 +27,7 @@ func TestScaffoldRule(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	content, err := os.ReadFile(filepath.Join(root, "rules", "security.md"))
+	content, err := os.ReadFile(filepath.Join(root, "spec", "rules", "security.md"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +46,7 @@ func TestScaffoldRule(t *testing.T) {
 
 func TestScaffoldSkill(t *testing.T) {
 	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "skills"), 0755)
+	os.MkdirAll(filepath.Join(root, "spec", "skills"), 0755)
 
 	p := tui.NewFakePrompter(
 		"api-designer", // name
@@ -60,7 +60,7 @@ func TestScaffoldSkill(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	content, err := os.ReadFile(filepath.Join(root, "skills", "api-designer.md"))
+	content, err := os.ReadFile(filepath.Join(root, "spec", "skills", "api-designer.md"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func TestScaffoldSkill(t *testing.T) {
 
 func TestScaffoldAgent(t *testing.T) {
 	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "agents"), 0755)
+	os.MkdirAll(filepath.Join(root, "spec", "agents"), 0755)
 
 	// name → description → role(enter=coder) → scope(enter=universal) → access(enter=read-write) → confirm
 	p := tui.NewFakePrompter(
@@ -93,7 +93,7 @@ func TestScaffoldAgent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	content, err := os.ReadFile(filepath.Join(root, "agents", "go-coder.md"))
+	content, err := os.ReadFile(filepath.Join(root, "spec", "agents", "go-coder.md"))
 	if err != nil {
 		t.Fatal(err)
 	}

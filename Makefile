@@ -5,7 +5,7 @@ ARMY := army/army
 help: ## Show available targets
 	@echo "Usage: make <target>"
 	@echo ""
-	@echo "  manifest       Scan rules/, skills/, and agents/ frontmatter and regenerate manifest.json."
+	@echo "  manifest       Scan spec/rules/, spec/skills/, and spec/agents/ frontmatter and regenerate manifest.json."
 	@echo "                 Resolves uses_rules and delegates_to transitively, including rules inherited from skills."
 	@echo ""
 	@echo "  edit-deps      Interactively add or remove dependency entries (uses_rules, uses_skills,"
@@ -13,7 +13,7 @@ help: ## Show available targets
 	@echo "                 Rewrites YAML frontmatter in-place, then auto-regenerates the manifest."
 	@echo ""
 	@echo "  resolve-deps   Validate all dependency references (uses_rules, uses_skills, uses_plugins,"
-	@echo "                 delegates_to) across rules/, skills/, and agents/. Detect and remove redundant"
+	@echo "                 delegates_to) across spec/rules/, spec/skills/, and spec/agents/. Detect and remove redundant"
 	@echo "                 uses_rules and delegates_to entries covered by transitive dependencies."
 	@echo ""
 	@echo "  new-rule       Scaffold a new rule with interactive prompts."

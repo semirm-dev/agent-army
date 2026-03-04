@@ -8,10 +8,10 @@ import (
 )
 
 var fieldLocation = map[string]string{
-	"uses_rules":   "rules/",
-	"uses_skills":  "skills/",
+	"uses_rules":   "spec/rules/",
+	"uses_skills":  "spec/skills/",
 	"uses_plugins": "config.json public_plugins",
-	"delegates_to": "agents/",
+	"delegates_to": "spec/agents/",
 }
 
 // FormatReport formats a human-readable validation report.

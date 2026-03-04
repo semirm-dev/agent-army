@@ -44,7 +44,7 @@ func scaffoldRule(root string, p tui.Prompter, w io.Writer) error {
 	}
 	name = strings.TrimSpace(name)
 
-	filePath := filepath.Join(root, "rules", name+".md")
+	filePath := filepath.Join(root, "spec", "rules", name+".md")
 	if checkDuplicate(w, filePath) {
 		return nil
 	}
@@ -89,7 +89,7 @@ func scaffoldSkill(root string, p tui.Prompter, w io.Writer) error {
 	}
 	name = strings.TrimSpace(name)
 
-	filePath := filepath.Join(root, "skills", name+".md")
+	filePath := filepath.Join(root, "spec", "skills", name+".md")
 	if checkDuplicate(w, filePath) {
 		return nil
 	}
@@ -134,7 +134,7 @@ func scaffoldAgent(root string, p tui.Prompter, w io.Writer) error {
 	}
 	name = strings.TrimSpace(name)
 
-	filePath := filepath.Join(root, "agents", name+".md")
+	filePath := filepath.Join(root, "spec", "agents", name+".md")
 	if checkDuplicate(w, filePath) {
 		return nil
 	}

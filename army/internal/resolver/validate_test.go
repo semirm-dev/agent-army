@@ -7,9 +7,9 @@ import (
 )
 
 func TestValidateAllRefs_Valid(t *testing.T) {
-	rules := []model.Rule{{Name: "security", Path: "rules/security.md"}}
-	skills := []model.Skill{{Name: "api", Path: "skills/api.md", UsesRules: []string{"security"}}}
-	agents := []model.Agent{{Name: "coder", Path: "agents/coder.md", UsesSkills: []string{"api"}, UsesRules: []string{"security"}}}
+	rules := []model.Rule{{Name: "security", Path: "spec/rules/security.md"}}
+	skills := []model.Skill{{Name: "api", Path: "spec/skills/api.md", UsesRules: []string{"security"}}}
+	agents := []model.Agent{{Name: "coder", Path: "spec/agents/coder.md", UsesSkills: []string{"api"}, UsesRules: []string{"security"}}}
 
 	errs := ValidateAllRefs(rules, skills, agents, nil)
 	if len(errs) != 0 {
@@ -18,8 +18,8 @@ func TestValidateAllRefs_Valid(t *testing.T) {
 }
 
 func TestValidateAllRefs_MissingRule(t *testing.T) {
-	rules := []model.Rule{{Name: "security", Path: "rules/security.md"}}
-	skills := []model.Skill{{Name: "api", Path: "skills/api.md", UsesRules: []string{"nonexistent"}}}
+	rules := []model.Rule{{Name: "security", Path: "spec/rules/security.md"}}
+	skills := []model.Skill{{Name: "api", Path: "spec/skills/api.md", UsesRules: []string{"nonexistent"}}}
 
 	errs := ValidateAllRefs(rules, skills, nil, nil)
 	if len(errs) != 1 {
@@ -34,7 +34,7 @@ func TestValidateAllRefs_MissingRule(t *testing.T) {
 }
 
 func TestValidateAllRefs_MissingPlugin(t *testing.T) {
-	agents := []model.Agent{{Name: "coder", Path: "agents/coder.md", UsesPlugins: []string{"missing-plugin"}}}
+	agents := []model.Agent{{Name: "coder", Path: "spec/agents/coder.md", UsesPlugins: []string{"missing-plugin"}}}
 
 	errs := ValidateAllRefs(nil, nil, agents, nil)
 	if len(errs) != 1 {

@@ -4,19 +4,19 @@ A modular library of coding standards, workflows, and agent prompts for AI-assis
 
 ## What's Inside
 
-### Rules (`rules/`)
+### Rules (`spec/rules/`)
 
 Coding standards and best practices. Markdown files with YAML frontmatter. Scoped as `universal` (all languages) or `language-specific` (e.g., `go/patterns`). Rules define **what** good code looks like — naming, error handling, security, testing, etc.
 
 Examples: `api-design`, `security`, `go/patterns`, `typescript/testing`
 
-### Skills (`skills/`)
+### Skills (`spec/skills/`)
 
 Structured workflows and decision trees. Also markdown with frontmatter. Skills define **how** to accomplish tasks — designing APIs, setting up caching, hardening security. Skills declare `uses_rules` to reference the rules they depend on.
 
 Examples: `api-designer`, `caching-strategy`, `go/coder`, `react/tester`
 
-### Agents (`agents/`)
+### Agents (`spec/agents/`)
 
 Prompt templates for specialized AI roles. Grouped by language/domain in subdirectories, with cross-cutting agents at the root. Platform-agnostic — no tool names, model references, or IDE-specific paths. Agents declare `uses_skills` (which transitively bring rules) and `uses_plugins` for extensions.
 

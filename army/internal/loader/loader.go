@@ -32,7 +32,7 @@ func FindMDFiles(dir string) ([]string, error) {
 
 // LoadRules loads all rules from root/rules/ directory.
 func LoadRules(root string) ([]model.Rule, error) {
-	rulesDir := filepath.Join(root, "rules")
+	rulesDir := filepath.Join(root, "spec", "rules")
 	if !isDir(rulesDir) {
 		return nil, nil
 	}
@@ -58,7 +58,7 @@ func LoadRules(root string) ([]model.Rule, error) {
 			Scope:       fm.StringVal("scope", "universal"),
 			Languages:   ensureList(fm, "languages"),
 			UsesRules:   ensureList(fm, "uses_rules"),
-			Path:        filepath.Join("rules", rel),
+			Path:        filepath.Join("spec", "rules", rel),
 		})
 	}
 	return rules, nil
@@ -66,7 +66,7 @@ func LoadRules(root string) ([]model.Rule, error) {
 
 // LoadSkills loads all skills from root/skills/ directory.
 func LoadSkills(root string) ([]model.Skill, error) {
-	skillsDir := filepath.Join(root, "skills")
+	skillsDir := filepath.Join(root, "spec", "skills")
 	if !isDir(skillsDir) {
 		return nil, nil
 	}
@@ -92,7 +92,7 @@ func LoadSkills(root string) ([]model.Skill, error) {
 			Scope:       fm.StringVal("scope", "universal"),
 			Languages:   ensureList(fm, "languages"),
 			UsesRules:   ensureList(fm, "uses_rules"),
-			Path:        filepath.Join("skills", rel),
+			Path:        filepath.Join("spec", "skills", rel),
 		})
 	}
 	return skills, nil
@@ -100,7 +100,7 @@ func LoadSkills(root string) ([]model.Skill, error) {
 
 // LoadAgents loads all agents from root/agents/ directory.
 func LoadAgents(root string) ([]model.Agent, error) {
-	agentsDir := filepath.Join(root, "agents")
+	agentsDir := filepath.Join(root, "spec", "agents")
 	if !isDir(agentsDir) {
 		return nil, nil
 	}
@@ -131,7 +131,7 @@ func LoadAgents(root string) ([]model.Agent, error) {
 			UsesRules:   ensureList(fm, "uses_rules"),
 			UsesPlugins: ensureList(fm, "uses_plugins"),
 			DelegatesTo: ensureList(fm, "delegates_to"),
-			Path:        filepath.Join("agents", rel),
+			Path:        filepath.Join("spec", "agents", rel),
 		})
 	}
 	return agents, nil

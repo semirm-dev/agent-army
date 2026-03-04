@@ -14,7 +14,7 @@ func TestEditFlow_AddRule(t *testing.T) {
 	root := t.TempDir()
 
 	// Create two rules
-	rulesDir := filepath.Join(root, "rules")
+	rulesDir := filepath.Join(root, "spec", "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "security.md"),
 		[]byte("---\nscope: universal\nuses_rules: []\n---\n\n# Security\n"), 0644)
@@ -45,7 +45,7 @@ func TestEditFlow_AddRule(t *testing.T) {
 func TestEditFlow_RemoveRule(t *testing.T) {
 	root := t.TempDir()
 
-	rulesDir := filepath.Join(root, "rules")
+	rulesDir := filepath.Join(root, "spec", "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "security.md"),
 		[]byte("---\nscope: universal\nuses_rules: [api-design, cross-cutting]\n---\n\n# Security\n"), 0644)

@@ -8,12 +8,12 @@ import (
 
 func TestComputeAllFixes_Redundant(t *testing.T) {
 	rules := []model.Rule{
-		{Name: "A", UsesRules: []string{"B"}, Path: "rules/a.md"},
-		{Name: "B", UsesRules: nil, Path: "rules/b.md"},
+		{Name: "A", UsesRules: []string{"B"}, Path: "spec/rules/a.md"},
+		{Name: "B", UsesRules: nil, Path: "spec/rules/b.md"},
 	}
 	// Rule A depends on B. If an agent has both A and B in uses_rules, B is redundant.
 	agents := []model.Agent{
-		{Name: "coder", Path: "agents/coder.md", UsesRules: []string{"A", "B"}},
+		{Name: "coder", Path: "spec/agents/coder.md", UsesRules: []string{"A", "B"}},
 	}
 
 	fixes := ComputeAllFixes(rules, nil, agents, "/tmp")
@@ -21,7 +21,7 @@ func TestComputeAllFixes_Redundant(t *testing.T) {
 		t.Fatalf("expected 1 fix, got %d", len(fixes))
 	}
 	fix := fixes[0]
-	if fix.FilePath != "agents/coder.md" {
+	if fix.FilePath != "spec/agents/coder.md" {
 		t.Errorf("filePath = %q", fix.FilePath)
 	}
 	if len(fix.After) != 1 || fix.After[0] != "A" {
@@ -31,11 +31,11 @@ func TestComputeAllFixes_Redundant(t *testing.T) {
 
 func TestComputeAllFixes_NoRedundancy(t *testing.T) {
 	rules := []model.Rule{
-		{Name: "A", Path: "rules/a.md"},
-		{Name: "B", Path: "rules/b.md"},
+		{Name: "A", Path: "spec/rules/a.md"},
+		{Name: "B", Path: "spec/rules/b.md"},
 	}
 	agents := []model.Agent{
-		{Name: "coder", Path: "agents/coder.md", UsesRules: []string{"A", "B"}},
+		{Name: "coder", Path: "spec/agents/coder.md", UsesRules: []string{"A", "B"}},
 	}
 
 	fixes := ComputeAllFixes(rules, nil, agents, "/tmp")

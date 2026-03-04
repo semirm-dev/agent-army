@@ -40,7 +40,7 @@ func TestFormatManifestJSON(t *testing.T) {
 	e := Entry{}
 	e.Add("name", "test-rule")
 	e.Add("scope", "universal")
-	e.Add("path", "rules/test.md")
+	e.Add("path", "spec/rules/test.md")
 
 	m := OrderedMap{
 		Keys: []string{"rules"},
@@ -69,19 +69,19 @@ func TestGenerateManifest(t *testing.T) {
 	root := t.TempDir()
 
 	// Create rules
-	rulesDir := filepath.Join(root, "rules")
+	rulesDir := filepath.Join(root, "spec", "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "security.md"),
 		[]byte("---\nscope: universal\n---\n\n# Security\n"), 0644)
 
 	// Create skills
-	skillsDir := filepath.Join(root, "skills")
+	skillsDir := filepath.Join(root, "spec", "skills")
 	os.MkdirAll(skillsDir, 0755)
 	os.WriteFile(filepath.Join(skillsDir, "api-designer.md"),
 		[]byte("---\nname: api-designer\nscope: universal\nuses_rules: [security]\n---\n\n# API Designer\n"), 0644)
 
 	// Create agents
-	agentsDir := filepath.Join(root, "agents")
+	agentsDir := filepath.Join(root, "spec", "agents")
 	os.MkdirAll(agentsDir, 0755)
 	os.WriteFile(filepath.Join(agentsDir, "coder.md"),
 		[]byte("---\nname: go-coder\ndescription: Go coder\nrole: coder\nscope: universal\naccess: read-write\nuses_skills: [api-designer]\nuses_rules: []\nuses_plugins: []\ndelegates_to: []\n---\n\n# Coder\n"), 0644)
@@ -115,7 +115,7 @@ func TestGenerateManifest(t *testing.T) {
 func TestWriteManifest(t *testing.T) {
 	root := t.TempDir()
 
-	rulesDir := filepath.Join(root, "rules")
+	rulesDir := filepath.Join(root, "spec", "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "test.md"),
 		[]byte("---\nscope: universal\n---\n\n# Test\n"), 0644)

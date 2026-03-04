@@ -17,14 +17,14 @@ func TestFormatReport_AllValid(t *testing.T) {
 
 func TestFormatReport_WithErrors(t *testing.T) {
 	errs := []model.ValidationError{
-		{FileLabel: "agents/coder.md", Field: "uses_rules", Ref: "missing", Severity: "error"},
+		{FileLabel: "spec/agents/coder.md", Field: "uses_rules", Ref: "missing", Severity: "error"},
 	}
 	got := FormatReport(errs, nil)
 
-	if !strings.Contains(got, "[ERROR] agents/coder.md") {
+	if !strings.Contains(got, "[ERROR] spec/agents/coder.md") {
 		t.Error("missing error line")
 	}
-	if !strings.Contains(got, `"missing" not found in rules/`) {
+	if !strings.Contains(got, `"missing" not found in spec/rules/`) {
 		t.Error("missing ref detail")
 	}
 	if !strings.Contains(got, "1 error(s)") {
@@ -35,9 +35,9 @@ func TestFormatReport_WithErrors(t *testing.T) {
 func TestFormatReport_WithFixes(t *testing.T) {
 	fixes := []model.Fix{
 		{
-			Label:    "agents/coder.md",
+			Label:    "spec/agents/coder.md",
 			Field:    "uses_rules",
-			FilePath: "agents/coder.md",
+			FilePath: "spec/agents/coder.md",
 			Before:   []string{"A", "B"},
 			After:    []string{"A"},
 			Reasons:  []string{`"B" covered by "A"`},
@@ -45,7 +45,7 @@ func TestFormatReport_WithFixes(t *testing.T) {
 	}
 	got := FormatReport(nil, fixes)
 
-	if !strings.Contains(got, "[FIX] agents/coder.md") {
+	if !strings.Contains(got, "[FIX] spec/agents/coder.md") {
 		t.Error("missing fix line")
 	}
 	if !strings.Contains(got, "Before: [A, B]") {

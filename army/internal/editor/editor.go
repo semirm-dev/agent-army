@@ -16,9 +16,9 @@ import (
 )
 
 var entityDirs = map[string]string{
-	"rule":  "rules",
-	"skill": "skills",
-	"agent": "agents",
+	"rule":  "spec/rules",
+	"skill": "spec/skills",
+	"agent": "spec/agents",
 }
 
 var entityFields = map[string][]string{

@@ -138,23 +138,23 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 <!-- BEGIN:sync-pairs-table -->
 | Rule File | Synced With | Content |
 |-----------|-------------|---------|
-| `rules/go-patterns.md` | `cursor/100-golang.mdc` | Go coding + testing patterns |
-| `rules/ts-patterns.md` | `cursor/101-typescript.mdc` | TypeScript coding + testing patterns |
-| `rules/py-patterns.md` | `cursor/102-python.mdc` | Python coding + testing patterns |
-| `rules/git-workflow.md` | `cursor/300-git.mdc` | Git conventions |
-| `rules/react-patterns.md` | `cursor/103-react.mdc` | React component and frontend patterns |
-| `rules/api-design.md` | `cursor/400-api-design.mdc` | API design patterns |
-| `rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
-| `rules/observability.md` | `cursor/500-observability.mdc` | Logging, metrics, health checks, tracing |
-| `rules/security.md` | `cursor/501-security.mdc` | Auth, CORS, rate limiting, secrets management |
-| `rules/cross-cutting.md` | `cursor/502-cross-cutting.mdc` | Error taxonomy, coverage targets, dependency policy |
-| `rules/concurrency.md` | `cursor/503-concurrency.mdc` | Concurrency patterns (goroutines, promises, asyncio) |
-| `rules/testing-patterns.md` | `cursor/504-testing.mdc` | Testing patterns (naming, table-driven, fixtures, CI) |
-| `rules/caching-patterns.md` | `cursor/505-caching.mdc` | Caching patterns (cache-aside, invalidation, key design) |
-| `rules/messaging-patterns.md` | `cursor/506-messaging.mdc` | Messaging patterns (queues, DLQ, idempotency, events) |
-| `rules/ai-assisted-development.md` | `cursor/507-ai-dev.mdc` | AI-assisted development patterns |
-| `rules/code-quality.md` | — | Code quality patterns (naming, structure, comments) |
-| `rules/infrastructure.md` | — | Infrastructure patterns (Docker, CI/CD, deployment) |
+| `spec/rules/go-patterns.md` | `cursor/100-golang.mdc` | Go coding + testing patterns |
+| `spec/rules/ts-patterns.md` | `cursor/101-typescript.mdc` | TypeScript coding + testing patterns |
+| `spec/rules/py-patterns.md` | `cursor/102-python.mdc` | Python coding + testing patterns |
+| `spec/rules/git-workflow.md` | `cursor/300-git.mdc` | Git conventions |
+| `spec/rules/react-patterns.md` | `cursor/103-react.mdc` | React component and frontend patterns |
+| `spec/rules/api-design.md` | `cursor/400-api-design.mdc` | API design patterns |
+| `spec/rules/database.md` | `cursor/401-database.mdc` | Database patterns, migrations, pooling |
+| `spec/rules/observability.md` | `cursor/500-observability.mdc` | Logging, metrics, health checks, tracing |
+| `spec/rules/security.md` | `cursor/501-security.mdc` | Auth, CORS, rate limiting, secrets management |
+| `spec/rules/cross-cutting.md` | `cursor/502-cross-cutting.mdc` | Error taxonomy, coverage targets, dependency policy |
+| `spec/rules/concurrency.md` | `cursor/503-concurrency.mdc` | Concurrency patterns (goroutines, promises, asyncio) |
+| `spec/rules/testing-patterns.md` | `cursor/504-testing.mdc` | Testing patterns (naming, table-driven, fixtures, CI) |
+| `spec/rules/caching-patterns.md` | `cursor/505-caching.mdc` | Caching patterns (cache-aside, invalidation, key design) |
+| `spec/rules/messaging-patterns.md` | `cursor/506-messaging.mdc` | Messaging patterns (queues, DLQ, idempotency, events) |
+| `spec/rules/ai-assisted-development.md` | `cursor/507-ai-dev.mdc` | AI-assisted development patterns |
+| `spec/rules/code-quality.md` | — | Code quality patterns (naming, structure, comments) |
+| `spec/rules/infrastructure.md` | — | Infrastructure patterns (Docker, CI/CD, deployment) |
 <!-- END:sync-pairs-table -->
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.

@@ -75,12 +75,12 @@ func TestDetectLanguage(t *testing.T) {
 
 func TestRuleToClaude(t *testing.T) {
 	dir := t.TempDir()
-	rulesDir := filepath.Join(dir, "rules")
+	rulesDir := filepath.Join(dir, "spec", "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "security.md"),
 		[]byte("---\nscope: universal\n---\n\n# Security\n\nBody.\n"), 0644)
 
-	got, err := ruleToClaude(dir, model.Rule{Name: "security", Path: "rules/security.md"})
+	got, err := ruleToClaude(dir, model.Rule{Name: "security", Path: "spec/rules/security.md"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestRuleToClaude(t *testing.T) {
 
 func TestRuleToCursor(t *testing.T) {
 	dir := t.TempDir()
-	rulesDir := filepath.Join(dir, "rules", "go")
+	rulesDir := filepath.Join(dir, "spec", "rules", "go")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "patterns.md"),
 		[]byte("---\nscope: language-specific\nlanguages: [go]\n---\n\n# Go Patterns\n"), 0644)
@@ -103,7 +103,7 @@ func TestRuleToCursor(t *testing.T) {
 		Name:        "go/patterns",
 		Description: "Go Patterns",
 		Languages:   []string{"go"},
-		Path:        "rules/go/patterns.md",
+		Path:        "spec/rules/go/patterns.md",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -118,7 +118,7 @@ func TestRuleToCursor(t *testing.T) {
 
 func TestAgentToCursor_Substitutions(t *testing.T) {
 	dir := t.TempDir()
-	agentsDir := filepath.Join(dir, "agents")
+	agentsDir := filepath.Join(dir, "spec", "agents")
 	os.MkdirAll(agentsDir, 0755)
 	os.WriteFile(filepath.Join(agentsDir, "coder.md"),
 		[]byte("---\nname: go-coder\ndescription: Go coder\n---\n\nUse `Edit` and `Bash` tools.\nCheck ~/.claude/config.\n"), 0644)
@@ -126,7 +126,7 @@ func TestAgentToCursor_Substitutions(t *testing.T) {
 	got, err := agentToCursor(dir, model.Agent{
 		Name:        "go-coder",
 		Description: "Go coder",
-		Path:        "agents/coder.md",
+		Path:        "spec/agents/coder.md",
 	})
 	if err != nil {
 		t.Fatal(err)

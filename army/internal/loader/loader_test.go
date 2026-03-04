@@ -25,7 +25,7 @@ func TestFindMDFiles(t *testing.T) {
 
 func TestLoadRules(t *testing.T) {
 	root := t.TempDir()
-	rulesDir := filepath.Join(root, "rules", "go")
+	rulesDir := filepath.Join(root, "spec", "rules", "go")
 	os.MkdirAll(rulesDir, 0755)
 
 	content := "---\nscope: language-specific\nlanguages: [go]\nuses_rules: [cross-cutting]\n---\n\n# Go Patterns\n"
@@ -59,7 +59,7 @@ func TestLoadRules(t *testing.T) {
 
 func TestLoadSkills(t *testing.T) {
 	root := t.TempDir()
-	skillsDir := filepath.Join(root, "skills")
+	skillsDir := filepath.Join(root, "spec", "skills")
 	os.MkdirAll(skillsDir, 0755)
 
 	content := "---\nname: api-designer\nscope: universal\nuses_rules: [api-design]\n---\n\n# API Designer\n"
@@ -84,7 +84,7 @@ func TestLoadSkills(t *testing.T) {
 
 func TestLoadAgents(t *testing.T) {
 	root := t.TempDir()
-	agentsDir := filepath.Join(root, "agents", "go")
+	agentsDir := filepath.Join(root, "spec", "agents", "go")
 	os.MkdirAll(agentsDir, 0755)
 
 	content := "---\nname: go-coder\ndescription: Go code writer\nrole: coder\nscope: language-specific\naccess: read-write\nlanguages: [go]\nuses_skills: [golang-pro]\nuses_rules: [go/patterns]\nuses_plugins: [context7]\ndelegates_to: []\n---\n\n# Go Coder\n"
