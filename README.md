@@ -74,11 +74,17 @@ Regenerate with `make manifest`.
 
 ## Bootstrap Output (`.build/`)
 
-`make bootstrap` generates platform-specific output in `.build/claude/`:
+### Claude Code
+
+`make bootstrap` and pick Claude Code, generates platform-specific output in `.build/claude/` (adjustable):
 
 - `CLAUDE.md` — orchestrator with agent definitions, safety constraints, and plugin references
 - `agents/`, `skills/`, `rules/` — resolved spec files ready for Claude Code consumption
 - `settings.json` — Claude Code settings from `spec/claude/settings.json`
+
+### Cursor
+
+> TODO
 
 ## File Format
 
