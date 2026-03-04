@@ -58,7 +58,7 @@ The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` 
 | `make new-agent` | Scaffold a new agent with interactive prompts |
 | `make bootstrap` | Generate model-specific rules, skills, and agents for Claude Code or Cursor (output in `.build/`) |
 
-## Manifest (`manifest.json`)
+## Manifest (`manifest.json`) - for now unused index file
 
 Auto-generated index of all rules, skills, and agents. Each entry lists:
 
