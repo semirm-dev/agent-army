@@ -78,7 +78,7 @@ Regenerate with `make manifest`.
 
 - `CLAUDE.md` — orchestrator with agent definitions, safety constraints, and plugin references
 - `agents/`, `skills/`, `rules/` — resolved spec files ready for Claude Code consumption
-- `settings.json` — Claude Code settings from `config.json`
+- `settings.json` — Claude Code settings from `settings.json`
 
 ## File Format
 
