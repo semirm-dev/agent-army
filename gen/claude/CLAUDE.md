@@ -23,18 +23,10 @@
   - **Infrastructure:** `docker-builder.md`, `docker-reviewer.md` (read-only), `docker-tester.md`
   - **Architecture:** `arch-reviewer.md` (read-only, dependency + cohesion analysis)
   - **Documentation:** `docs-writer.md` (standalone, READMEs, ADRs, API docs)
-  - **Quality:** `type-design-analyzer.md`, `silent-failure-hunter.md`, `comment-analyzer.md`, `pr-test-analyzer.md`
+  - **Quality:** `type-design-analyzer.md`, `comment-analyzer.md`, `pr-test-analyzer.md`
 <!-- END:agent-definitions -->
-- **Cursor Built-in Agents:** When running in Cursor, these additional `subagent_type` values are available and complement the custom agents above:
-  - `explore` -- Fast codebase exploration agent. Use for finding files, searching code, and answering structural questions about the codebase before coding.
-  - `generalPurpose` -- General-purpose agent for complex multi-step tasks requiring multiple tools and extended reasoning.
-  - `shell` -- Command execution specialist. Use for running build commands, git operations, and terminal tasks.
-  - `browser-use` -- Web testing and automation agent. Use for navigating web pages, testing UI changes, filling forms, and taking screenshots.
-  - `code-reviewer` -- Cross-language code review against project guidelines and style. Use after writing or modifying code, especially before commits or PRs.
-  - `code-simplifier` -- Simplifies recently modified code for clarity and maintainability while preserving functionality. Use after completing a coding task.
-  - `docs-researcher` -- Lightweight agent for fetching library documentation without cluttering main conversation context. Use when looking up unfamiliar APIs.
 - **Subagent Launch Tips:**
-  - Use `readonly: true` when launching reviewer agents (`*-reviewer`, `arch-reviewer`, `type-design-analyzer`, `silent-failure-hunter`, `comment-analyzer`, `pr-test-analyzer`) to enforce read-only access at the tool level.
+  - Use `readonly: true` when launching reviewer agents (`*-reviewer`, `arch-reviewer`, `type-design-analyzer`, `comment-analyzer`, `pr-test-analyzer`) to enforce read-only access at the tool level.
   - Use `model: "fast"` for quick, scoped tasks (reviewers analyzing a few files, simple test generation, codebase exploration). Use the default model for complex coding tasks requiring deep reasoning.
 - **Plugins vs Skills:** Plugins (e.g., `context7-plugin`, `frontend-design`, `code-review`, `superpowers`) are installed via `claude plugin install` from their respective marketplaces and enabled via `enabledPlugins` in settings.json. Plugin config (names, marketplaces, sources) lives in `config.json` under the `plugins` array. npm skills (e.g., `golang-pro`, `database-schema-designer`) are installed via `npx skills add`. Custom skills (below) are markdown files in `~/.claude/skills/` that define structured workflows. Both are invoked via the Skill tool, but plugins receive automatic updates while custom skills are version-controlled in this repo.
 - **Custom Skills:** Located in `~/.claude/skills/`. Use these when the task matches:
@@ -48,6 +40,15 @@
   - `testing-strategy` -- Invoke when planning test coverage, choosing test types, or diagnosing flaky tests.
   - `cli-design` -- Invoke when building CLI tools, admin scripts, or migration runners.
   - `refactoring-patterns` -- Invoke when extracting methods, renaming, moving code, or addressing code smells.
+  - `concurrency-design` -- Invoke when implementing concurrent or parallel code patterns.
+  - `caching-strategy` -- Invoke when designing cache layers, selecting TTL strategies, or preventing stampedes.
+  - `containerization` -- Invoke when writing Dockerfiles, Docker Compose configs, or CI/CD pipelines.
+  - `observability-setup` -- Invoke when setting up monitoring, logging, metrics, or tracing.
+  - `security-hardening` -- Invoke when selecting auth flows, hardening input validation, or managing secrets.
+  - `performance-audit` -- Invoke when profiling, analyzing query plans, or auditing bundle size.
+  - `data-modeling` -- Invoke when designing schemas, choosing SQL vs NoSQL, or planning migrations.
+  - `messaging-patterns` -- Invoke when designing message queues, DLQs, idempotency, or event schemas.
+  - `database-schema-designer` -- Invoke when implementing physical schemas, column types, constraints, or partitioning.
   - _(Add languages: create `<lang>-coder.md`, `<lang>-reviewer.md`, `<lang>-tester.md`)_
 <!-- END:custom-skills -->
 - **Plugins (superpowers):** The `superpowers` plugin provides structured workflows. Use these when applicable:
@@ -152,6 +153,8 @@ Detailed patterns are loaded on-demand from `~/.claude/rules/`:
 | `rules/caching-patterns.md` | `cursor/505-caching.mdc` | Caching patterns (cache-aside, invalidation, key design) |
 | `rules/messaging-patterns.md` | `cursor/506-messaging.mdc` | Messaging patterns (queues, DLQ, idempotency, events) |
 | `rules/ai-assisted-development.md` | `cursor/507-ai-dev.mdc` | AI-assisted development patterns |
+| `rules/code-quality.md` | — | Code quality patterns (naming, structure, comments) |
+| `rules/infrastructure.md` | — | Infrastructure patterns (Docker, CI/CD, deployment) |
 <!-- END:sync-pairs-table -->
 
 Agents load their relevant pattern file at activation. The orchestrator loads only this core file.
