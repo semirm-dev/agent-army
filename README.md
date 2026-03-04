@@ -3,6 +3,7 @@
 A modular library of coding standards, workflows, and agent prompts for AI-assisted development. Includes a Go CLI (`army`) to manage specs, resolve dependencies, and generate platform-specific output for Claude Code or Cursor.
 
 > NOTE: It is heavy on context if you dump all the manifests into user's space, will improve it later.
+> NOTE: Caution!! Always backup your current setup because `bootstrap` will always do remove-all-existing -> generate new.
 
 ## What's Inside
 
