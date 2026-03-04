@@ -140,7 +140,7 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 	}
 
 	isClaude := target == "Claude Code"
-	written, err := generateAll(root, dest, ruleObjs, skillObjs, agentObjs, skills, agents, ruleLookup, isClaude)
+	written, cursorRuleNames, err := generateAll(root, dest, ruleObjs, skillObjs, agentObjs, skills, agents, ruleLookup, isClaude)
 	if err != nil {
 		return err
 	}
@@ -178,6 +178,32 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 				return fmt.Errorf("generate settings.json: %w", err)
 			}
 			fmt.Fprintln(w, "settings.json generated.")
+		}
+	}
+
+	// AGENTS.md generation (Cursor only)
+	if !isClaude {
+		genMD, err := p.Prompt("Generate AGENTS.md? [y/N] ")
+		if err != nil {
+			return err
+		}
+		if strings.TrimSpace(strings.ToLower(genMD)) == "y" {
+			agentsMDPath := filepath.Join(dest, "AGENTS.md")
+			if _, statErr := os.Stat(agentsMDPath); statErr == nil {
+				overwrite, err := p.Prompt("AGENTS.md exists. Overwrite? [y/N] ")
+				if err != nil {
+					return err
+				}
+				if strings.TrimSpace(strings.ToLower(overwrite)) != "y" {
+					fmt.Fprintln(w, "Skipped AGENTS.md generation.")
+					return nil
+				}
+			}
+			templatePath := filepath.Join(root, "spec", "cursor", "AGENTS.md")
+			if err := generateAgentsMD(dest, templatePath, agentObjs, skillObjs, ruleObjs, cursorRuleNames); err != nil {
+				return fmt.Errorf("generate AGENTS.md: %w", err)
+			}
+			fmt.Fprintln(w, "AGENTS.md generated.")
 		}
 	}
 
@@ -373,7 +399,7 @@ func generateAll(
 	allAgents []model.Agent,
 	ruleLookup map[string][]string,
 	isClaude bool,
-) (int, error) {
+) (int, map[string]string, error) {
 	written := 0
 
 	// Build lookup maps for dependency resolution
@@ -406,11 +432,11 @@ func generateAll(
 			for _, r := range rules {
 				content, err := ruleToClaude(root, r)
 				if err != nil {
-					return written, err
+					return written, cursorRuleNames, err
 				}
 				rel := filepath.Join("rules", flattenName(r.Name)+".md")
 				if err := writeOutput(dest, rel, content); err != nil {
-					return written, err
+					return written, cursorRuleNames, err
 				}
 				written++
 			}
@@ -419,12 +445,12 @@ func generateAll(
 			for i, r := range rules {
 				content, err := ruleToCursor(root, r)
 				if err != nil {
-					return written, err
+					return written, cursorRuleNames, err
 				}
 				rel := filepath.Join("rules", fmt.Sprintf("%d-%s.mdc", assignments[i].Number, assignments[i].ShortName))
 				rel = resolveCollision(dest, rel)
 				if err := writeOutput(dest, rel, content); err != nil {
-					return written, err
+					return written, cursorRuleNames, err
 				}
 				written++
 			}
@@ -442,11 +468,11 @@ func generateAll(
 			content, err = skillToCursor(root, s)
 		}
 		if err != nil {
-			return written, err
+			return written, cursorRuleNames, err
 		}
 		rel := filepath.Join("skills", flat, "SKILL.md")
 		if err := writeOutput(dest, rel, content); err != nil {
-			return written, err
+			return written, cursorRuleNames, err
 		}
 		written++
 	}
@@ -463,16 +489,16 @@ func generateAll(
 			content, err = agentToCursor(root, a, deps, cursorRuleNames)
 		}
 		if err != nil {
-			return written, err
+			return written, cursorRuleNames, err
 		}
 		rel := filepath.Join("agents", flat+".md")
 		if err := writeOutput(dest, rel, content); err != nil {
-			return written, err
+			return written, cursorRuleNames, err
 		}
 		written++
 	}
 
-	return written, nil
+	return written, cursorRuleNames, nil
 }
 
 func names[T any](items []T, key func(T) string) []string {

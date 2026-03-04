@@ -222,15 +222,22 @@ func TestSkillToCursor(t *testing.T) {
 		[]byte("---\nname: test\n---\n\n# Test\n\nUse `Edit` and `Bash` at ~/.claude/path.\n"), 0644)
 
 	got, err := skillToCursor(dir, model.Skill{
-		Name: "test",
-		Path: "spec/skills/test.md",
+		Name:    "test",
+		Summary: "A test skill for testing",
+		Path:    "spec/skills/test.md",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if strings.Contains(got, "---") {
-		t.Error("Cursor skill should not contain frontmatter")
+	if !strings.Contains(got, "---") {
+		t.Error("Cursor skill should contain frontmatter")
+	}
+	if !strings.Contains(got, "name: test") {
+		t.Error("Cursor skill frontmatter should contain name")
+	}
+	if !strings.Contains(got, "description: A test skill for testing") {
+		t.Error("Cursor skill frontmatter should contain description")
 	}
 	if strings.Contains(got, "`Edit`") {
 		t.Error("Edit should be replaced with StrReplace")

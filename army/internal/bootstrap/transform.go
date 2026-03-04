@@ -109,6 +109,10 @@ func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, curs
 	} else {
 		lines = append(lines, fmt.Sprintf("description: %s", agent.Description))
 	}
+	lines = append(lines, "model: inherit")
+	if agent.Access == "read-only" {
+		lines = append(lines, "readonly: true")
+	}
 	lines = append(lines, "---")
 
 	body = editRe.ReplaceAllString(body, "`StrReplace`")
@@ -132,7 +136,19 @@ func skillToCursor(root string, skill model.Skill) (string, error) {
 	body = bashRe.ReplaceAllString(body, "`Shell`")
 	body = strings.ReplaceAll(body, "~/.claude/", "~/.cursor/")
 
-	return body, nil
+	flat := flattenName(skill.Name)
+	desc := skillDescription(skill)
+
+	lines := []string{"---"}
+	lines = append(lines, fmt.Sprintf("name: %s", flat))
+	if strings.Contains(desc, ":") {
+		lines = append(lines, fmt.Sprintf("description: %q", desc))
+	} else {
+		lines = append(lines, fmt.Sprintf("description: %s", desc))
+	}
+	lines = append(lines, "---")
+
+	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
 func extractBody(filePath string) (string, error) {
