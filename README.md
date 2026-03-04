@@ -2,6 +2,8 @@
 
 A modular library of coding standards, workflows, and agent prompts for AI-assisted development. Includes a Go CLI (`army`) to manage specs, resolve dependencies, and generate platform-specific output for Claude Code or Cursor.
 
+> NOTE: It is heavy on context if you dump all the manifests into user's space, will improve it later.
+
 ## What's Inside
 
 ### Rules (`spec/rules/`)
@@ -75,6 +77,7 @@ Regenerate with `make manifest`.
 ## Bootstrap Output (`.build/`)
 
 ### Claude Code
+> Testing in progress...
 
 `make bootstrap` and pick Claude Code, generates platform-specific output in `.build/claude/` (adjustable):
 
@@ -83,8 +86,12 @@ Regenerate with `make manifest`.
 - `settings.json` — Claude Code settings from `spec/claude/settings.json`
 
 ### Cursor
+> Testing in progress...
 
-> TODO
+`make bootstrap` and pick Cursor, generates platform-specific output in `.build/cursor/` (adjustable):
+
+- `AGENTS.md` — orchestrator with agent definitions, safety constraints, and plugin references
+- `agents/`, `skills/`, `rules/` — resolved spec files ready for Cursor consumption
 
 ## File Format
 
