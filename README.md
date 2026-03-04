@@ -142,3 +142,8 @@ uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
 ```
+
+
+## TODO
+- [ ] Add support for Gemini CLI
+- [ ] Add support for Antigravity
