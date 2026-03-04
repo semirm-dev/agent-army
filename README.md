@@ -1,6 +1,6 @@
 # Agent Army
 
-A modular library of coding standards, workflows, and agent prompts for AI-assisted development.
+A modular library of coding standards, workflows, and agent prompts for AI-assisted development. Includes a Go CLI (`army`) to manage specs, resolve dependencies, and generate platform-specific output for Claude Code or Cursor.
 
 ## What's Inside
 
@@ -39,6 +39,25 @@ Agents      → specialized roles that invoke skills and follow rules  (the "who
   go/patterns                    react/tester                python/tester
 ```
 
+## CLI (`army`)
+
+The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` targets or directly as `army/army <command>`.
+
+## Make Commands
+
+| Target | Description |
+|--------|-------------|
+| `make help` | Show all available targets |
+| `make build` | Build the Go CLI binary |
+| `make test` | Run Go tests with race detection |
+| `make manifest` | Scan `spec/` frontmatter and regenerate `manifest.json`. Resolves `uses_rules` and `delegates_to` transitively, including rules inherited from skills |
+| `make edit-deps` | Interactively add or remove dependency entries (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) on any spec file. Rewrites YAML frontmatter in-place, then auto-regenerates the manifest |
+| `make resolve-deps` | Validate all dependency references across `spec/`. Detect and remove redundant `uses_rules` and `delegates_to` entries covered by transitive dependencies |
+| `make new-rule` | Scaffold a new rule with interactive prompts |
+| `make new-skill` | Scaffold a new skill with interactive prompts |
+| `make new-agent` | Scaffold a new agent with interactive prompts |
+| `make bootstrap` | Generate model-specific rules, skills, and agents for Claude Code or Cursor (output in `.build/`) |
+
 ## Manifest (`manifest.json`)
 
 Auto-generated index of all rules, skills, and agents. Each entry lists:
@@ -53,9 +72,13 @@ Agent entries additionally include: **role**, **access**, **uses_skills**, **use
 
 Regenerate with `make manifest`.
 
-## Make Commands
+## Bootstrap Output (`.build/`)
 
-Run `make help` to see all available targets.
+`make bootstrap` generates platform-specific output in `.build/claude/`:
+
+- `CLAUDE.md` — orchestrator with agent definitions, safety constraints, and plugin references
+- `agents/`, `skills/`, `rules/` — resolved spec files ready for Claude Code consumption
+- `settings.json` — Claude Code settings from `config.json`
 
 ## File Format
 
@@ -104,3 +127,4 @@ uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
+```
