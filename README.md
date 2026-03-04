@@ -57,50 +57,6 @@ Regenerate with `make manifest`.
 
 Run `make help` to see all available targets.
 
-## Development
-
-### Prerequisites
-
-- Python 3.14+
-
-### Setup
-
-```bash
-make setup
-```
-
-<details>
-<summary>Manual setup (if make is unavailable)</summary>
-
-```bash
-cd src
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-```
-
-**Note:** Editable installs require pip 21.3+ (for PEP 660). If you see "editable mode currently requires a setuptools-based build", run `pip install --upgrade pip` first.
-</details>
-
-### Running Tests
-
-```bash
-make test
-# or directly:
-cd src && .venv/bin/pytest tests/ -v
-```
-
-### CLI Usage
-
-The `make` targets call into the Python package. You can also invoke the CLI directly:
-
-```bash
-python -m agent_army manifest   # regenerate manifest.json
-python -m agent_army resolve    # validate refs + fix redundancies
-python -m agent_army edit       # interactive dependency editor
-python -m agent_army bootstrap  # generate rules/skills/agents for Claude Code or Cursor
-```
-
 ## File Format
 
 ### Rule

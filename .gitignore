@@ -11,3 +11,4 @@ __pycache__/
 src/.pytest_cache/
 src/.ruff_cache/
 .build/
+army/army
