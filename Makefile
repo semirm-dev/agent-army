@@ -1,7 +1,6 @@
-.PHONY: help setup manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test
+.PHONY: help build manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test
 
-PYTHON := src/.venv/bin/python3
-SYSTEM_PYTHON := $(shell command -v python3.14 || echo python3)
+ARMY := army/army
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -25,37 +24,35 @@ help: ## Show available targets
 	@echo ""
 	@echo "  bootstrap      Generate model-specific rules, skills, and agents for Claude Code or Cursor."
 	@echo ""
-	@echo "  test           Run the Python test suite."
+	@echo "  test           Run the Go test suite."
 	@echo ""
-	@echo "  setup          Create venv and install the package (runs automatically when needed)."
+	@echo "  build          Build the Go CLI binary."
 
-setup: $(PYTHON) ## Create venv and install the package
-	src/.venv/bin/pip install -e "src[dev]"
+$(ARMY): $(shell find army -name '*.go')
+	cd army && go build -o army ./cmd/army
 
-$(PYTHON):
-	$(SYSTEM_PYTHON) -m venv src/.venv
-	src/.venv/bin/pip install --upgrade pip
+build: $(ARMY) ## Build the Go CLI binary
 
-manifest: | $(PYTHON) ## Generate manifest
-	$(PYTHON) -m agent_army manifest
+manifest: | $(ARMY) ## Generate manifest
+	$(ARMY) manifest
 
-edit-deps: | $(PYTHON) ## Add or remove dependency entries interactively
-	$(PYTHON) -m agent_army edit
+edit-deps: | $(ARMY) ## Add or remove dependency entries interactively
+	$(ARMY) edit
 
-resolve-deps: | $(PYTHON) ## Validate all dependency references and remove redundancies
-	$(PYTHON) -m agent_army resolve
+resolve-deps: | $(ARMY) ## Validate all dependency references and remove redundancies
+	$(ARMY) resolve
 
-new-rule: | $(PYTHON) ## Scaffold a new rule
-	$(PYTHON) -m agent_army new rule
+new-rule: | $(ARMY) ## Scaffold a new rule
+	$(ARMY) new rule
 
-new-skill: | $(PYTHON) ## Scaffold a new skill
-	$(PYTHON) -m agent_army new skill
+new-skill: | $(ARMY) ## Scaffold a new skill
+	$(ARMY) new skill
 
-new-agent: | $(PYTHON) ## Scaffold a new agent
-	$(PYTHON) -m agent_army new agent
+new-agent: | $(ARMY) ## Scaffold a new agent
+	$(ARMY) new agent
 
-bootstrap: | $(PYTHON) ## Generate model-specific rules, skills, and agents
-	$(PYTHON) -m agent_army bootstrap
+bootstrap: | $(ARMY) ## Generate model-specific rules, skills, and agents
+	$(ARMY) bootstrap
 
-test: | $(PYTHON) ## Run tests
-	cd src && .venv/bin/pytest tests/ -v
+test: ## Run Go tests with race detection
+	cd army && go test ./... -race -count=1
