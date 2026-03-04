@@ -402,6 +402,17 @@ func generateAll(
 ) (int, map[string]string, error) {
 	written := 0
 
+	// Clean stale output from previous runs to prevent duplicate files
+	// (e.g., resolveCollision creating _2 variants when target already exists).
+	for _, subdir := range []string{"rules", "skills", "agents"} {
+		target := filepath.Join(dest, subdir)
+		if _, err := os.Stat(target); err == nil {
+			if err := os.RemoveAll(target); err != nil {
+				return 0, nil, fmt.Errorf("clean %s: %w", subdir, err)
+			}
+		}
+	}
+
 	// Build lookup maps for dependency resolution
 	skillMap := make(map[string]model.Skill, len(allSkills))
 	for _, s := range allSkills {
