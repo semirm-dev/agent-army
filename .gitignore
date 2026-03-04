@@ -4,11 +4,7 @@
 *~
 
 # Python
-src/.venv/
-src/*.egg-info/
 __pycache__/
 *.pyc
-src/.pytest_cache/
-src/.ruff_cache/
 .build/
 army/army
