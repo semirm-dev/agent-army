@@ -10,7 +10,7 @@ import (
 var fieldLocation = map[string]string{
 	"uses_rules":   "spec/rules/",
 	"uses_skills":  "spec/skills/",
-	"uses_plugins": "config.json public_plugins",
+	"uses_plugins": "spec/claude/settings.json external_plugins",
 	"delegates_to": "spec/agents/",
 }
 

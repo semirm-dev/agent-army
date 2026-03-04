@@ -140,12 +140,47 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 	}
 
 	isClaude := target == "Claude Code"
-	written, err := generateAll(root, dest, ruleObjs, skillObjs, agentObjs, isClaude)
+	written, err := generateAll(root, dest, ruleObjs, skillObjs, agentObjs, skills, agents, ruleLookup, isClaude)
 	if err != nil {
 		return err
 	}
 
 	fmt.Fprintf(w, "\nDone. %d files written to %s\n", written, dest)
+
+	// CLAUDE.md generation (Claude Code only)
+	if isClaude {
+		genMD, err := p.Prompt("Generate CLAUDE.md? [y/N] ")
+		if err != nil {
+			return err
+		}
+		if strings.TrimSpace(strings.ToLower(genMD)) == "y" {
+			claudeMDPath := filepath.Join(dest, "CLAUDE.md")
+			if _, statErr := os.Stat(claudeMDPath); statErr == nil {
+				overwrite, err := p.Prompt("CLAUDE.md exists. Overwrite? [y/N] ")
+				if err != nil {
+					return err
+				}
+				if strings.TrimSpace(strings.ToLower(overwrite)) != "y" {
+					fmt.Fprintln(w, "Skipped CLAUDE.md generation.")
+					return nil
+				}
+			}
+			plugins, _ := loader.LoadPlugins(root)
+			templatePath := filepath.Join(root, "spec", "claude", "CLAUDE.md")
+			if err := generateClaudeMD(dest, templatePath, agentObjs, skillObjs, ruleObjs, plugins); err != nil {
+				return fmt.Errorf("generate CLAUDE.md: %w", err)
+			}
+			fmt.Fprintln(w, "CLAUDE.md generated.")
+
+			// Generate settings.json with enabledPlugins synced from external_plugins
+			settingsTemplatePath := filepath.Join(root, "spec", "claude", "settings.json")
+			if err := generateSettings(dest, settingsTemplatePath, plugins); err != nil {
+				return fmt.Errorf("generate settings.json: %w", err)
+			}
+			fmt.Fprintln(w, "settings.json generated.")
+		}
+	}
+
 	return nil
 }
 
@@ -329,9 +364,43 @@ func selectAdditionalEntities(p tui.Prompter, w io.Writer, entityType string, au
 	}
 }
 
-func generateAll(root, dest string, rules []model.Rule, skills []model.Skill, agents []model.Agent, isClaude bool) (int, error) {
+func generateAll(
+	root, dest string,
+	rules []model.Rule,
+	skills []model.Skill,
+	agents []model.Agent,
+	allSkills []model.Skill,
+	allAgents []model.Agent,
+	ruleLookup map[string][]string,
+	isClaude bool,
+) (int, error) {
 	written := 0
 
+	// Build lookup maps for dependency resolution
+	skillMap := make(map[string]model.Skill, len(allSkills))
+	for _, s := range allSkills {
+		skillMap[s.Name] = s
+	}
+	ruleMap := make(map[string]model.Rule, len(rules))
+	for _, r := range rules {
+		ruleMap[r.Name] = r
+	}
+	agentMap := make(map[string]model.Agent, len(allAgents))
+	for _, a := range allAgents {
+		agentMap[a.Name] = a
+	}
+
+	// Pre-compute Cursor rule name mapping for enrichment
+	var cursorRuleNames map[string]string
+	if !isClaude && len(rules) > 0 {
+		assignments := assignCursorNumbers(rules)
+		cursorRuleNames = make(map[string]string, len(rules))
+		for i, r := range rules {
+			cursorRuleNames[r.Name] = fmt.Sprintf("%d-%s.mdc", assignments[i].Number, assignments[i].ShortName)
+		}
+	}
+
+	// Generate rules
 	if len(rules) > 0 {
 		if isClaude {
 			for _, r := range rules {
@@ -362,9 +431,16 @@ func generateAll(root, dest string, rules []model.Rule, skills []model.Skill, ag
 		}
 	}
 
+	// Generate skills
 	for _, s := range skills {
 		flat := flattenName(s.Name)
-		content, err := readFileContent(root, s.Path)
+		var content string
+		var err error
+		if isClaude {
+			content, err = skillToClaude(root, s)
+		} else {
+			content, err = skillToCursor(root, s)
+		}
 		if err != nil {
 			return written, err
 		}
@@ -375,14 +451,16 @@ func generateAll(root, dest string, rules []model.Rule, skills []model.Skill, ag
 		written++
 	}
 
+	// Generate agents with enriched bodies
 	for _, a := range agents {
 		flat := flattenName(a.Name)
+		deps := buildResolvedDeps(a, skillMap, ruleMap, agentMap, ruleLookup)
 		var content string
 		var err error
 		if isClaude {
-			content, err = agentToClaude(root, a)
+			content, err = agentToClaude(root, a, deps)
 		} else {
-			content, err = agentToCursor(root, a)
+			content, err = agentToCursor(root, a, deps, cursorRuleNames)
 		}
 		if err != nil {
 			return written, err

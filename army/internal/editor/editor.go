@@ -214,7 +214,7 @@ func loadValidValues(field, root string) []string {
 		return names
 	case "uses_plugins":
 		plugins, _ := loader.LoadPlugins(root)
-		return plugins
+		return model.PluginNames(plugins)
 	case "delegates_to":
 		agents, _ := loader.LoadAgents(root)
 		names := make([]string, len(agents))

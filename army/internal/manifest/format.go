@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -8,8 +9,9 @@ import (
 
 // OrderedMap preserves section order in the manifest.
 type OrderedMap struct {
-	Keys     []string
-	Sections map[string][]Entry
+	Keys        []string
+	Sections    map[string][]Entry
+	RawSections map[string]json.RawMessage // pass-through JSON sections (e.g., external_plugins)
 }
 
 // Entry preserves field order within a manifest entry.
@@ -71,13 +73,22 @@ func formatManifestJSON(m OrderedMap) string {
 	lines = append(lines, "{")
 
 	for secIdx, section := range m.Keys {
-		entries := m.Sections[section]
 		isLast := secIdx == len(m.Keys)-1
 		suffix := ""
 		if !isLast {
 			suffix = ","
 		}
 
+		// Check if this is a raw pass-through section
+		if raw, ok := m.RawSections[section]; ok {
+			var indented bytes.Buffer
+			if err := json.Indent(&indented, raw, "  ", "  "); err == nil {
+				lines = append(lines, fmt.Sprintf("  %q: %s%s", section, indented.String(), suffix))
+			}
+			continue
+		}
+
+		entries := m.Sections[section]
 		lines = append(lines, fmt.Sprintf("  %q: [", section))
 		for i, entry := range entries {
 			comma := ""

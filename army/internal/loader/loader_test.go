@@ -3,6 +3,7 @@ package loader
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -111,12 +112,47 @@ func TestLoadAgents(t *testing.T) {
 	if a.Access != "read-write" {
 		t.Errorf("access = %q", a.Access)
 	}
+	// Domain defaults to empty when not in frontmatter
+	if a.Domain != "" {
+		t.Errorf("domain = %q, want empty (not set in frontmatter)", a.Domain)
+	}
+}
+
+func TestLoadAgents_WithDomain(t *testing.T) {
+	root := t.TempDir()
+	agentsDir := filepath.Join(root, "spec", "agents")
+	os.MkdirAll(agentsDir, 0755)
+
+	content := "---\nname: deploy-agent\ndescription: Deployment automation\nrole: builder\ndomain: DevOps\naccess: read-write\n---\n\n# Deploy Agent\n"
+	os.WriteFile(filepath.Join(agentsDir, "deploy-agent.md"), []byte(content), 0644)
+
+	agents, err := LoadAgents(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(agents) != 1 {
+		t.Fatalf("got %d agents, want 1", len(agents))
+	}
+	if agents[0].Domain != "DevOps" {
+		t.Errorf("domain = %q, want %q", agents[0].Domain, "DevOps")
+	}
 }
 
 func TestLoadPlugins(t *testing.T) {
 	root := t.TempDir()
-	config := `{"public_plugins": [{"name": "context7"}, {"name": "superpowers"}]}`
-	os.WriteFile(filepath.Join(root, "config.json"), []byte(config), 0644)
+	claudeDir := filepath.Join(root, "spec", "claude")
+	os.MkdirAll(claudeDir, 0755)
+	config := `{
+		"permissions": {"defaultMode": "plan"},
+		"external_plugins": [
+			{"name": "context7", "marketplace": "claude-plugins-official", "description": "Docs lookup"},
+			{"name": "superpowers", "marketplace": "claude-plugins-official", "description": "Dev workflows", "workflows": [
+				{"name": "brainstorming", "description": "Before creative work."},
+				{"name": "debugging", "description": "When encountering bugs."}
+			]}
+		]
+	}`
+	os.WriteFile(filepath.Join(claudeDir, "settings.json"), []byte(config), 0644)
 
 	plugins, err := LoadPlugins(root)
 	if err != nil {
@@ -125,8 +161,26 @@ func TestLoadPlugins(t *testing.T) {
 	if len(plugins) != 2 {
 		t.Fatalf("got %d plugins, want 2", len(plugins))
 	}
-	if plugins[0] != "context7" || plugins[1] != "superpowers" {
-		t.Errorf("plugins = %v", plugins)
+	if plugins[0].Name != "context7" || plugins[1].Name != "superpowers" {
+		t.Errorf("plugin names = %v, %v", plugins[0].Name, plugins[1].Name)
+	}
+	if plugins[0].Description != "Docs lookup" {
+		t.Errorf("plugin[0].Description = %q, want %q", plugins[0].Description, "Docs lookup")
+	}
+	if plugins[0].Marketplace != "claude-plugins-official" {
+		t.Errorf("plugin[0].Marketplace = %q, want %q", plugins[0].Marketplace, "claude-plugins-official")
+	}
+	if len(plugins[0].Workflows) != 0 {
+		t.Errorf("context7 should have no workflows, got %d", len(plugins[0].Workflows))
+	}
+	if len(plugins[1].Workflows) != 2 {
+		t.Fatalf("superpowers should have 2 workflows, got %d", len(plugins[1].Workflows))
+	}
+	if plugins[1].Workflows[0].Name != "brainstorming" {
+		t.Errorf("workflow[0].Name = %q, want brainstorming", plugins[1].Workflows[0].Name)
+	}
+	if plugins[1].Workflows[1].Description != "When encountering bugs." {
+		t.Errorf("workflow[1].Description = %q", plugins[1].Workflows[1].Description)
 	}
 }
 
@@ -138,6 +192,39 @@ func TestLoadPlugins_NoFile(t *testing.T) {
 	}
 	if plugins != nil {
 		t.Errorf("got %v, want nil", plugins)
+	}
+}
+
+func TestLoadPluginsConfig(t *testing.T) {
+	root := t.TempDir()
+	claudeDir := filepath.Join(root, "spec", "claude")
+	os.MkdirAll(claudeDir, 0755)
+	config := `{"permissions": {"defaultMode": "plan"}, "external_plugins": [{"name": "context7"}], "external_skills": [{"name": "skill-creator"}]}`
+	os.WriteFile(filepath.Join(claudeDir, "settings.json"), []byte(config), 0644)
+
+	raw, err := LoadPluginsConfig(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if raw == nil {
+		t.Fatal("expected non-nil raw config")
+	}
+	if !strings.Contains(string(raw), "context7") {
+		t.Error("raw config should contain plugin data")
+	}
+	if strings.Contains(string(raw), "permissions") {
+		t.Error("raw config should not contain settings fields like permissions")
+	}
+}
+
+func TestLoadPluginsConfig_NoFile(t *testing.T) {
+	root := t.TempDir()
+	raw, err := LoadPluginsConfig(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if raw != nil {
+		t.Errorf("got %v, want nil", raw)
 	}
 }
 

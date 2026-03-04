@@ -61,11 +61,13 @@ func ruleToCursor(root string, rule model.Rule) (string, error) {
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
-func agentToClaude(root string, agent model.Agent) (string, error) {
+func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
 	if err != nil {
 		return "", err
 	}
+
+	body = enrichAgentBody(body, deps, true, nil)
 
 	flat := flattenName(agent.Name)
 	tools := claudeToolsRW
@@ -90,11 +92,13 @@ func agentToClaude(root string, agent model.Agent) (string, error) {
 var editRe = regexp.MustCompile("`Edit`")
 var bashRe = regexp.MustCompile("`Bash`")
 
-func agentToCursor(root string, agent model.Agent) (string, error) {
+func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, cursorRuleNames map[string]string) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
 	if err != nil {
 		return "", err
 	}
+
+	body = enrichAgentBody(body, deps, false, cursorRuleNames)
 
 	flat := flattenName(agent.Name)
 
@@ -112,6 +116,23 @@ func agentToCursor(root string, agent model.Agent) (string, error) {
 	body = strings.ReplaceAll(body, "~/.claude/", "~/.cursor/")
 
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+func skillToClaude(root string, skill model.Skill) (string, error) {
+	return extractBody(filepath.Join(root, skill.Path))
+}
+
+func skillToCursor(root string, skill model.Skill) (string, error) {
+	body, err := extractBody(filepath.Join(root, skill.Path))
+	if err != nil {
+		return "", err
+	}
+
+	body = editRe.ReplaceAllString(body, "`StrReplace`")
+	body = bashRe.ReplaceAllString(body, "`Shell`")
+	body = strings.ReplaceAll(body, "~/.claude/", "~/.cursor/")
+
+	return body, nil
 }
 
 func extractBody(filePath string) (string, error) {

@@ -55,6 +55,7 @@ func LoadRules(root string) ([]model.Rule, error) {
 		rules = append(rules, model.Rule{
 			Name:        name,
 			Description: frontmatter.ExtractH1(string(content)),
+			Summary:     fm.StringVal("description", ""),
 			Scope:       fm.StringVal("scope", "universal"),
 			Languages:   ensureList(fm, "languages"),
 			UsesRules:   ensureList(fm, "uses_rules"),
@@ -89,6 +90,7 @@ func LoadSkills(root string) ([]model.Skill, error) {
 		skills = append(skills, model.Skill{
 			Name:        name,
 			Description: frontmatter.ExtractH1(string(content)),
+			Summary:     fm.StringVal("description", ""),
 			Scope:       fm.StringVal("scope", "universal"),
 			Languages:   ensureList(fm, "languages"),
 			UsesRules:   ensureList(fm, "uses_rules"),
@@ -124,6 +126,7 @@ func LoadAgents(root string) ([]model.Agent, error) {
 			Name:        name,
 			Description: fm.StringVal("description", ""),
 			Role:        fm.StringVal("role", ""),
+			Domain:      fm.StringVal("domain", ""),
 			Scope:       fm.StringVal("scope", "universal"),
 			Access:      fm.StringVal("access", "read-write"),
 			Languages:   ensureList(fm, "languages"),
@@ -137,10 +140,10 @@ func LoadAgents(root string) ([]model.Agent, error) {
 	return agents, nil
 }
 
-// LoadPlugins loads plugin names from root/config.json -> public_plugins[].name.
-func LoadPlugins(root string) ([]string, error) {
-	configPath := filepath.Join(root, "config.json")
-	data, err := os.ReadFile(configPath)
+// LoadPlugins loads plugins from root/spec/claude/settings.json -> external_plugins[].
+func LoadPlugins(root string) ([]model.Plugin, error) {
+	pluginsPath := filepath.Join(root, "spec", "claude", "settings.json")
+	data, err := os.ReadFile(pluginsPath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -149,21 +152,75 @@ func LoadPlugins(root string) ([]string, error) {
 	}
 
 	var config struct {
-		PublicPlugins []struct {
-			Name string `json:"name"`
-		} `json:"public_plugins"`
+		ExternalPlugins []struct {
+			Name        string `json:"name"`
+			Description string `json:"description"`
+			Marketplace string `json:"marketplace"`
+			Workflows   []struct {
+				Name        string `json:"name"`
+				Description string `json:"description"`
+			} `json:"workflows"`
+		} `json:"external_plugins"`
 	}
 	if err := json.Unmarshal(data, &config); err != nil {
 		return nil, nil
 	}
 
-	var names []string
-	for _, p := range config.PublicPlugins {
+	var plugins []model.Plugin
+	for _, p := range config.ExternalPlugins {
 		if p.Name != "" {
-			names = append(names, p.Name)
+			plugin := model.Plugin{
+				Name:        p.Name,
+				Description: p.Description,
+				Marketplace: p.Marketplace,
+			}
+			for _, w := range p.Workflows {
+				if w.Name != "" {
+					plugin.Workflows = append(plugin.Workflows, model.Workflow{
+						Name:        w.Name,
+						Description: w.Description,
+					})
+				}
+			}
+			plugins = append(plugins, plugin)
 		}
 	}
-	return names, nil
+	return plugins, nil
+}
+
+// LoadPluginsConfig extracts external_plugins and external_skills from
+// spec/claude/settings.json for inclusion in the manifest.
+func LoadPluginsConfig(root string) (json.RawMessage, error) {
+	settingsPath := filepath.Join(root, "spec", "claude", "settings.json")
+	data, err := os.ReadFile(settingsPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	var full map[string]json.RawMessage
+	if err := json.Unmarshal(data, &full); err != nil {
+		return nil, nil
+	}
+
+	subset := make(map[string]json.RawMessage)
+	if v, ok := full["external_plugins"]; ok {
+		subset["external_plugins"] = v
+	}
+	if v, ok := full["external_skills"]; ok {
+		subset["external_skills"] = v
+	}
+	if len(subset) == 0 {
+		return nil, nil
+	}
+
+	out, err := json.Marshal(subset)
+	if err != nil {
+		return nil, err
+	}
+	return json.RawMessage(out), nil
 }
 
 func ensureList(fm frontmatter.Frontmatter, key string) []string {

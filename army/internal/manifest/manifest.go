@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 
@@ -43,6 +44,12 @@ func GenerateManifest(root string) (OrderedMap, error) {
 		agentEntries = append(agentEntries, agentEntry(a, ruleLookup, skillLookup, agentLookup))
 	}
 
+	// Load external plugins/skills config for inclusion in manifest
+	pluginsRaw, err := loader.LoadPluginsConfig(root)
+	if err != nil {
+		return OrderedMap{}, err
+	}
+
 	m := OrderedMap{
 		Keys: []string{"rules", "skills", "agents"},
 		Sections: map[string][]Entry{
@@ -50,7 +57,27 @@ func GenerateManifest(root string) (OrderedMap, error) {
 			"skills": skillEntries,
 			"agents": agentEntries,
 		},
+		RawSections: make(map[string]json.RawMessage),
 	}
+
+	if pluginsRaw != nil {
+		// Parse the plugins config to extract individual sections
+		var pluginsConfig struct {
+			ExternalPlugins json.RawMessage `json:"external_plugins"`
+			ExternalSkills  json.RawMessage `json:"external_skills"`
+		}
+		if err := json.Unmarshal(pluginsRaw, &pluginsConfig); err == nil {
+			if pluginsConfig.ExternalPlugins != nil {
+				m.Keys = append(m.Keys, "external_plugins")
+				m.RawSections["external_plugins"] = pluginsConfig.ExternalPlugins
+			}
+			if pluginsConfig.ExternalSkills != nil {
+				m.Keys = append(m.Keys, "external_skills")
+				m.RawSections["external_skills"] = pluginsConfig.ExternalSkills
+			}
+		}
+	}
+
 	return m, nil
 }
 

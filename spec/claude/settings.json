@@ -63,5 +63,34 @@
     "context7@claude-plugins-official": true
   },
   "skipDangerousModePermissionPrompt": true,
-  "_generated": "DO NOT EDIT — generated from config.json by scripts/generate-settings.sh"
+  "external_plugins": [
+    { "name": "code-review", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official", "description": "Automated code review and improvement suggestions" },
+    { "name": "frontend-design", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official", "description": "Frontend design patterns and UI/UX guidance" },
+    { "name": "security-guidance", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official", "description": "Security best practices and vulnerability detection" },
+    { "name": "code-simplifier", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official", "description": "Code simplification and readability improvements" },
+    {
+      "name": "superpowers",
+      "marketplace": "claude-plugins-official",
+      "source": "anthropics/claude-plugins-official",
+      "description": "Structured development workflows",
+      "workflows": [
+        { "name": "brainstorming", "description": "Before any creative work (features, components, behavior changes)." },
+        { "name": "systematic-debugging", "description": "When encountering bugs or test failures, before proposing fixes." },
+        { "name": "test-driven-development", "description": "When implementing features, write tests first." },
+        { "name": "writing-plans` / `executing-plans", "description": "For multi-step implementation tasks." },
+        { "name": "subagent-driven-development", "description": "When executing plans with independent parallel tasks." },
+        { "name": "dispatching-parallel-agents", "description": "When facing 2+ independent tasks with no shared state." },
+        { "name": "verification-before-completion", "description": "Before claiming work is done, run verification." },
+        { "name": "requesting-code-review` / `receiving-code-review", "description": "When submitting or responding to code review." },
+        { "name": "finishing-a-development-branch", "description": "When implementation is complete, deciding how to integrate." },
+        { "name": "using-git-worktrees", "description": "When starting feature work that needs isolation." },
+        { "name": "writing-skills", "description": "When creating or editing custom skills." },
+        { "name": "using-superpowers", "description": "How to find and use skills (auto-invoked at conversation start)." }
+      ]
+    },
+    { "name": "context7", "marketplace": "claude-plugins-official", "source": "anthropics/claude-plugins-official", "description": "Library documentation lookup and context injection" }
+  ],
+  "external_skills": [
+    { "name": "skill-creator", "repo": "https://github.com/anthropics/skills", "tool": "npm", "description": "Skill authoring guide" }
+  ]
 }

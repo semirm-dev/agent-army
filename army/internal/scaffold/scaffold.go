@@ -484,5 +484,9 @@ func agentNames(root string) []string {
 
 func pluginNames(root string) []string {
 	plugins, _ := loader.LoadPlugins(root)
-	return plugins
+	names := make([]string, len(plugins))
+	for i, p := range plugins {
+		names[i] = p.Name
+	}
+	return names
 }

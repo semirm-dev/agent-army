@@ -8,6 +8,7 @@ import (
 
 	"github.com/semir/agent-army/internal/loader"
 	"github.com/semir/agent-army/internal/manifest"
+	"github.com/semir/agent-army/internal/model"
 	"github.com/semir/agent-army/internal/resolver"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +37,7 @@ func newResolveCmd() *cobra.Command {
 				return err
 			}
 
-			errors := resolver.ValidateAllRefs(rules, skills, agents, plugins)
+			errors := resolver.ValidateAllRefs(rules, skills, agents, model.PluginNames(plugins))
 			fixes := resolver.ComputeAllFixes(rules, skills, agents, root)
 
 			report := resolver.FormatReport(errors, fixes)
