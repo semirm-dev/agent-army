@@ -10,3 +10,4 @@ __pycache__/
 *.pyc
 src/.pytest_cache/
 src/.ruff_cache/
+.build/
