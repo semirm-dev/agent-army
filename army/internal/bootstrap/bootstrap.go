@@ -14,7 +14,18 @@ import (
 	"github.com/semir/agent-army/internal/tui"
 )
 
-var targets = []string{"Claude Code", "Cursor"}
+const (
+	// TargetClaude identifies Claude Code as the bootstrap output target.
+	TargetClaude = "Claude Code"
+	// TargetCursor identifies Cursor as the bootstrap output target.
+	TargetCursor = "Cursor"
+	// TargetGemini identifies Gemini CLI as the bootstrap output target.
+	TargetGemini = "Gemini CLI"
+	// TargetAntigravity identifies Antigravity as the bootstrap output target.
+	TargetAntigravity = "Antigravity"
+)
+
+var targets = []string{TargetClaude, TargetCursor, TargetGemini, TargetAntigravity}
 
 // MainBootstrap runs the interactive bootstrap flow.
 func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
@@ -139,16 +150,16 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 		return nil
 	}
 
-	isClaude := target == "Claude Code"
-	written, cursorRuleNames, err := generateAll(root, dest, ruleObjs, skillObjs, agentObjs, skills, agents, ruleLookup, isClaude)
+	written, cursorRuleNames, err := generateAll(root, dest, ruleObjs, skillObjs, agentObjs, skills, agents, ruleLookup, target)
 	if err != nil {
 		return err
 	}
 
 	fmt.Fprintf(w, "\nDone. %d files written to %s\n", written, dest)
 
-	// CLAUDE.md generation (Claude Code only)
-	if isClaude {
+	// Target-specific orchestrator file generation
+	switch target {
+	case TargetClaude:
 		genMD, err := p.Prompt("Generate CLAUDE.md? [y/N] ")
 		if err != nil {
 			return err
@@ -179,10 +190,7 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 			}
 			fmt.Fprintln(w, "settings.json generated.")
 		}
-	}
-
-	// AGENTS.md generation (Cursor only)
-	if !isClaude {
+	case TargetCursor:
 		genMD, err := p.Prompt("Generate AGENTS.md? [y/N] ")
 		if err != nil {
 			return err
@@ -205,6 +213,8 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 			}
 			fmt.Fprintln(w, "AGENTS.md generated.")
 		}
+	case TargetGemini, TargetAntigravity:
+		// Orchestrator generation for Gemini and Antigravity will be added in Task 10.
 	}
 
 	return nil
@@ -231,15 +241,11 @@ func selectTarget(p tui.Prompter, w io.Writer) (string, error) {
 }
 
 func selectDestination(p tui.Prompter, w io.Writer, target string) (string, error) {
-	suffix := ".claude"
-	if target != "Claude Code" {
-		suffix = ".cursor"
-	}
+	suffix := targetDirSuffix(target)
 
 	cwd, _ := os.Getwd()
 	local := filepath.Join(cwd, suffix)
-	home, _ := os.UserHomeDir()
-	globalHome := filepath.Join(home, suffix)
+	globalHome := targetGlobalDir(target)
 
 	fmt.Fprintln(w, "\nStep 2 — Output destination:")
 	fmt.Fprintf(w, "  1) Local project (%s)  (*)\n", local)
@@ -275,6 +281,39 @@ func selectDestination(p tui.Prompter, w io.Writer, target string) (string, erro
 			return custom, nil
 		}
 		fmt.Fprintln(w, "Invalid choice. Enter 1, 2, or 3.")
+	}
+}
+
+// targetDirSuffix returns the dot-prefixed directory name for the given target.
+func targetDirSuffix(target string) string {
+	switch target {
+	case TargetClaude:
+		return ".claude"
+	case TargetCursor:
+		return ".cursor"
+	case TargetGemini:
+		return ".gemini"
+	case TargetAntigravity:
+		return ".agent"
+	default:
+		return ".claude"
+	}
+}
+
+// targetGlobalDir returns the global (home-relative) config directory for the given target.
+func targetGlobalDir(target string) string {
+	home, _ := os.UserHomeDir()
+	switch target {
+	case TargetClaude:
+		return filepath.Join(home, ".claude")
+	case TargetCursor:
+		return filepath.Join(home, ".cursor")
+	case TargetGemini:
+		return filepath.Join(home, ".gemini")
+	case TargetAntigravity:
+		return filepath.Join(home, ".gemini", "antigravity")
+	default:
+		return filepath.Join(home, ".claude")
 	}
 }
 
@@ -398,16 +437,16 @@ func generateAll(
 	allSkills []model.Skill,
 	allAgents []model.Agent,
 	ruleLookup map[string][]string,
-	isClaude bool,
+	target string,
 ) (int, map[string]string, error) {
 	written := 0
 
 	// Clean stale output from previous runs to prevent duplicate files
 	// (e.g., resolveCollision creating _2 variants when target already exists).
 	for _, subdir := range []string{"rules", "skills", "agents"} {
-		target := filepath.Join(dest, subdir)
-		if _, err := os.Stat(target); err == nil {
-			if err := os.RemoveAll(target); err != nil {
+		dirPath := filepath.Join(dest, subdir)
+		if _, err := os.Stat(dirPath); err == nil {
+			if err := os.RemoveAll(dirPath); err != nil {
 				return 0, nil, fmt.Errorf("clean %s: %w", subdir, err)
 			}
 		}
@@ -429,7 +468,7 @@ func generateAll(
 
 	// Pre-compute Cursor rule name mapping for enrichment
 	var cursorRuleNames map[string]string
-	if !isClaude && len(rules) > 0 {
+	if target == TargetCursor && len(rules) > 0 {
 		assignments := assignCursorNumbers(rules)
 		cursorRuleNames = make(map[string]string, len(rules))
 		for i, r := range rules {
@@ -439,19 +478,7 @@ func generateAll(
 
 	// Generate rules
 	if len(rules) > 0 {
-		if isClaude {
-			for _, r := range rules {
-				content, err := ruleToClaude(root, r)
-				if err != nil {
-					return written, cursorRuleNames, err
-				}
-				rel := filepath.Join("rules", flattenName(r.Name)+".md")
-				if err := writeOutput(dest, rel, content); err != nil {
-					return written, cursorRuleNames, err
-				}
-				written++
-			}
-		} else {
+		if target == TargetCursor {
 			assignments := assignCursorNumbers(rules)
 			for i, r := range rules {
 				content, err := ruleToCursor(root, r)
@@ -465,6 +492,19 @@ func generateAll(
 				}
 				written++
 			}
+		} else {
+			// Claude, Gemini, Antigravity all use Claude-style rules for now
+			for _, r := range rules {
+				content, err := ruleToClaude(root, r)
+				if err != nil {
+					return written, cursorRuleNames, err
+				}
+				rel := filepath.Join("rules", flattenName(r.Name)+".md")
+				if err := writeOutput(dest, rel, content); err != nil {
+					return written, cursorRuleNames, err
+				}
+				written++
+			}
 		}
 	}
 
@@ -473,10 +513,11 @@ func generateAll(
 		flat := flattenName(s.Name)
 		var content string
 		var err error
-		if isClaude {
-			content, err = skillToClaude(root, s)
-		} else {
+		if target == TargetCursor {
 			content, err = skillToCursor(root, s)
+		} else {
+			// Claude, Gemini, Antigravity all use Claude-style skills for now
+			content, err = skillToClaude(root, s)
 		}
 		if err != nil {
 			return written, cursorRuleNames, err
@@ -494,10 +535,11 @@ func generateAll(
 		deps := buildResolvedDeps(a, skillMap, ruleMap, agentMap, ruleLookup)
 		var content string
 		var err error
-		if isClaude {
-			content, err = agentToClaude(root, a, deps)
-		} else {
+		if target == TargetCursor {
 			content, err = agentToCursor(root, a, deps, cursorRuleNames)
+		} else {
+			// Claude, Gemini, Antigravity all use Claude-style agents for now
+			content, err = agentToClaude(root, a, deps)
 		}
 		if err != nil {
 			return written, cursorRuleNames, err
