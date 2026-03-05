@@ -19,13 +19,11 @@ const (
 	TargetClaude = "Claude Code"
 	// TargetCursor identifies Cursor as the bootstrap output target.
 	TargetCursor = "Cursor"
-	// TargetGemini identifies Gemini CLI as the bootstrap output target.
-	TargetGemini = "Gemini CLI"
 	// TargetAntigravity identifies Antigravity as the bootstrap output target.
 	TargetAntigravity = "Antigravity"
 )
 
-var targets = []string{TargetClaude, TargetCursor, TargetGemini, TargetAntigravity}
+var targets = []string{TargetClaude, TargetCursor, TargetAntigravity}
 
 // MainBootstrap runs the interactive bootstrap flow.
 func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
@@ -213,36 +211,13 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 			}
 			fmt.Fprintln(w, "AGENTS.md generated.")
 		}
-	case TargetGemini:
-		genMD, err := p.Prompt("Generate GEMINI.md? [y/N] ")
-		if err != nil {
-			return err
-		}
-		if strings.TrimSpace(strings.ToLower(genMD)) == "y" {
-			geminiMDPath := filepath.Join(dest, "GEMINI.md")
-			if _, statErr := os.Stat(geminiMDPath); statErr == nil {
-				overwrite, err := p.Prompt("GEMINI.md exists. Overwrite? [y/N] ")
-				if err != nil {
-					return err
-				}
-				if strings.TrimSpace(strings.ToLower(overwrite)) != "y" {
-					fmt.Fprintln(w, "Skipped GEMINI.md generation.")
-					return nil
-				}
-			}
-			templatePath := filepath.Join(root, "spec", "gemini", "GEMINI.md")
-			if err := generateGeminiMD(dest, templatePath, agentObjs, skillObjs, ruleObjs); err != nil {
-				return fmt.Errorf("generate GEMINI.md: %w", err)
-			}
-			fmt.Fprintln(w, "GEMINI.md generated.")
-		}
 	case TargetAntigravity:
 		genMD, err := p.Prompt("Generate GEMINI.md? [y/N] ")
 		if err != nil {
 			return err
 		}
 		if strings.TrimSpace(strings.ToLower(genMD)) == "y" {
-			geminiMDPath := filepath.Join(dest, "GEMINI.md")
+			geminiMDPath := AntigravityGeminiMDPath(dest)
 			if _, statErr := os.Stat(geminiMDPath); statErr == nil {
 				overwrite, err := p.Prompt("GEMINI.md exists. Overwrite? [y/N] ")
 				if err != nil {
@@ -254,7 +229,7 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 				}
 			}
 			templatePath := filepath.Join(root, "spec", "antigravity", "GEMINI.md")
-			if err := generateAntigravityMD(dest, templatePath, agentObjs, skillObjs, ruleObjs); err != nil {
+			if err := generateAntigravityMD(root, dest, templatePath); err != nil {
 				return fmt.Errorf("generate GEMINI.md: %w", err)
 			}
 			fmt.Fprintln(w, "GEMINI.md generated.")
@@ -335,8 +310,6 @@ func targetDirSuffix(target string) string {
 		return ".claude"
 	case TargetCursor:
 		return ".cursor"
-	case TargetGemini:
-		return ".gemini"
 	case TargetAntigravity:
 		return ".agents"
 	default:
@@ -352,8 +325,6 @@ func targetGlobalDir(target string) string {
 		return filepath.Join(home, ".claude")
 	case TargetCursor:
 		return filepath.Join(home, ".cursor")
-	case TargetGemini:
-		return filepath.Join(home, ".gemini")
 	case TargetAntigravity:
 		return filepath.Join(home, ".gemini", "antigravity")
 	default:
@@ -487,7 +458,13 @@ func generateAll(
 
 	// Clean stale output from previous runs to prevent duplicate files
 	// (e.g., resolveCollision creating _2 variants when target already exists).
-	for _, subdir := range []string{"rules", "skills", "agents"} {
+	// Antigravity only generates skills (with rules appended); no agents or separate rules.
+	agentSubdir := "agents"
+	subdirs := []string{"rules", "skills", agentSubdir}
+	if target == TargetAntigravity {
+		subdirs = []string{"skills"}
+	}
+	for _, subdir := range subdirs {
 		dirPath := filepath.Join(dest, subdir)
 		if _, err := os.Stat(dirPath); err == nil {
 			if err := os.RemoveAll(dirPath); err != nil {
@@ -520,8 +497,8 @@ func generateAll(
 		}
 	}
 
-	// Generate rules
-	if len(rules) > 0 {
+	// Generate rules (Antigravity inlines rules into GEMINI.md, no separate files)
+	if len(rules) > 0 && target != TargetAntigravity {
 		if target == TargetCursor {
 			assignments := assignCursorNumbers(rules)
 			for i, r := range rules {
@@ -538,16 +515,7 @@ func generateAll(
 			}
 		} else {
 			for _, r := range rules {
-				var content string
-				var err error
-				switch target {
-				case TargetGemini:
-					content, err = ruleToGemini(root, r)
-				case TargetAntigravity:
-					content, err = ruleToAntigravity(root, r)
-				default:
-					content, err = ruleToClaude(root, r)
-				}
+				content, err := ruleToClaude(root, r)
 				if err != nil {
 					return written, cursorRuleNames, err
 				}
@@ -568,10 +536,18 @@ func generateAll(
 		switch target {
 		case TargetCursor:
 			content, err = skillToCursor(root, s)
-		case TargetGemini:
-			content, err = skillToGemini(root, s)
 		case TargetAntigravity:
-			content, err = skillToAntigravity(root, s)
+			// Resolve this skill's rules transitively and append them to the skill file
+			resolvedNames := graph.ResolveTransitive(s.UsesRules, func(name string) []string {
+				return ruleLookup[name]
+			})
+			var resolvedRules []model.Rule
+			for _, name := range resolvedNames {
+				if r, ok := ruleMap[name]; ok {
+					resolvedRules = append(resolvedRules, r)
+				}
+			}
+			content, err = skillToAntigravity(root, s, resolvedRules)
 		default:
 			content, err = skillToClaude(root, s)
 		}
@@ -585,30 +561,28 @@ func generateAll(
 		written++
 	}
 
-	// Generate agents with enriched bodies
-	for _, a := range agents {
-		flat := flattenName(a.Name)
-		deps := buildResolvedDeps(a, skillMap, ruleMap, agentMap, ruleLookup)
-		var content string
-		var err error
-		switch target {
-		case TargetCursor:
-			content, err = agentToCursor(root, a, deps, cursorRuleNames)
-		case TargetGemini:
-			content, err = agentToGemini(root, a, deps)
-		case TargetAntigravity:
-			content, err = agentToAntigravity(root, a, deps)
-		default:
-			content, err = agentToClaude(root, a, deps)
+	// Generate agents with enriched bodies (Antigravity does not support agents)
+	if target != TargetAntigravity {
+		for _, a := range agents {
+			flat := flattenName(a.Name)
+			deps := buildResolvedDeps(a, skillMap, ruleMap, agentMap, ruleLookup)
+			var content string
+			var err error
+			switch target {
+			case TargetCursor:
+				content, err = agentToCursor(root, a, deps, cursorRuleNames)
+			default:
+				content, err = agentToClaude(root, a, deps)
+			}
+			if err != nil {
+				return written, cursorRuleNames, err
+			}
+			rel := filepath.Join(agentSubdir, flat+".md")
+			if err := writeOutput(dest, rel, content); err != nil {
+				return written, cursorRuleNames, err
+			}
+			written++
 		}
-		if err != nil {
-			return written, cursorRuleNames, err
-		}
-		rel := filepath.Join("agents", flat+".md")
-		if err := writeOutput(dest, rel, content); err != nil {
-			return written, cursorRuleNames, err
-		}
-		written++
 	}
 
 	return written, cursorRuleNames, nil

@@ -279,39 +279,6 @@ func TestAssignCursorNumbers(t *testing.T) {
 	}
 }
 
-func TestGeminiToolRewrites(t *testing.T) {
-	input := "Use `Edit` to modify, `Bash` to run, `Read` to view, `Write` to create, `Grep` to search, `Glob` to find."
-	got := applyGeminiToolRewrites(input)
-
-	tests := []struct{ old, new string }{
-		{"`Edit`", "`replace`"},
-		{"`Bash`", "`run_shell_command`"},
-		{"`Read`", "`read_file`"},
-		{"`Write`", "`write_file`"},
-		{"`Grep`", "`search_file_content`"},
-		{"`Glob`", "`glob`"},
-	}
-	for _, tt := range tests {
-		if strings.Contains(got, tt.old) {
-			t.Errorf("%s should be replaced", tt.old)
-		}
-		if !strings.Contains(got, tt.new) {
-			t.Errorf("missing %s", tt.new)
-		}
-	}
-}
-
-func TestGeminiPathRewrite(t *testing.T) {
-	input := "Check ~/.claude/config for settings."
-	got := applyGeminiPathRewrites(input)
-	if strings.Contains(got, "~/.claude/") {
-		t.Error("~/.claude/ should be replaced with ~/.gemini/")
-	}
-	if !strings.Contains(got, "~/.gemini/") {
-		t.Error("missing ~/.gemini/")
-	}
-}
-
 func TestAntigravityPathRewrite(t *testing.T) {
 	input := "Check ~/.claude/config for settings."
 	got := applyAntigravityPathRewrites(input)
@@ -345,98 +312,6 @@ func TestAntigravityToolRewrites(t *testing.T) {
 	}
 }
 
-func TestRuleToGemini(t *testing.T) {
-	dir := t.TempDir()
-	rulesDir := filepath.Join(dir, "spec", "rules")
-	os.MkdirAll(rulesDir, 0755)
-	os.WriteFile(filepath.Join(rulesDir, "security.md"),
-		[]byte("---\nscope: universal\n---\n\n# Security\n\nBody.\n"), 0644)
-
-	got, err := ruleToGemini(dir, model.Rule{Name: "security", Path: "spec/rules/security.md"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Gemini rules: body only, same as Claude (no frontmatter)
-	if strings.Contains(got, "---") {
-		t.Error("Gemini rule should not contain frontmatter")
-	}
-	if !strings.Contains(got, "# Security") {
-		t.Error("missing body content")
-	}
-}
-
-func TestRuleToAntigravity(t *testing.T) {
-	dir := t.TempDir()
-	rulesDir := filepath.Join(dir, "spec", "rules")
-	os.MkdirAll(rulesDir, 0755)
-	os.WriteFile(filepath.Join(rulesDir, "security.md"),
-		[]byte("---\nscope: universal\n---\n\n# Security\n\nBody.\n"), 0644)
-
-	got, err := ruleToAntigravity(dir, model.Rule{
-		Name:        "security",
-		Description: "Security Patterns",
-		Path:        "spec/rules/security.md",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Antigravity rules: description-only frontmatter
-	if !strings.Contains(got, "---") {
-		t.Error("Antigravity rule should contain frontmatter")
-	}
-	if !strings.Contains(got, "description: Security Patterns") {
-		t.Error("missing description in frontmatter")
-	}
-	if strings.Contains(got, "globs:") {
-		t.Error("Antigravity rules should not have globs")
-	}
-	if strings.Contains(got, "alwaysApply:") {
-		t.Error("Antigravity rules should not have alwaysApply")
-	}
-	if !strings.Contains(got, "# Security") {
-		t.Error("missing body")
-	}
-}
-
-func TestSkillToGemini(t *testing.T) {
-	dir := t.TempDir()
-	skillsDir := filepath.Join(dir, "spec", "skills")
-	os.MkdirAll(skillsDir, 0755)
-	os.WriteFile(filepath.Join(skillsDir, "test.md"),
-		[]byte("---\nname: test\n---\n\n# Test\n\nUse `Edit` and `Bash` at ~/.claude/path.\n"), 0644)
-
-	got, err := skillToGemini(dir, model.Skill{
-		Name:    "test",
-		Summary: "A test skill",
-		Path:    "spec/skills/test.md",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Gemini skills: no frontmatter, tool rewrites, path rewrites
-	if strings.Contains(got, "---") {
-		t.Error("Gemini skill should not contain frontmatter")
-	}
-	if strings.Contains(got, "`Edit`") {
-		t.Error("Edit should be replaced with replace")
-	}
-	if !strings.Contains(got, "`replace`") {
-		t.Error("missing replace")
-	}
-	if strings.Contains(got, "`Bash`") {
-		t.Error("Bash should be replaced with run_shell_command")
-	}
-	if !strings.Contains(got, "`run_shell_command`") {
-		t.Error("missing run_shell_command")
-	}
-	if strings.Contains(got, "~/.claude/") {
-		t.Error("~/.claude/ should be replaced with ~/.gemini/")
-	}
-	if !strings.Contains(got, "~/.gemini/") {
-		t.Error("missing ~/.gemini/")
-	}
-}
-
 func TestSkillToAntigravity(t *testing.T) {
 	dir := t.TempDir()
 	skillsDir := filepath.Join(dir, "spec", "skills")
@@ -444,11 +319,20 @@ func TestSkillToAntigravity(t *testing.T) {
 	os.WriteFile(filepath.Join(skillsDir, "test.md"),
 		[]byte("---\nname: test\n---\n\n# Test\n\nUse `Edit` and `Bash` at ~/.claude/path.\n"), 0644)
 
+	rulesDir := filepath.Join(dir, "spec", "rules")
+	os.MkdirAll(rulesDir, 0755)
+	os.WriteFile(filepath.Join(rulesDir, "security.md"),
+		[]byte("---\nname: security\n---\n\n# Security Patterns\n\nUse `Grep` to search.\n"), 0644)
+
+	rules := []model.Rule{
+		{Name: "security", Path: "spec/rules/security.md"},
+	}
+
 	got, err := skillToAntigravity(dir, model.Skill{
 		Name:    "test",
 		Summary: "A test skill",
 		Path:    "spec/skills/test.md",
-	})
+	}, rules)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -481,85 +365,44 @@ func TestSkillToAntigravity(t *testing.T) {
 	if !strings.Contains(got, "`run_shell_command`") {
 		t.Error("missing run_shell_command")
 	}
-}
 
-func TestAgentToGemini_Frontmatter(t *testing.T) {
-	dir := t.TempDir()
-	agentsDir := filepath.Join(dir, "spec", "agents")
-	os.MkdirAll(agentsDir, 0755)
-	os.WriteFile(filepath.Join(agentsDir, "coder.md"),
-		[]byte("---\nname: go/coder\ndescription: Go coder\n---\n\n# Go Coder\n\nUse `Edit` and `Bash`.\nCheck ~/.claude/config.\n\n## Workflow\n1. Do stuff\n"), 0644)
-
-	got, err := agentToGemini(dir, model.Agent{
-		Name:        "go/coder",
-		Description: "Go coder",
-		Access:      "read-write",
-		Path:        "spec/agents/coder.md",
-	}, model.ResolvedDeps{})
-	if err != nil {
-		t.Fatal(err)
+	// Verify resolved rules are appended at the bottom
+	if !strings.Contains(got, "# Security Patterns") {
+		t.Error("missing appended rule body")
 	}
-
-	if !strings.Contains(got, "name: go-coder") {
-		t.Error("missing name in frontmatter")
+	// Rule tool rewrites should also be applied
+	if strings.Contains(got, "`Grep`") {
+		t.Error("Grep in rule body should be rewritten to search_file_content")
 	}
-	if !strings.Contains(got, "description: Go coder") {
-		t.Error("missing description in frontmatter")
+	if !strings.Contains(got, "`search_file_content`") {
+		t.Error("missing Antigravity tool rewrite in appended rule")
 	}
-	if !strings.Contains(got, "- read_file") {
-		t.Error("missing read_file tool")
-	}
-	if !strings.Contains(got, "- write_file") {
-		t.Error("missing write_file tool")
-	}
-	if !strings.Contains(got, "- replace") {
-		t.Error("missing replace tool")
-	}
-	if !strings.Contains(got, "- run_shell_command") {
-		t.Error("missing run_shell_command tool")
-	}
-	if !strings.Contains(got, "model: gemini-3.1-pro") {
-		t.Error("missing model")
-	}
-	if !strings.Contains(got, "max_turns: 15") {
-		t.Error("missing max_turns")
-	}
-	// Tool rewrites in body
-	if strings.Contains(got, "`Edit`") {
-		t.Error("Edit should be replaced")
-	}
-	if strings.Contains(got, "`Bash`") {
-		t.Error("Bash should be replaced")
-	}
-	// Path rewrites
-	if strings.Contains(got, "~/.claude/") {
-		t.Error("~/.claude/ should be replaced")
+	// Rule frontmatter should be stripped
+	if strings.Contains(got, "name: security") {
+		t.Error("rule frontmatter should be stripped")
 	}
 }
 
-func TestAgentToGemini_ReadOnly(t *testing.T) {
+func TestSkillToAntigravity_NoRules(t *testing.T) {
 	dir := t.TempDir()
-	agentsDir := filepath.Join(dir, "spec", "agents")
-	os.MkdirAll(agentsDir, 0755)
-	os.WriteFile(filepath.Join(agentsDir, "reviewer.md"),
-		[]byte("---\nname: go/reviewer\n---\n\n# Reviewer\n"), 0644)
+	skillsDir := filepath.Join(dir, "spec", "skills")
+	os.MkdirAll(skillsDir, 0755)
+	os.WriteFile(filepath.Join(skillsDir, "test.md"),
+		[]byte("---\nname: test\n---\n\n# Test\n\nBody.\n"), 0644)
 
-	got, err := agentToGemini(dir, model.Agent{
-		Name:   "go/reviewer",
-		Access: "read-only",
-		Path:   "spec/agents/reviewer.md",
-	}, model.ResolvedDeps{})
+	got, err := skillToAntigravity(dir, model.Skill{
+		Name:    "test",
+		Summary: "A test skill",
+		Path:    "spec/skills/test.md",
+	}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(got, "- write_file") {
-		t.Error("read-only agent should not have write_file")
+	if !strings.Contains(got, "# Test") {
+		t.Error("missing skill body")
 	}
-	if strings.Contains(got, "- replace") {
-		t.Error("read-only agent should not have replace")
-	}
-	if !strings.Contains(got, "- read_file") {
-		t.Error("missing read_file for read-only agent")
+	if !strings.Contains(got, "name: test") {
+		t.Error("missing frontmatter")
 	}
 }
 

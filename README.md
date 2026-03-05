@@ -2,8 +2,7 @@
 
 A modular library of coding standards, workflows, and agent prompts for AI-assisted development. Includes a Go CLI (`army`) to manage specs, resolve dependencies, and generate platform-specific output for Claude Code or Cursor.
 
-> NOTE: It is heavy on context if you dump all the manifests into user's space, will improve it later.
-> NOTE: Caution!! Always backup your current setup because `bootstrap` will always do remove-all-existing -> generate new.
+> NOTE: **Caution!!** Always backup your current destination setup because `bootstrap` will always do remove-all-existing -> generate new. Test in a safe place (destination) first.
 
 ## What's Inside
 
@@ -59,7 +58,7 @@ The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` 
 | `make new-rule` | Scaffold a new rule with interactive prompts |
 | `make new-skill` | Scaffold a new skill with interactive prompts |
 | `make new-agent` | Scaffold a new agent with interactive prompts |
-| `make bootstrap` | Generate model-specific rules, skills, and agents for Claude Code or Cursor (output in `.build/`) |
+| `make bootstrap` | Generate model-specific rules, skills, and agents (output in `.build/`) |
 
 ## Manifest (`manifest.json`) - for now unused index file
 
@@ -78,7 +77,6 @@ Regenerate with `make manifest`.
 ## Bootstrap Output (`.build/`)
 
 ### Claude Code
-> Testing in progress...
 
 `make bootstrap` and pick Claude Code, generates platform-specific output in `.build/claude/` (adjustable):
 
@@ -93,6 +91,14 @@ Regenerate with `make manifest`.
 
 - `AGENTS.md` — orchestrator with agent definitions, safety constraints, and plugin references
 - `agents/`, `skills/`, `rules/` — resolved spec files ready for Cursor consumption
+
+### Antigravity
+> Work in progress...
+
+`make bootstrap` and pick Antigravity, generates platform-specific output in `.build/antigravity/` (adjustable):
+
+- `GEMINI.md` — orchestrator with some general instructions
+- `agents/`, `skills/`, `rules/` — resolved spec files ready for Antigravity consumption
 
 ## File Format
 

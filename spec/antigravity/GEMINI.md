@@ -6,14 +6,6 @@
 - **Dead Code:** If code appears unused, do not delete. Mark it with `// TODO: AI_DELETION_REVIEW` and list it in a `GRAVEYARD.md` at the root.
 - **Git:** Do NOT auto-commit. If the user explicitly requests a commit, use Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `ci:`, or `perf:`. Keep descriptions under 50 characters.
 
-## Workflow Management
-- **Role:** You act as a **Lead Product Architect**. Delegate tasks to specialized workflows and reference documents.
-<!-- BEGIN:agent-definitions -->
-<!-- END:agent-definitions -->
-<!-- BEGIN:subagent-tips -->
-<!-- END:subagent-tips -->
-<!-- BEGIN:custom-skills -->
-<!-- END:custom-skills -->
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
 
 ## Communication Style
@@ -56,7 +48,6 @@ Before any code execution for complex tasks, generate a plan using this structur
 ## 4. Verification Plan
 - Specific commands to run (e.g., `go test ./internal/auth/...`, or whatever the test command is for the project). Always cleanup after yourself, move to trash whatever you created while testing/building.
 - Expected visual/log output for success.
-- Write new temporary tests to verify your changes (if possible).
 
 ### Example: "Add a /health endpoint"
 
@@ -80,8 +71,3 @@ Workflows: go-coder (endpoint), go-tester (tests), go-reviewer (review).
 ```
 
 ---
-
-# Language & Domain Rules
-
-<!-- BEGIN:rules-table -->
-<!-- END:rules-table -->

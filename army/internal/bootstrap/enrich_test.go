@@ -278,32 +278,6 @@ func TestInjectSection(t *testing.T) {
 	}
 }
 
-func TestEnrichAgentBody_Gemini(t *testing.T) {
-	body := "# Agent\n\n## Workflow\n1. Step one\n"
-	deps := model.ResolvedDeps{
-		Rules:  []model.Rule{{Name: "security", Summary: "Auth patterns"}},
-		Skills: []model.Skill{{Name: "error-handling", Summary: "Error taxonomy"}},
-	}
-
-	result := enrichAgentBody(body, deps, TargetGemini, nil)
-
-	if !strings.Contains(result, "### Rules (Auto-Loaded via @file)") {
-		t.Error("missing Gemini-style Rules subsection")
-	}
-	if !strings.Contains(result, "@rules/security.md") {
-		t.Error("missing @file reference for rule")
-	}
-	if !strings.Contains(result, "### Workflow References (@file)") {
-		t.Error("missing Gemini-style Skills subsection")
-	}
-	if !strings.Contains(result, "@skills/error-handling/SKILL.md") {
-		t.Error("missing @file reference for skill")
-	}
-	if strings.Contains(result, "### Plugins") {
-		t.Error("Gemini should not have Plugins section")
-	}
-}
-
 func TestEnrichAgentBody_Antigravity(t *testing.T) {
 	body := "# Agent\n\n## Workflow\n1. Step one\n"
 	deps := model.ResolvedDeps{
@@ -313,7 +287,7 @@ func TestEnrichAgentBody_Antigravity(t *testing.T) {
 
 	result := enrichAgentBody(body, deps, TargetAntigravity, nil)
 
-	if !strings.Contains(result, "### Rules (Reference)") {
+	if !strings.Contains(result, "### Rules (Bundled in Skill Files)") {
 		t.Error("missing Antigravity-style Rules subsection")
 	}
 	if !strings.Contains(result, "### Workflow References") {
@@ -321,48 +295,6 @@ func TestEnrichAgentBody_Antigravity(t *testing.T) {
 	}
 	if strings.Contains(result, "### Plugins") {
 		t.Error("Antigravity should not have Plugins section")
-	}
-}
-
-func TestRewriteBodyRefs_Gemini(t *testing.T) {
-	tests := []struct {
-		name  string
-		input string
-		want  string
-	}{
-		{
-			name:  "invoke skill",
-			input: "invoke the `error-handling` skill",
-			want:  "read and follow `@skills/error-handling/SKILL.md`",
-		},
-		{
-			name:  "invoke skill for",
-			input: "invoke the `error-handling` skill for error patterns",
-			want:  "read and follow `@skills/error-handling/SKILL.md` for error patterns",
-		},
-		{
-			name:  "delegate to",
-			input: "Delegate to `type-design-analyzer`",
-			want:  "consult the reference in `agents/type-design-analyzer.md`",
-		},
-		{
-			name:  "loaded via skill",
-			input: "Go coding patterns are loaded via the `go/coder` skill.",
-			want:  "Go coding patterns are defined in `@skills/go/coder/SKILL.md`.",
-		},
-		{
-			name:  "loaded via rule",
-			input: "Patterns are loaded via the `ai-assisted-development` rule.",
-			want:  "Patterns are defined in `@rules/ai-assisted-development.md`.",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := rewriteBodyRefs(tt.input, TargetGemini)
-			if got != tt.want {
-				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want)
-			}
-		})
 	}
 }
 
@@ -380,12 +312,12 @@ func TestRewriteBodyRefs_Antigravity(t *testing.T) {
 		{
 			name:  "delegate to",
 			input: "Delegate to `type-design-analyzer`",
-			want:  "consult the reference in `agents/type-design-analyzer.md`",
+			want:  "consult the reference in `workflows/type-design-analyzer.md`",
 		},
 		{
 			name:  "loaded via rule",
 			input: "Patterns are loaded via the `ai-assisted-development` rule.",
-			want:  "Patterns are defined in `rules/ai-assisted-development.md`.",
+			want:  "Patterns are appended to the relevant SKILL.md files.",
 		},
 	}
 	for _, tt := range tests {
