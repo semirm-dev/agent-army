@@ -181,6 +181,40 @@ func skillToCursor(root string, skill model.Skill) (string, error) {
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
+// skillToGemini transforms a spec skill for Gemini CLI output (no frontmatter, tool and path rewrites).
+func skillToGemini(root string, skill model.Skill) (string, error) {
+	body, err := extractBody(filepath.Join(root, skill.Path))
+	if err != nil {
+		return "", err
+	}
+	body = applyGeminiToolRewrites(body)
+	body = applyGeminiPathRewrites(body)
+	return body, nil
+}
+
+// skillToAntigravity transforms a spec skill for Antigravity output (name+description frontmatter, path rewrites).
+func skillToAntigravity(root string, skill model.Skill) (string, error) {
+	body, err := extractBody(filepath.Join(root, skill.Path))
+	if err != nil {
+		return "", err
+	}
+	body = applyAntigravityPathRewrites(body)
+
+	flat := flattenName(skill.Name)
+	desc := skillDescription(skill)
+
+	lines := []string{"---"}
+	lines = append(lines, fmt.Sprintf("name: %s", flat))
+	if strings.Contains(desc, ":") {
+		lines = append(lines, fmt.Sprintf("description: %q", desc))
+	} else {
+		lines = append(lines, fmt.Sprintf("description: %s", desc))
+	}
+	lines = append(lines, "---")
+
+	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
 // applyGeminiToolRewrites replaces Claude Code tool names with their Gemini CLI equivalents.
 func applyGeminiToolRewrites(body string) string {
 	body = editRe.ReplaceAllString(body, "`replace`")

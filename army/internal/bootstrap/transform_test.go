@@ -376,6 +376,88 @@ func TestRuleToAntigravity(t *testing.T) {
 	}
 }
 
+func TestSkillToGemini(t *testing.T) {
+	dir := t.TempDir()
+	skillsDir := filepath.Join(dir, "spec", "skills")
+	os.MkdirAll(skillsDir, 0755)
+	os.WriteFile(filepath.Join(skillsDir, "test.md"),
+		[]byte("---\nname: test\n---\n\n# Test\n\nUse `Edit` and `Bash` at ~/.claude/path.\n"), 0644)
+
+	got, err := skillToGemini(dir, model.Skill{
+		Name:    "test",
+		Summary: "A test skill",
+		Path:    "spec/skills/test.md",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Gemini skills: no frontmatter, tool rewrites, path rewrites
+	if strings.Contains(got, "---") {
+		t.Error("Gemini skill should not contain frontmatter")
+	}
+	if strings.Contains(got, "`Edit`") {
+		t.Error("Edit should be replaced with replace")
+	}
+	if !strings.Contains(got, "`replace`") {
+		t.Error("missing replace")
+	}
+	if strings.Contains(got, "`Bash`") {
+		t.Error("Bash should be replaced with run_shell_command")
+	}
+	if !strings.Contains(got, "`run_shell_command`") {
+		t.Error("missing run_shell_command")
+	}
+	if strings.Contains(got, "~/.claude/") {
+		t.Error("~/.claude/ should be replaced with ~/.gemini/")
+	}
+	if !strings.Contains(got, "~/.gemini/") {
+		t.Error("missing ~/.gemini/")
+	}
+}
+
+func TestSkillToAntigravity(t *testing.T) {
+	dir := t.TempDir()
+	skillsDir := filepath.Join(dir, "spec", "skills")
+	os.MkdirAll(skillsDir, 0755)
+	os.WriteFile(filepath.Join(skillsDir, "test.md"),
+		[]byte("---\nname: test\n---\n\n# Test\n\nUse `Edit` and `Bash` at ~/.claude/path.\n"), 0644)
+
+	got, err := skillToAntigravity(dir, model.Skill{
+		Name:    "test",
+		Summary: "A test skill",
+		Path:    "spec/skills/test.md",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Antigravity skills: name+description frontmatter, path rewrites
+	if !strings.Contains(got, "---") {
+		t.Error("Antigravity skill should contain frontmatter")
+	}
+	if !strings.Contains(got, "name: test") {
+		t.Error("missing name in frontmatter")
+	}
+	if !strings.Contains(got, "description: A test skill") {
+		t.Error("missing description in frontmatter")
+	}
+	if strings.Contains(got, "~/.claude/") {
+		t.Error("~/.claude/ should be replaced with ~/.agent/")
+	}
+	// Verify tool names are NOT rewritten (unlike Gemini)
+	if !strings.Contains(got, "`Edit`") {
+		t.Error("Antigravity should NOT rewrite Edit tool name")
+	}
+	if !strings.Contains(got, "`Bash`") {
+		t.Error("Antigravity should NOT rewrite Bash tool name")
+	}
+	if strings.Contains(got, "`replace`") {
+		t.Error("Antigravity should not contain Gemini tool names")
+	}
+	if strings.Contains(got, "`run_shell_command`") {
+		t.Error("Antigravity should not contain Gemini tool names")
+	}
+}
+
 func TestCategorizeRule(t *testing.T) {
 	tests := []struct {
 		name string
