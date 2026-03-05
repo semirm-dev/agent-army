@@ -36,7 +36,7 @@ func generateAntigravityMD(dest, templatePath string, agents []model.Agent, skil
 }
 
 // antigravityDestPrefix determines the display path prefix for the Antigravity destination directory.
-// Global (~/.gemini/antigravity) uses "~/.gemini/antigravity", project-local uses ".agent", custom uses the path as-is.
+// Global (~/.gemini/antigravity) uses "~/.gemini/antigravity", project-local uses ".agents", custom uses the path as-is.
 func antigravityDestPrefix(dest string) string {
 	home, err := os.UserHomeDir()
 	if err == nil {
@@ -47,8 +47,8 @@ func antigravityDestPrefix(dest string) string {
 	}
 
 	base := filepath.Base(dest)
-	if base == ".agent" {
-		return ".agent"
+	if base == ".agents" {
+		return ".agents"
 	}
 
 	return dest

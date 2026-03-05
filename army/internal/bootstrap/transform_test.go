@@ -316,10 +316,32 @@ func TestAntigravityPathRewrite(t *testing.T) {
 	input := "Check ~/.claude/config for settings."
 	got := applyAntigravityPathRewrites(input)
 	if strings.Contains(got, "~/.claude/") {
-		t.Error("~/.claude/ should be replaced with ~/.agent/")
+		t.Error("~/.claude/ should be replaced with ~/.agents/")
 	}
-	if !strings.Contains(got, "~/.agent/") {
-		t.Error("missing ~/.agent/")
+	if !strings.Contains(got, "~/.agents/") {
+		t.Error("missing ~/.agents/")
+	}
+}
+
+func TestAntigravityToolRewrites(t *testing.T) {
+	input := "Use `Edit` to modify, `Bash` to run, `Read` to view, `Write` to create, `Grep` to search, `Glob` to find."
+	got := applyAntigravityToolRewrites(input)
+
+	tests := []struct{ old, new string }{
+		{"`Edit`", "`replace`"},
+		{"`Bash`", "`run_shell_command`"},
+		{"`Read`", "`read_file`"},
+		{"`Write`", "`write_file`"},
+		{"`Grep`", "`search_file_content`"},
+		{"`Glob`", "`glob`"},
+	}
+	for _, tt := range tests {
+		if strings.Contains(got, tt.old) {
+			t.Errorf("%s should be replaced", tt.old)
+		}
+		if !strings.Contains(got, tt.new) {
+			t.Errorf("missing %s", tt.new)
+		}
 	}
 }
 
@@ -430,7 +452,7 @@ func TestSkillToAntigravity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Antigravity skills: name+description frontmatter, path rewrites
+	// Antigravity skills: name+description frontmatter, tool and path rewrites
 	if !strings.Contains(got, "---") {
 		t.Error("Antigravity skill should contain frontmatter")
 	}
@@ -441,20 +463,23 @@ func TestSkillToAntigravity(t *testing.T) {
 		t.Error("missing description in frontmatter")
 	}
 	if strings.Contains(got, "~/.claude/") {
-		t.Error("~/.claude/ should be replaced with ~/.agent/")
+		t.Error("~/.claude/ should be replaced with ~/.agents/")
 	}
-	// Verify tool names are NOT rewritten (unlike Gemini)
-	if !strings.Contains(got, "`Edit`") {
-		t.Error("Antigravity should NOT rewrite Edit tool name")
+	if !strings.Contains(got, "~/.agents/") {
+		t.Error("missing ~/.agents/ path")
 	}
-	if !strings.Contains(got, "`Bash`") {
-		t.Error("Antigravity should NOT rewrite Bash tool name")
+	// Verify tool names ARE rewritten (Antigravity uses Gemini tool names)
+	if strings.Contains(got, "`Edit`") {
+		t.Error("Edit should be replaced with replace")
 	}
-	if strings.Contains(got, "`replace`") {
-		t.Error("Antigravity should not contain Gemini tool names")
+	if !strings.Contains(got, "`replace`") {
+		t.Error("missing replace")
 	}
-	if strings.Contains(got, "`run_shell_command`") {
-		t.Error("Antigravity should not contain Gemini tool names")
+	if strings.Contains(got, "`Bash`") {
+		t.Error("Bash should be replaced with run_shell_command")
+	}
+	if !strings.Contains(got, "`run_shell_command`") {
+		t.Error("missing run_shell_command")
 	}
 }
 
@@ -493,7 +518,7 @@ func TestAgentToGemini_Frontmatter(t *testing.T) {
 	if !strings.Contains(got, "- run_shell_command") {
 		t.Error("missing run_shell_command tool")
 	}
-	if !strings.Contains(got, "model: gemini-2.5-pro") {
+	if !strings.Contains(got, "model: gemini-3.1-pro") {
 		t.Error("missing model")
 	}
 	if !strings.Contains(got, "max_turns: 15") {

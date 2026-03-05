@@ -183,7 +183,7 @@ func agentToGemini(root string, agent model.Agent, deps model.ResolvedDeps) (str
 	for _, tool := range toolList {
 		lines = append(lines, fmt.Sprintf("  - %s", tool))
 	}
-	lines = append(lines, "model: gemini-2.5-pro")
+	lines = append(lines, "model: gemini-3.1-pro")
 	lines = append(lines, "max_turns: 15")
 	lines = append(lines, "---")
 
@@ -198,6 +198,7 @@ func agentToAntigravity(root string, agent model.Agent, deps model.ResolvedDeps)
 	}
 
 	body = enrichAgentBody(body, deps, TargetAntigravity, nil)
+	body = applyAntigravityToolRewrites(body)
 	body = applyAntigravityPathRewrites(body)
 
 	return body, nil
@@ -243,12 +244,13 @@ func skillToGemini(root string, skill model.Skill) (string, error) {
 	return body, nil
 }
 
-// skillToAntigravity transforms a spec skill for Antigravity output (name+description frontmatter, path rewrites).
+// skillToAntigravity transforms a spec skill for Antigravity output (name+description frontmatter, tool and path rewrites).
 func skillToAntigravity(root string, skill model.Skill) (string, error) {
 	body, err := extractBody(filepath.Join(root, skill.Path))
 	if err != nil {
 		return "", err
 	}
+	body = applyAntigravityToolRewrites(body)
 	body = applyAntigravityPathRewrites(body)
 
 	flat := flattenName(skill.Name)
@@ -282,9 +284,15 @@ func applyGeminiPathRewrites(body string) string {
 	return strings.ReplaceAll(body, "~/.claude/", "~/.gemini/")
 }
 
+// applyAntigravityToolRewrites replaces Claude Code tool names with their Gemini equivalents.
+// Antigravity uses the same Gemini models and tool names as Gemini CLI.
+func applyAntigravityToolRewrites(body string) string {
+	return applyGeminiToolRewrites(body)
+}
+
 // applyAntigravityPathRewrites replaces Claude Code config paths with Antigravity equivalents.
 func applyAntigravityPathRewrites(body string) string {
-	return strings.ReplaceAll(body, "~/.claude/", "~/.agent/")
+	return strings.ReplaceAll(body, "~/.claude/", "~/.agents/")
 }
 
 func extractBody(filePath string) (string, error) {

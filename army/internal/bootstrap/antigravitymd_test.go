@@ -39,7 +39,7 @@ End of doc.
 	tmplPath := filepath.Join(tmplDir, "GEMINI.md")
 	os.WriteFile(tmplPath, []byte(template), 0644)
 
-	destDir := filepath.Join(dir, "project", ".agent")
+	destDir := filepath.Join(dir, "project", ".agents")
 
 	agents := []model.Agent{
 		{Name: "go/coder", Access: "read-write"},
@@ -103,18 +103,18 @@ End of doc.
 		t.Error("missing go-reviewer in reference tips")
 	}
 
-	// Verify {{BASE}} was replaced with .agent (project-local)
+	// Verify {{BASE}} was replaced with .agents (project-local)
 	if strings.Contains(result, "{{BASE}}") {
 		t.Error("{{BASE}} placeholder should be replaced")
 	}
-	if !strings.Contains(result, ".agent/agents/") {
-		t.Errorf("expected .agent/agents/ path for project-local dest, got:\n%s", result)
+	if !strings.Contains(result, ".agents/agents/") {
+		t.Errorf("expected .agents/agents/ path for project-local dest, got:\n%s", result)
 	}
-	if !strings.Contains(result, ".agent/skills/") {
-		t.Error("expected .agent/skills/ path")
+	if !strings.Contains(result, ".agents/skills/") {
+		t.Error("expected .agents/skills/ path")
 	}
-	if !strings.Contains(result, ".agent/rules/") {
-		t.Error("expected .agent/rules/ path")
+	if !strings.Contains(result, ".agents/rules/") {
+		t.Error("expected .agents/rules/ path")
 	}
 
 	// Verify no excessive blank lines
@@ -145,7 +145,7 @@ func TestGenerateAntigravityMD_EmptyBuilders(t *testing.T) {
 	tmplPath := filepath.Join(tmplDir, "GEMINI.md")
 	os.WriteFile(tmplPath, []byte(template), 0644)
 
-	destDir := filepath.Join(dir, "project", ".agent")
+	destDir := filepath.Join(dir, "project", ".agents")
 
 	err := generateAntigravityMD(destDir, tmplPath, nil, nil, nil)
 	if err != nil {
@@ -192,9 +192,9 @@ func TestAntigravityDestPrefix(t *testing.T) {
 			want: "~/.gemini/antigravity",
 		},
 		{
-			name: "project local .agent",
-			dest: "/some/project/.agent",
-			want: ".agent",
+			name: "project local .agents",
+			dest: "/some/project/.agents",
+			want: ".agents",
 		},
 		{
 			name: "custom path",

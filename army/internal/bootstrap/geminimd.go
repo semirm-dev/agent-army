@@ -121,7 +121,7 @@ func buildGeminiSubagentTips(agents []model.Agent) string {
 			strings.Join(readOnlyNames, ", ")))
 	}
 
-	sb.WriteString("  - Use `model: gemini-2.5-pro` for all subagent tasks. Override per-agent if needed.\n")
+	sb.WriteString("  - Use `model: gemini-3.1-pro` for all subagent tasks. Override per-agent if needed.\n")
 
 	return sb.String()
 }

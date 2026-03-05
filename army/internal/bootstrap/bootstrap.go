@@ -338,7 +338,7 @@ func targetDirSuffix(target string) string {
 	case TargetGemini:
 		return ".gemini"
 	case TargetAntigravity:
-		return ".agent"
+		return ".agents"
 	default:
 		return ".claude"
 	}

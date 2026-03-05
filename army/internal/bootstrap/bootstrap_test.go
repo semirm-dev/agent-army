@@ -34,7 +34,7 @@ func TestTargetDirSuffix(t *testing.T) {
 		{TargetClaude, ".claude"},
 		{TargetCursor, ".cursor"},
 		{TargetGemini, ".gemini"},
-		{TargetAntigravity, ".agent"},
+		{TargetAntigravity, ".agents"},
 		{"unknown", ".claude"},
 	}
 	for _, tt := range tests {

@@ -99,7 +99,7 @@ End of doc.
 	if !strings.Contains(result, "`go-reviewer`") {
 		t.Error("missing go-reviewer in subagent tips")
 	}
-	if !strings.Contains(result, "gemini-2.5-pro") {
+	if !strings.Contains(result, "gemini-3.1-pro") {
 		t.Error("missing gemini model tip")
 	}
 
@@ -281,7 +281,7 @@ func TestBuildGeminiSubagentTips(t *testing.T) {
 		if !strings.Contains(result, "read_file") {
 			t.Error("missing read tool reference for read-only agents")
 		}
-		if !strings.Contains(result, "gemini-2.5-pro") {
+		if !strings.Contains(result, "gemini-3.1-pro") {
 			t.Error("missing gemini model tip")
 		}
 	})
@@ -296,7 +296,7 @@ func TestBuildGeminiSubagentTips(t *testing.T) {
 		if strings.Contains(result, "Read-only agents") {
 			t.Error("read-only tip should not appear when no read-only agents")
 		}
-		if !strings.Contains(result, "gemini-2.5-pro") {
+		if !strings.Contains(result, "gemini-3.1-pro") {
 			t.Error("gemini model tip should always appear")
 		}
 	})

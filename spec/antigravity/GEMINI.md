@@ -34,6 +34,53 @@ When rules contradict, follow this priority order:
 
 ---
 
+# Agentic Implementation Plan
+
+Skip for trivial changes (single-file fixes, typo corrections, config tweaks).
+
+Before any code execution for complex tasks, generate a plan using this structure:
+
+## 1. Summary
+- High-level architectural goal.
+- List of specialized workflows required for parallel execution.
+
+## 2. Strategy
+- **File Diff Preview:** List every file to be created or modified.
+- **Breaking Changes:** Explicitly flag if this change breaks existing APIs or DB schemas.
+
+## 3. Risk Assessment
+- **Risk Level:** [LOW / MEDIUM / HIGH]
+- **Rollback Plan:** Specific steps to undo the changes if the build fails.
+- **Human Gate:** If Risk is HIGH, stop and wait for a "PROCEED" command.
+
+## 4. Verification Plan
+- Specific commands to run (e.g., `go test ./internal/auth/...`, or whatever the test command is for the project). Always cleanup after yourself, move to trash whatever you created while testing/building.
+- Expected visual/log output for success.
+- Write new temporary tests to verify your changes (if possible).
+
+### Example: "Add a /health endpoint"
+
+```
+## 1. Summary
+Add /healthz and /readyz endpoints to the API server.
+Workflows: go-coder (endpoint), go-tester (tests), go-reviewer (review).
+
+## 2. Strategy
+- Create: internal/health/handler.go, internal/health/handler_test.go
+- Modify: cmd/server/main.go (register routes)
+- Breaking Changes: None.
+
+## 3. Risk Assessment
+- Risk Level: LOW
+- Rollback Plan: Revert the 2 new files and 1 route registration line.
+
+## 4. Verification Plan
+- go build ./... && go test ./internal/health/... -race
+- Expected: 200 on /healthz, 503 on /readyz when DB is down.
+```
+
+---
+
 # Language & Domain Rules
 
 <!-- BEGIN:rules-table -->
