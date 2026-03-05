@@ -213,8 +213,52 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 			}
 			fmt.Fprintln(w, "AGENTS.md generated.")
 		}
-	case TargetGemini, TargetAntigravity:
-		// Orchestrator generation for Gemini and Antigravity will be added in Task 10.
+	case TargetGemini:
+		genMD, err := p.Prompt("Generate GEMINI.md? [y/N] ")
+		if err != nil {
+			return err
+		}
+		if strings.TrimSpace(strings.ToLower(genMD)) == "y" {
+			geminiMDPath := filepath.Join(dest, "GEMINI.md")
+			if _, statErr := os.Stat(geminiMDPath); statErr == nil {
+				overwrite, err := p.Prompt("GEMINI.md exists. Overwrite? [y/N] ")
+				if err != nil {
+					return err
+				}
+				if strings.TrimSpace(strings.ToLower(overwrite)) != "y" {
+					fmt.Fprintln(w, "Skipped GEMINI.md generation.")
+					return nil
+				}
+			}
+			templatePath := filepath.Join(root, "spec", "gemini", "GEMINI.md")
+			if err := generateGeminiMD(dest, templatePath, agentObjs, skillObjs, ruleObjs); err != nil {
+				return fmt.Errorf("generate GEMINI.md: %w", err)
+			}
+			fmt.Fprintln(w, "GEMINI.md generated.")
+		}
+	case TargetAntigravity:
+		genMD, err := p.Prompt("Generate GEMINI.md? [y/N] ")
+		if err != nil {
+			return err
+		}
+		if strings.TrimSpace(strings.ToLower(genMD)) == "y" {
+			geminiMDPath := filepath.Join(dest, "GEMINI.md")
+			if _, statErr := os.Stat(geminiMDPath); statErr == nil {
+				overwrite, err := p.Prompt("GEMINI.md exists. Overwrite? [y/N] ")
+				if err != nil {
+					return err
+				}
+				if strings.TrimSpace(strings.ToLower(overwrite)) != "y" {
+					fmt.Fprintln(w, "Skipped GEMINI.md generation.")
+					return nil
+				}
+			}
+			templatePath := filepath.Join(root, "spec", "antigravity", "GEMINI.md")
+			if err := generateAntigravityMD(dest, templatePath, agentObjs, skillObjs, ruleObjs); err != nil {
+				return fmt.Errorf("generate GEMINI.md: %w", err)
+			}
+			fmt.Fprintln(w, "GEMINI.md generated.")
+		}
 	}
 
 	return nil
