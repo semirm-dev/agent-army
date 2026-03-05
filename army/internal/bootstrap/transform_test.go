@@ -458,6 +458,117 @@ func TestSkillToAntigravity(t *testing.T) {
 	}
 }
 
+func TestAgentToGemini_Frontmatter(t *testing.T) {
+	dir := t.TempDir()
+	agentsDir := filepath.Join(dir, "spec", "agents")
+	os.MkdirAll(agentsDir, 0755)
+	os.WriteFile(filepath.Join(agentsDir, "coder.md"),
+		[]byte("---\nname: go/coder\ndescription: Go coder\n---\n\n# Go Coder\n\nUse `Edit` and `Bash`.\nCheck ~/.claude/config.\n\n## Workflow\n1. Do stuff\n"), 0644)
+
+	got, err := agentToGemini(dir, model.Agent{
+		Name:        "go/coder",
+		Description: "Go coder",
+		Access:      "read-write",
+		Path:        "spec/agents/coder.md",
+	}, model.ResolvedDeps{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !strings.Contains(got, "name: go-coder") {
+		t.Error("missing name in frontmatter")
+	}
+	if !strings.Contains(got, "description: Go coder") {
+		t.Error("missing description in frontmatter")
+	}
+	if !strings.Contains(got, "- read_file") {
+		t.Error("missing read_file tool")
+	}
+	if !strings.Contains(got, "- write_file") {
+		t.Error("missing write_file tool")
+	}
+	if !strings.Contains(got, "- replace") {
+		t.Error("missing replace tool")
+	}
+	if !strings.Contains(got, "- run_shell_command") {
+		t.Error("missing run_shell_command tool")
+	}
+	if !strings.Contains(got, "model: gemini-2.5-pro") {
+		t.Error("missing model")
+	}
+	if !strings.Contains(got, "max_turns: 15") {
+		t.Error("missing max_turns")
+	}
+	// Tool rewrites in body
+	if strings.Contains(got, "`Edit`") {
+		t.Error("Edit should be replaced")
+	}
+	if strings.Contains(got, "`Bash`") {
+		t.Error("Bash should be replaced")
+	}
+	// Path rewrites
+	if strings.Contains(got, "~/.claude/") {
+		t.Error("~/.claude/ should be replaced")
+	}
+}
+
+func TestAgentToGemini_ReadOnly(t *testing.T) {
+	dir := t.TempDir()
+	agentsDir := filepath.Join(dir, "spec", "agents")
+	os.MkdirAll(agentsDir, 0755)
+	os.WriteFile(filepath.Join(agentsDir, "reviewer.md"),
+		[]byte("---\nname: go/reviewer\n---\n\n# Reviewer\n"), 0644)
+
+	got, err := agentToGemini(dir, model.Agent{
+		Name:   "go/reviewer",
+		Access: "read-only",
+		Path:   "spec/agents/reviewer.md",
+	}, model.ResolvedDeps{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(got, "- write_file") {
+		t.Error("read-only agent should not have write_file")
+	}
+	if strings.Contains(got, "- replace") {
+		t.Error("read-only agent should not have replace")
+	}
+	if !strings.Contains(got, "- read_file") {
+		t.Error("missing read_file for read-only agent")
+	}
+}
+
+func TestAgentToAntigravity(t *testing.T) {
+	dir := t.TempDir()
+	agentsDir := filepath.Join(dir, "spec", "agents")
+	os.MkdirAll(agentsDir, 0755)
+	os.WriteFile(filepath.Join(agentsDir, "coder.md"),
+		[]byte("---\nname: go/coder\n---\n\n# Go Coder\n\nCheck ~/.claude/config.\n\n## Workflow\n1. Do stuff\n"), 0644)
+
+	got, err := agentToAntigravity(dir, model.Agent{
+		Name:        "go/coder",
+		Description: "Go coder",
+		Path:        "spec/agents/coder.md",
+	}, model.ResolvedDeps{
+		Rules: []model.Rule{{Name: "security", Summary: "Auth"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// No frontmatter (reference docs)
+	if strings.HasPrefix(got, "---") {
+		t.Error("Antigravity agent should not have frontmatter (reference doc)")
+	}
+	// Path rewrites
+	if strings.Contains(got, "~/.claude/") {
+		t.Error("~/.claude/ should be replaced")
+	}
+	// Body enrichment still present
+	if !strings.Contains(got, "## Resources Available") {
+		t.Error("missing Resources Available section")
+	}
+}
+
 func TestCategorizeRule(t *testing.T) {
 	tests := []struct {
 		name string

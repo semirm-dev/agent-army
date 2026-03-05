@@ -91,7 +91,7 @@ func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (str
 		return "", err
 	}
 
-	body = enrichAgentBody(body, deps, true, nil)
+	body = enrichAgentBody(body, deps, TargetClaude, nil)
 
 	flat := flattenName(agent.Name)
 	tools := claudeToolsRW
@@ -128,7 +128,7 @@ func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, curs
 		return "", err
 	}
 
-	body = enrichAgentBody(body, deps, false, cursorRuleNames)
+	body = enrichAgentBody(body, deps, TargetCursor, cursorRuleNames)
 
 	flat := flattenName(agent.Name)
 
@@ -150,6 +150,57 @@ func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, curs
 	body = strings.ReplaceAll(body, "~/.claude/", "~/.cursor/")
 
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+// agentToGemini transforms a spec agent for Gemini CLI output (full frontmatter with tools list).
+func agentToGemini(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
+	body, err := extractBody(filepath.Join(root, agent.Path))
+	if err != nil {
+		return "", err
+	}
+
+	body = enrichAgentBody(body, deps, TargetGemini, nil)
+	body = applyGeminiToolRewrites(body)
+	body = applyGeminiPathRewrites(body)
+
+	flat := flattenName(agent.Name)
+
+	var toolList []string
+	if agent.Access == "read-only" {
+		toolList = []string{"read_file", "glob", "search_file_content", "run_shell_command"}
+	} else {
+		toolList = []string{"read_file", "write_file", "replace", "run_shell_command", "glob", "search_file_content"}
+	}
+
+	lines := []string{"---"}
+	lines = append(lines, fmt.Sprintf("name: %s", flat))
+	if strings.Contains(agent.Description, ":") {
+		lines = append(lines, fmt.Sprintf("description: %q", agent.Description))
+	} else {
+		lines = append(lines, fmt.Sprintf("description: %s", agent.Description))
+	}
+	lines = append(lines, "tools:")
+	for _, tool := range toolList {
+		lines = append(lines, fmt.Sprintf("  - %s", tool))
+	}
+	lines = append(lines, "model: gemini-2.5-pro")
+	lines = append(lines, "max_turns: 15")
+	lines = append(lines, "---")
+
+	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+// agentToAntigravity transforms a spec agent for Antigravity output (reference doc, no frontmatter).
+func agentToAntigravity(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
+	body, err := extractBody(filepath.Join(root, agent.Path))
+	if err != nil {
+		return "", err
+	}
+
+	body = enrichAgentBody(body, deps, TargetAntigravity, nil)
+	body = applyAntigravityPathRewrites(body)
+
+	return body, nil
 }
 
 func skillToClaude(root string, skill model.Skill) (string, error) {

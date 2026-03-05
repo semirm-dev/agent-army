@@ -493,9 +493,17 @@ func generateAll(
 				written++
 			}
 		} else {
-			// Claude, Gemini, Antigravity all use Claude-style rules for now
 			for _, r := range rules {
-				content, err := ruleToClaude(root, r)
+				var content string
+				var err error
+				switch target {
+				case TargetGemini:
+					content, err = ruleToGemini(root, r)
+				case TargetAntigravity:
+					content, err = ruleToAntigravity(root, r)
+				default:
+					content, err = ruleToClaude(root, r)
+				}
 				if err != nil {
 					return written, cursorRuleNames, err
 				}
@@ -513,10 +521,14 @@ func generateAll(
 		flat := flattenName(s.Name)
 		var content string
 		var err error
-		if target == TargetCursor {
+		switch target {
+		case TargetCursor:
 			content, err = skillToCursor(root, s)
-		} else {
-			// Claude, Gemini, Antigravity all use Claude-style skills for now
+		case TargetGemini:
+			content, err = skillToGemini(root, s)
+		case TargetAntigravity:
+			content, err = skillToAntigravity(root, s)
+		default:
 			content, err = skillToClaude(root, s)
 		}
 		if err != nil {
@@ -535,10 +547,14 @@ func generateAll(
 		deps := buildResolvedDeps(a, skillMap, ruleMap, agentMap, ruleLookup)
 		var content string
 		var err error
-		if target == TargetCursor {
+		switch target {
+		case TargetCursor:
 			content, err = agentToCursor(root, a, deps, cursorRuleNames)
-		} else {
-			// Claude, Gemini, Antigravity all use Claude-style agents for now
+		case TargetGemini:
+			content, err = agentToGemini(root, a, deps)
+		case TargetAntigravity:
+			content, err = agentToAntigravity(root, a, deps)
+		default:
 			content, err = agentToClaude(root, a, deps)
 		}
 		if err != nil {
