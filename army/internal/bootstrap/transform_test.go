@@ -323,6 +323,59 @@ func TestAntigravityPathRewrite(t *testing.T) {
 	}
 }
 
+func TestRuleToGemini(t *testing.T) {
+	dir := t.TempDir()
+	rulesDir := filepath.Join(dir, "spec", "rules")
+	os.MkdirAll(rulesDir, 0755)
+	os.WriteFile(filepath.Join(rulesDir, "security.md"),
+		[]byte("---\nscope: universal\n---\n\n# Security\n\nBody.\n"), 0644)
+
+	got, err := ruleToGemini(dir, model.Rule{Name: "security", Path: "spec/rules/security.md"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Gemini rules: body only, same as Claude (no frontmatter)
+	if strings.Contains(got, "---") {
+		t.Error("Gemini rule should not contain frontmatter")
+	}
+	if !strings.Contains(got, "# Security") {
+		t.Error("missing body content")
+	}
+}
+
+func TestRuleToAntigravity(t *testing.T) {
+	dir := t.TempDir()
+	rulesDir := filepath.Join(dir, "spec", "rules")
+	os.MkdirAll(rulesDir, 0755)
+	os.WriteFile(filepath.Join(rulesDir, "security.md"),
+		[]byte("---\nscope: universal\n---\n\n# Security\n\nBody.\n"), 0644)
+
+	got, err := ruleToAntigravity(dir, model.Rule{
+		Name:        "security",
+		Description: "Security Patterns",
+		Path:        "spec/rules/security.md",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Antigravity rules: description-only frontmatter
+	if !strings.Contains(got, "---") {
+		t.Error("Antigravity rule should contain frontmatter")
+	}
+	if !strings.Contains(got, "description: Security Patterns") {
+		t.Error("missing description in frontmatter")
+	}
+	if strings.Contains(got, "globs:") {
+		t.Error("Antigravity rules should not have globs")
+	}
+	if strings.Contains(got, "alwaysApply:") {
+		t.Error("Antigravity rules should not have alwaysApply")
+	}
+	if !strings.Contains(got, "# Security") {
+		t.Error("missing body")
+	}
+}
+
 func TestCategorizeRule(t *testing.T) {
 	tests := []struct {
 		name string

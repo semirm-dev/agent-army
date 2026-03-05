@@ -61,6 +61,30 @@ func ruleToCursor(root string, rule model.Rule) (string, error) {
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
+// ruleToGemini transforms a spec rule for Gemini CLI output (body only, no frontmatter).
+func ruleToGemini(root string, rule model.Rule) (string, error) {
+	return extractBody(filepath.Join(root, rule.Path))
+}
+
+// ruleToAntigravity transforms a spec rule for Antigravity output (description-only frontmatter + body).
+func ruleToAntigravity(root string, rule model.Rule) (string, error) {
+	body, err := extractBody(filepath.Join(root, rule.Path))
+	if err != nil {
+		return "", err
+	}
+
+	desc := ruleDescription(rule)
+	lines := []string{"---"}
+	if strings.Contains(desc, ":") {
+		lines = append(lines, fmt.Sprintf("description: %q", desc))
+	} else {
+		lines = append(lines, fmt.Sprintf("description: %s", desc))
+	}
+	lines = append(lines, "---")
+
+	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
 func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
 	if err != nil {
