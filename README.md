@@ -139,3 +139,7 @@ uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
 ```
+
+## TODO
+- prompt generator (feature, app)
+- setup generator (pick skills, plugins...)
