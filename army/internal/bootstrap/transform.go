@@ -61,13 +61,37 @@ func ruleToCursor(root string, rule model.Rule) (string, error) {
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
+// ruleToGemini transforms a spec rule for Gemini CLI output (body only, no frontmatter).
+func ruleToGemini(root string, rule model.Rule) (string, error) {
+	return extractBody(filepath.Join(root, rule.Path))
+}
+
+// ruleToAntigravity transforms a spec rule for Antigravity output (description-only frontmatter + body).
+func ruleToAntigravity(root string, rule model.Rule) (string, error) {
+	body, err := extractBody(filepath.Join(root, rule.Path))
+	if err != nil {
+		return "", err
+	}
+
+	desc := ruleDescription(rule)
+	lines := []string{"---"}
+	if strings.Contains(desc, ":") {
+		lines = append(lines, fmt.Sprintf("description: %q", desc))
+	} else {
+		lines = append(lines, fmt.Sprintf("description: %s", desc))
+	}
+	lines = append(lines, "---")
+
+	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
 func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
 	if err != nil {
 		return "", err
 	}
 
-	body = enrichAgentBody(body, deps, true, nil)
+	body = enrichAgentBody(body, deps, TargetClaude, nil)
 
 	flat := flattenName(agent.Name)
 	tools := claudeToolsRW
@@ -89,8 +113,14 @@ func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (str
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
-var editRe = regexp.MustCompile("`Edit`")
-var bashRe = regexp.MustCompile("`Bash`")
+var (
+	editRe  = regexp.MustCompile("`Edit`")
+	bashRe  = regexp.MustCompile("`Bash`")
+	readRe  = regexp.MustCompile("`Read`")
+	writeRe = regexp.MustCompile("`Write`")
+	grepRe  = regexp.MustCompile("`Grep`")
+	globRe  = regexp.MustCompile("`Glob`")
+)
 
 func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, cursorRuleNames map[string]string) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
@@ -98,7 +128,7 @@ func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, curs
 		return "", err
 	}
 
-	body = enrichAgentBody(body, deps, false, cursorRuleNames)
+	body = enrichAgentBody(body, deps, TargetCursor, cursorRuleNames)
 
 	flat := flattenName(agent.Name)
 
@@ -120,6 +150,57 @@ func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, curs
 	body = strings.ReplaceAll(body, "~/.claude/", "~/.cursor/")
 
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+// agentToGemini transforms a spec agent for Gemini CLI output (full frontmatter with tools list).
+func agentToGemini(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
+	body, err := extractBody(filepath.Join(root, agent.Path))
+	if err != nil {
+		return "", err
+	}
+
+	body = enrichAgentBody(body, deps, TargetGemini, nil)
+	body = applyGeminiToolRewrites(body)
+	body = applyGeminiPathRewrites(body)
+
+	flat := flattenName(agent.Name)
+
+	var toolList []string
+	if agent.Access == "read-only" {
+		toolList = []string{"read_file", "glob", "search_file_content", "run_shell_command"}
+	} else {
+		toolList = []string{"read_file", "write_file", "replace", "run_shell_command", "glob", "search_file_content"}
+	}
+
+	lines := []string{"---"}
+	lines = append(lines, fmt.Sprintf("name: %s", flat))
+	if strings.Contains(agent.Description, ":") {
+		lines = append(lines, fmt.Sprintf("description: %q", agent.Description))
+	} else {
+		lines = append(lines, fmt.Sprintf("description: %s", agent.Description))
+	}
+	lines = append(lines, "tools:")
+	for _, tool := range toolList {
+		lines = append(lines, fmt.Sprintf("  - %s", tool))
+	}
+	lines = append(lines, "model: gemini-2.5-pro")
+	lines = append(lines, "max_turns: 15")
+	lines = append(lines, "---")
+
+	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+// agentToAntigravity transforms a spec agent for Antigravity output (reference doc, no frontmatter).
+func agentToAntigravity(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
+	body, err := extractBody(filepath.Join(root, agent.Path))
+	if err != nil {
+		return "", err
+	}
+
+	body = enrichAgentBody(body, deps, TargetAntigravity, nil)
+	body = applyAntigravityPathRewrites(body)
+
+	return body, nil
 }
 
 func skillToClaude(root string, skill model.Skill) (string, error) {
@@ -149,6 +230,61 @@ func skillToCursor(root string, skill model.Skill) (string, error) {
 	lines = append(lines, "---")
 
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+// skillToGemini transforms a spec skill for Gemini CLI output (no frontmatter, tool and path rewrites).
+func skillToGemini(root string, skill model.Skill) (string, error) {
+	body, err := extractBody(filepath.Join(root, skill.Path))
+	if err != nil {
+		return "", err
+	}
+	body = applyGeminiToolRewrites(body)
+	body = applyGeminiPathRewrites(body)
+	return body, nil
+}
+
+// skillToAntigravity transforms a spec skill for Antigravity output (name+description frontmatter, path rewrites).
+func skillToAntigravity(root string, skill model.Skill) (string, error) {
+	body, err := extractBody(filepath.Join(root, skill.Path))
+	if err != nil {
+		return "", err
+	}
+	body = applyAntigravityPathRewrites(body)
+
+	flat := flattenName(skill.Name)
+	desc := skillDescription(skill)
+
+	lines := []string{"---"}
+	lines = append(lines, fmt.Sprintf("name: %s", flat))
+	if strings.Contains(desc, ":") {
+		lines = append(lines, fmt.Sprintf("description: %q", desc))
+	} else {
+		lines = append(lines, fmt.Sprintf("description: %s", desc))
+	}
+	lines = append(lines, "---")
+
+	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+// applyGeminiToolRewrites replaces Claude Code tool names with their Gemini CLI equivalents.
+func applyGeminiToolRewrites(body string) string {
+	body = editRe.ReplaceAllString(body, "`replace`")
+	body = bashRe.ReplaceAllString(body, "`run_shell_command`")
+	body = readRe.ReplaceAllString(body, "`read_file`")
+	body = writeRe.ReplaceAllString(body, "`write_file`")
+	body = grepRe.ReplaceAllString(body, "`search_file_content`")
+	body = globRe.ReplaceAllString(body, "`glob`")
+	return body
+}
+
+// applyGeminiPathRewrites replaces Claude Code config paths with Gemini CLI equivalents.
+func applyGeminiPathRewrites(body string) string {
+	return strings.ReplaceAll(body, "~/.claude/", "~/.gemini/")
+}
+
+// applyAntigravityPathRewrites replaces Claude Code config paths with Antigravity equivalents.
+func applyAntigravityPathRewrites(body string) string {
+	return strings.ReplaceAll(body, "~/.claude/", "~/.agent/")
 }
 
 func extractBody(filePath string) (string, error) {

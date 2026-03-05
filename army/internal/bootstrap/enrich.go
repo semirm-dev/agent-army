@@ -69,15 +69,15 @@ func buildResolvedDeps(
 
 // enrichAgentBody injects a "Resources Available" section into the agent body
 // and rewrites body text references to be target-native.
-func enrichAgentBody(body string, deps model.ResolvedDeps, isClaude bool, cursorRuleNames map[string]string) string {
-	resources := buildResourcesSection(deps, isClaude, cursorRuleNames)
+func enrichAgentBody(body string, deps model.ResolvedDeps, target string, cursorRuleNames map[string]string) string {
+	resources := buildResourcesSection(deps, target, cursorRuleNames)
 	body = injectSection(body, resources)
-	body = rewriteBodyRefs(body, isClaude)
+	body = rewriteBodyRefs(body, target)
 	return body
 }
 
 // buildResourcesSection generates the "## Resources Available" markdown section.
-func buildResourcesSection(deps model.ResolvedDeps, isClaude bool, cursorRuleNames map[string]string) string {
+func buildResourcesSection(deps model.ResolvedDeps, target string, cursorRuleNames map[string]string) string {
 	var sb strings.Builder
 
 	sb.WriteString("## Resources Available\n")
@@ -85,13 +85,14 @@ func buildResourcesSection(deps model.ResolvedDeps, isClaude bool, cursorRuleNam
 	// Rules section
 	if len(deps.Rules) > 0 {
 		sb.WriteString("\n")
-		if isClaude {
+		switch target {
+		case TargetClaude:
 			sb.WriteString("### Rules (Auto-Loaded)\n")
 			sb.WriteString("The following rules are automatically loaded into context. Follow them:\n")
 			for _, r := range deps.Rules {
 				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", flattenName(r.Name), ruleDescription(r)))
 			}
-		} else {
+		case TargetCursor:
 			sb.WriteString("### Rules (Auto-Applied)\n")
 			sb.WriteString("The following rules are automatically applied based on file type. Follow them:\n")
 			for _, r := range deps.Rules {
@@ -101,19 +102,44 @@ func buildResourcesSection(deps model.ResolvedDeps, isClaude bool, cursorRuleNam
 				}
 				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", displayName, ruleDescription(r)))
 			}
+		case TargetGemini:
+			sb.WriteString("### Rules (Auto-Loaded via @file)\n")
+			sb.WriteString("The following rules are loaded via @file imports. Follow them:\n")
+			for _, r := range deps.Rules {
+				sb.WriteString(fmt.Sprintf("- `@rules/%s.md` -- %s\n", flattenName(r.Name), ruleDescription(r)))
+			}
+		case TargetAntigravity:
+			sb.WriteString("### Rules (Reference)\n")
+			sb.WriteString("The following rules are available for reference. Follow them:\n")
+			for _, r := range deps.Rules {
+				sb.WriteString(fmt.Sprintf("- `rules/%s.md` -- %s\n", flattenName(r.Name), ruleDescription(r)))
+			}
 		}
 	}
 
 	// Skills section
 	if len(deps.Skills) > 0 {
 		sb.WriteString("\n")
-		if isClaude {
+		switch target {
+		case TargetClaude:
 			sb.WriteString("### Skills (Invoke via Skill Tool)\n")
 			sb.WriteString("Use the Skill tool to invoke these when the task matches:\n")
 			for _, s := range deps.Skills {
 				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", flattenName(s.Name), skillDescription(s)))
 			}
-		} else {
+		case TargetCursor:
+			sb.WriteString("### Workflow References\n")
+			sb.WriteString("Read and follow these workflow files when the task matches:\n")
+			for _, s := range deps.Skills {
+				sb.WriteString(fmt.Sprintf("- `skills/%s/SKILL.md` -- %s\n", flattenName(s.Name), skillDescription(s)))
+			}
+		case TargetGemini:
+			sb.WriteString("### Workflow References (@file)\n")
+			sb.WriteString("Read and follow these workflow files when the task matches:\n")
+			for _, s := range deps.Skills {
+				sb.WriteString(fmt.Sprintf("- `@skills/%s/SKILL.md` -- %s\n", flattenName(s.Name), skillDescription(s)))
+			}
+		case TargetAntigravity:
 			sb.WriteString("### Workflow References\n")
 			sb.WriteString("Read and follow these workflow files when the task matches:\n")
 			for _, s := range deps.Skills {
@@ -123,7 +149,7 @@ func buildResourcesSection(deps model.ResolvedDeps, isClaude bool, cursorRuleNam
 	}
 
 	// Plugins section (Claude only)
-	if isClaude && len(deps.Plugins) > 0 {
+	if target == TargetClaude && len(deps.Plugins) > 0 {
 		sb.WriteString("\n### Plugins\n")
 		for _, p := range deps.Plugins {
 			sb.WriteString(fmt.Sprintf("- `%s`\n", p))
@@ -131,7 +157,7 @@ func buildResourcesSection(deps model.ResolvedDeps, isClaude bool, cursorRuleNam
 	}
 
 	// Delegate agents section (Claude only)
-	if isClaude && len(deps.DelegatesTo) > 0 {
+	if target == TargetClaude && len(deps.DelegatesTo) > 0 {
 		sb.WriteString("\n### Delegate Agents (Invoke via Task Tool)\n")
 		sb.WriteString("Use the Task tool with these agent files when delegation is needed:\n")
 		for _, a := range deps.DelegatesTo {
@@ -176,28 +202,39 @@ var (
 )
 
 // rewriteBodyRefs rewrites instructional references in the body text to be target-native.
-func rewriteBodyRefs(body string, isClaude bool) string {
-	if isClaude {
+func rewriteBodyRefs(body string, target string) string {
+	switch target {
+	case TargetClaude:
 		// Claude body text is already native — no changes needed
 		return body
+	case TargetCursor:
+		body = invokeSkillForRe.ReplaceAllString(body, "read and follow the workflow in `skills/$1/SKILL.md` $2")
+		body = invokeSkillRe.ReplaceAllString(body, "read and follow the workflow in `skills/$1/SKILL.md`")
+		body = loadedViaSkillRe.ReplaceAllString(body, "defined in `skills/$1/SKILL.md`")
+		body = loadedViaSkillsRe.ReplaceAllString(body, "defined in the workflow files listed under Resources Available")
+		body = loadedViaRuleRe.ReplaceAllString(body, "defined in the `$1` rule")
+		body = delegateToRe.ReplaceAllString(body, "read the review checklist in `agents/$1.md`")
+		body = viaSkillToolRe.ReplaceAllString(body, "")
+		body = viaSkillToolBacktickRe.ReplaceAllString(body, "")
+	case TargetGemini:
+		body = invokeSkillForRe.ReplaceAllString(body, "read and follow `@skills/$1/SKILL.md` $2")
+		body = invokeSkillRe.ReplaceAllString(body, "read and follow `@skills/$1/SKILL.md`")
+		body = loadedViaSkillRe.ReplaceAllString(body, "defined in `@skills/$1/SKILL.md`")
+		body = loadedViaSkillsRe.ReplaceAllString(body, "defined in the workflow files listed under Resources Available")
+		body = loadedViaRuleRe.ReplaceAllString(body, "defined in `@rules/$1.md`")
+		body = delegateToRe.ReplaceAllString(body, "consult the reference in `agents/$1.md`")
+		body = viaSkillToolRe.ReplaceAllString(body, "")
+		body = viaSkillToolBacktickRe.ReplaceAllString(body, "")
+	case TargetAntigravity:
+		body = invokeSkillForRe.ReplaceAllString(body, "read and follow `skills/$1/SKILL.md` $2")
+		body = invokeSkillRe.ReplaceAllString(body, "read and follow `skills/$1/SKILL.md`")
+		body = loadedViaSkillRe.ReplaceAllString(body, "defined in `skills/$1/SKILL.md`")
+		body = loadedViaSkillsRe.ReplaceAllString(body, "defined in the workflow files listed under Resources Available")
+		body = loadedViaRuleRe.ReplaceAllString(body, "defined in `rules/$1.md`")
+		body = delegateToRe.ReplaceAllString(body, "consult the reference in `agents/$1.md`")
+		body = viaSkillToolRe.ReplaceAllString(body, "")
+		body = viaSkillToolBacktickRe.ReplaceAllString(body, "")
 	}
-
-	// Cursor: rewrite skill invocations
-	body = invokeSkillForRe.ReplaceAllString(body, "read and follow the workflow in `skills/$1/SKILL.md` $2")
-	body = invokeSkillRe.ReplaceAllString(body, "read and follow the workflow in `skills/$1/SKILL.md`")
-
-	// Cursor: rewrite "loaded via" references
-	body = loadedViaSkillRe.ReplaceAllString(body, "defined in `skills/$1/SKILL.md`")
-	body = loadedViaSkillsRe.ReplaceAllString(body, "defined in the workflow files listed under Resources Available")
-	body = loadedViaRuleRe.ReplaceAllString(body, "defined in the `$1` rule")
-
-	// Cursor: rewrite delegation
-	body = delegateToRe.ReplaceAllString(body, "read the review checklist in `agents/$1.md`")
-
-	// Cursor: remove Skill tool references
-	body = viaSkillToolRe.ReplaceAllString(body, "")
-	body = viaSkillToolBacktickRe.ReplaceAllString(body, "")
-
 	return body
 }
 
