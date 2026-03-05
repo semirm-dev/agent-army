@@ -89,8 +89,14 @@ func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (str
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
-var editRe = regexp.MustCompile("`Edit`")
-var bashRe = regexp.MustCompile("`Bash`")
+var (
+	editRe  = regexp.MustCompile("`Edit`")
+	bashRe  = regexp.MustCompile("`Bash`")
+	readRe  = regexp.MustCompile("`Read`")
+	writeRe = regexp.MustCompile("`Write`")
+	grepRe  = regexp.MustCompile("`Grep`")
+	globRe  = regexp.MustCompile("`Glob`")
+)
 
 func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, cursorRuleNames map[string]string) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
@@ -149,6 +155,27 @@ func skillToCursor(root string, skill model.Skill) (string, error) {
 	lines = append(lines, "---")
 
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
+}
+
+// applyGeminiToolRewrites replaces Claude Code tool names with their Gemini CLI equivalents.
+func applyGeminiToolRewrites(body string) string {
+	body = editRe.ReplaceAllString(body, "`replace`")
+	body = bashRe.ReplaceAllString(body, "`run_shell_command`")
+	body = readRe.ReplaceAllString(body, "`read_file`")
+	body = writeRe.ReplaceAllString(body, "`write_file`")
+	body = grepRe.ReplaceAllString(body, "`search_file_content`")
+	body = globRe.ReplaceAllString(body, "`glob`")
+	return body
+}
+
+// applyGeminiPathRewrites replaces Claude Code config paths with Gemini CLI equivalents.
+func applyGeminiPathRewrites(body string) string {
+	return strings.ReplaceAll(body, "~/.claude/", "~/.gemini/")
+}
+
+// applyAntigravityPathRewrites replaces Claude Code config paths with Antigravity equivalents.
+func applyAntigravityPathRewrites(body string) string {
+	return strings.ReplaceAll(body, "~/.claude/", "~/.agent/")
 }
 
 func extractBody(filePath string) (string, error) {

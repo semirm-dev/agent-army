@@ -279,6 +279,50 @@ func TestAssignCursorNumbers(t *testing.T) {
 	}
 }
 
+func TestGeminiToolRewrites(t *testing.T) {
+	input := "Use `Edit` to modify, `Bash` to run, `Read` to view, `Write` to create, `Grep` to search, `Glob` to find."
+	got := applyGeminiToolRewrites(input)
+
+	tests := []struct{ old, new string }{
+		{"`Edit`", "`replace`"},
+		{"`Bash`", "`run_shell_command`"},
+		{"`Read`", "`read_file`"},
+		{"`Write`", "`write_file`"},
+		{"`Grep`", "`search_file_content`"},
+		{"`Glob`", "`glob`"},
+	}
+	for _, tt := range tests {
+		if strings.Contains(got, tt.old) {
+			t.Errorf("%s should be replaced", tt.old)
+		}
+		if !strings.Contains(got, tt.new) {
+			t.Errorf("missing %s", tt.new)
+		}
+	}
+}
+
+func TestGeminiPathRewrite(t *testing.T) {
+	input := "Check ~/.claude/config for settings."
+	got := applyGeminiPathRewrites(input)
+	if strings.Contains(got, "~/.claude/") {
+		t.Error("~/.claude/ should be replaced with ~/.gemini/")
+	}
+	if !strings.Contains(got, "~/.gemini/") {
+		t.Error("missing ~/.gemini/")
+	}
+}
+
+func TestAntigravityPathRewrite(t *testing.T) {
+	input := "Check ~/.claude/config for settings."
+	got := applyAntigravityPathRewrites(input)
+	if strings.Contains(got, "~/.claude/") {
+		t.Error("~/.claude/ should be replaced with ~/.agent/")
+	}
+	if !strings.Contains(got, "~/.agent/") {
+		t.Error("missing ~/.agent/")
+	}
+}
+
 func TestCategorizeRule(t *testing.T) {
 	tests := []struct {
 		name string
