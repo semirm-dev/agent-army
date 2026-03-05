@@ -90,12 +90,8 @@ func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (str
 }
 
 var (
-	editRe  = regexp.MustCompile("`Edit`")
-	bashRe  = regexp.MustCompile("`Bash`")
-	readRe  = regexp.MustCompile("`Read`")
-	writeRe = regexp.MustCompile("`Write`")
-	grepRe  = regexp.MustCompile("`Grep`")
-	globRe  = regexp.MustCompile("`Glob`")
+	editRe = regexp.MustCompile("`Edit`")
+	bashRe = regexp.MustCompile("`Bash`")
 )
 
 func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, cursorRuleNames map[string]string) (string, error) {
@@ -128,21 +124,6 @@ func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, curs
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
 }
 
-// TODO: AI_DELETION_REVIEW — agentToAntigravity is no longer called (Antigravity does not support agents).
-// agentToAntigravity transforms a spec agent for Antigravity output (reference doc, no frontmatter).
-func agentToAntigravity(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
-	body, err := extractBody(filepath.Join(root, agent.Path))
-	if err != nil {
-		return "", err
-	}
-
-	body = enrichAgentBody(body, deps, TargetAntigravity, nil)
-	body = applyAntigravityToolRewrites(body)
-	body = applyAntigravityPathRewrites(body)
-
-	return body, nil
-}
-
 func skillToClaude(root string, skill model.Skill) (string, error) {
 	return extractBody(filepath.Join(root, skill.Path))
 }
@@ -170,65 +151,6 @@ func skillToCursor(root string, skill model.Skill) (string, error) {
 	lines = append(lines, "---")
 
 	return strings.Join(lines, "\n") + "\n\n" + body, nil
-}
-
-// skillToAntigravity transforms a spec skill for Antigravity output (name+description frontmatter, tool and path rewrites).
-// Resolved rules are appended at the bottom of the skill file so Antigravity loads them alongside the skill.
-func skillToAntigravity(root string, skill model.Skill, rules []model.Rule) (string, error) {
-	body, err := extractBody(filepath.Join(root, skill.Path))
-	if err != nil {
-		return "", err
-	}
-	body = applyAntigravityToolRewrites(body)
-	body = applyAntigravityPathRewrites(body)
-
-	flat := flattenName(skill.Name)
-	desc := skillDescription(skill)
-
-	lines := []string{"---"}
-	lines = append(lines, fmt.Sprintf("name: %s", flat))
-	if strings.Contains(desc, ":") {
-		lines = append(lines, fmt.Sprintf("description: %q", desc))
-	} else {
-		lines = append(lines, fmt.Sprintf("description: %s", desc))
-	}
-	lines = append(lines, "---")
-
-	var sb strings.Builder
-	sb.WriteString(strings.Join(lines, "\n") + "\n\n" + body)
-
-	// Append resolved rule bodies at the bottom
-	for _, r := range rules {
-		ruleBody, err := extractBody(filepath.Join(root, r.Path))
-		if err != nil {
-			return "", fmt.Errorf("read rule %s for skill %s: %w", r.Name, skill.Name, err)
-		}
-		ruleBody = applyAntigravityToolRewrites(ruleBody)
-		ruleBody = applyAntigravityPathRewrites(ruleBody)
-		if !strings.HasSuffix(sb.String(), "\n") {
-			sb.WriteString("\n")
-		}
-		sb.WriteString("\n")
-		sb.WriteString(ruleBody)
-	}
-
-	return sb.String(), nil
-}
-
-// applyAntigravityToolRewrites replaces Claude Code tool names with their Antigravity equivalents.
-func applyAntigravityToolRewrites(body string) string {
-	body = editRe.ReplaceAllString(body, "`replace`")
-	body = bashRe.ReplaceAllString(body, "`run_shell_command`")
-	body = readRe.ReplaceAllString(body, "`read_file`")
-	body = writeRe.ReplaceAllString(body, "`write_file`")
-	body = grepRe.ReplaceAllString(body, "`search_file_content`")
-	body = globRe.ReplaceAllString(body, "`glob`")
-	return body
-}
-
-// applyAntigravityPathRewrites replaces Claude Code config paths with Antigravity equivalents.
-func applyAntigravityPathRewrites(body string) string {
-	return strings.ReplaceAll(body, "~/.claude/", "~/.agents/")
 }
 
 func extractBody(filePath string) (string, error) {

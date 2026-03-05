@@ -102,12 +102,6 @@ func buildResourcesSection(deps model.ResolvedDeps, target string, cursorRuleNam
 				}
 				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", displayName, ruleDescription(r)))
 			}
-		case TargetAntigravity:
-			sb.WriteString("### Rules (Bundled in Skill Files)\n")
-			sb.WriteString("The following rules are appended to each skill's SKILL.md file:\n")
-			for _, r := range deps.Rules {
-				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", flattenName(r.Name), ruleDescription(r)))
-			}
 		}
 	}
 
@@ -122,12 +116,6 @@ func buildResourcesSection(deps model.ResolvedDeps, target string, cursorRuleNam
 				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", flattenName(s.Name), skillDescription(s)))
 			}
 		case TargetCursor:
-			sb.WriteString("### Workflow References\n")
-			sb.WriteString("Read and follow these workflow files when the task matches:\n")
-			for _, s := range deps.Skills {
-				sb.WriteString(fmt.Sprintf("- `skills/%s/SKILL.md` -- %s\n", flattenName(s.Name), skillDescription(s)))
-			}
-		case TargetAntigravity:
 			sb.WriteString("### Workflow References\n")
 			sb.WriteString("Read and follow these workflow files when the task matches:\n")
 			for _, s := range deps.Skills {
@@ -202,15 +190,6 @@ func rewriteBodyRefs(body string, target string) string {
 		body = loadedViaSkillsRe.ReplaceAllString(body, "defined in the workflow files listed under Resources Available")
 		body = loadedViaRuleRe.ReplaceAllString(body, "defined in the `$1` rule")
 		body = delegateToRe.ReplaceAllString(body, "read the review checklist in `agents/$1.md`")
-		body = viaSkillToolRe.ReplaceAllString(body, "")
-		body = viaSkillToolBacktickRe.ReplaceAllString(body, "")
-	case TargetAntigravity:
-		body = invokeSkillForRe.ReplaceAllString(body, "read and follow `skills/$1/SKILL.md` $2")
-		body = invokeSkillRe.ReplaceAllString(body, "read and follow `skills/$1/SKILL.md`")
-		body = loadedViaSkillRe.ReplaceAllString(body, "defined in `skills/$1/SKILL.md`")
-		body = loadedViaSkillsRe.ReplaceAllString(body, "defined in the workflow files listed under Resources Available")
-		body = loadedViaRuleRe.ReplaceAllString(body, "appended to the relevant SKILL.md files")
-		body = delegateToRe.ReplaceAllString(body, "consult the reference in `workflows/$1.md`")
 		body = viaSkillToolRe.ReplaceAllString(body, "")
 		body = viaSkillToolBacktickRe.ReplaceAllString(body, "")
 	}

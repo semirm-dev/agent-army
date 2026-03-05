@@ -33,7 +33,6 @@ func TestTargetDirSuffix(t *testing.T) {
 	}{
 		{TargetClaude, ".claude"},
 		{TargetCursor, ".cursor"},
-		{TargetAntigravity, ".agents"},
 		{"unknown", ".claude"},
 	}
 	for _, tt := range tests {
@@ -57,7 +56,6 @@ func TestTargetGlobalDir(t *testing.T) {
 	}{
 		{TargetClaude, filepath.Join(home, ".claude")},
 		{TargetCursor, filepath.Join(home, ".cursor")},
-		{TargetAntigravity, filepath.Join(home, ".gemini", "antigravity")},
 		{"unknown", filepath.Join(home, ".claude")},
 	}
 	for _, tt := range tests {

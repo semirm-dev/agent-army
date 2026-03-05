@@ -85,20 +85,11 @@ Regenerate with `make manifest`.
 - `settings.json` — Claude Code settings from `spec/claude/settings.json`
 
 ### Cursor
-> Testing in progress...
 
 `make bootstrap` and pick Cursor, generates platform-specific output in `.build/cursor/` (adjustable):
 
 - `AGENTS.md` — orchestrator with agent definitions, safety constraints, and plugin references
 - `agents/`, `skills/`, `rules/` — resolved spec files ready for Cursor consumption
-
-### Antigravity
-> Work in progress...
-
-`make bootstrap` and pick Antigravity, generates platform-specific output in `.build/antigravity/` (adjustable):
-
-- `GEMINI.md` — orchestrator with some general instructions
-- `agents/`, `skills/`, `rules/` — resolved spec files ready for Antigravity consumption
 
 ## File Format
 
@@ -148,8 +139,3 @@ uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
 ```
-
-
-## TODO
-- [ ] Add support for Gemini CLI
-- [ ] Add support for Antigravity

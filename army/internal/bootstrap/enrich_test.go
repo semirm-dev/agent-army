@@ -278,58 +278,6 @@ func TestInjectSection(t *testing.T) {
 	}
 }
 
-func TestEnrichAgentBody_Antigravity(t *testing.T) {
-	body := "# Agent\n\n## Workflow\n1. Step one\n"
-	deps := model.ResolvedDeps{
-		Rules:  []model.Rule{{Name: "security", Summary: "Auth patterns"}},
-		Skills: []model.Skill{{Name: "error-handling", Summary: "Error taxonomy"}},
-	}
-
-	result := enrichAgentBody(body, deps, TargetAntigravity, nil)
-
-	if !strings.Contains(result, "### Rules (Bundled in Skill Files)") {
-		t.Error("missing Antigravity-style Rules subsection")
-	}
-	if !strings.Contains(result, "### Workflow References") {
-		t.Error("missing Antigravity-style Skills subsection")
-	}
-	if strings.Contains(result, "### Plugins") {
-		t.Error("Antigravity should not have Plugins section")
-	}
-}
-
-func TestRewriteBodyRefs_Antigravity(t *testing.T) {
-	tests := []struct {
-		name  string
-		input string
-		want  string
-	}{
-		{
-			name:  "invoke skill",
-			input: "invoke the `error-handling` skill",
-			want:  "read and follow `skills/error-handling/SKILL.md`",
-		},
-		{
-			name:  "delegate to",
-			input: "Delegate to `type-design-analyzer`",
-			want:  "consult the reference in `workflows/type-design-analyzer.md`",
-		},
-		{
-			name:  "loaded via rule",
-			input: "Patterns are loaded via the `ai-assisted-development` rule.",
-			want:  "Patterns are appended to the relevant SKILL.md files.",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := rewriteBodyRefs(tt.input, TargetAntigravity)
-			if got != tt.want {
-				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestRuleDescription(t *testing.T) {
 	r := model.Rule{Name: "test", Description: "H1 Title", Summary: "Brief summary"}
 	if got := ruleDescription(r); got != "Brief summary" {
