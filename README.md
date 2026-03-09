@@ -141,5 +141,8 @@ delegates_to: []
 ```
 
 ## TODO
-- prompt generator (feature, app)
-- setup generator (pick skills, plugins...)
+- [ ] Get rid of rules/, focus on skills/ and agents/ only
+- [ ] Adjust skills/ output to be model agnostic (supported by all)
+- [ ] Favor claude's skill creator to create new skills, suggest based on project and tech stack
+- [ ] Simplify claude.md and agents.md (remove references to agents, skills, rules...), be as generic as possible
+- [ ] Cleanup agents/, keep only absolutely necessary ones
