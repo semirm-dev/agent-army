@@ -18,6 +18,7 @@ make new-rule           # Scaffold a new rule
 make new-skill          # Scaffold a new skill
 make new-agent          # Scaffold a new agent
 make edit-deps          # Interactively add/remove dependency entries
+make sync               # Install all plugins and skills from PLUGINS_AND_SKILLS.md
 ```
 
 Run a single test package:

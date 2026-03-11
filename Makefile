@@ -1,4 +1,4 @@
-.PHONY: help build manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test
+.PHONY: help build manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test sync
 
 ARMY := army/army
 
@@ -27,6 +27,8 @@ help: ## Show available targets
 	@echo "  test           Run the Go test suite."
 	@echo ""
 	@echo "  build          Build the Go CLI binary."
+	@echo ""
+	@echo "  sync           Install all plugins and skills listed in PLUGINS_AND_SKILLS.md."
 
 $(ARMY): $(shell find army -name '*.go')
 	cd army && go build -o army ./cmd/army
@@ -56,3 +58,6 @@ bootstrap: | $(ARMY) ## Generate model-specific rules, skills, and agents
 
 test: ## Run Go tests with race detection
 	cd army && go test ./... -race -count=1
+
+sync: ## Install all plugins and skills from PLUGINS_AND_SKILLS.md
+	./scripts/sync.sh

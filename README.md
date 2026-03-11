@@ -59,6 +59,7 @@ The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` 
 | `make new-skill` | Scaffold a new skill with interactive prompts |
 | `make new-agent` | Scaffold a new agent with interactive prompts |
 | `make bootstrap` | Generate model-specific rules, skills, and agents (output in `.build/`) |
+| `make sync` | Install all plugins and skills listed in `PLUGINS_AND_SKILLS.md` |
 
 ## Manifest (`manifest.json`) - for now unused index file
 
