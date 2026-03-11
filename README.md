@@ -71,6 +71,13 @@ Three commands manage Claude Code plugins and standalone skills:
 2. **`make sync`** — Reads `PLUGINS_AND_SKILLS.md` and installs all listed plugins and skills. Also removes standalone skills flagged as redundant.
 3. **`make analyze`** — Read-only terminal report showing installed plugins, skills, and any duplicates. Use for verification without modifying anything.
 
+### Workflow
+
+1. **Install locally** — Add a skill or plugin on your machine (e.g., `/skill add`, `/plugin install`, or `npx skills add`)
+2. **Capture** — Run `make update-plugins-skills` to record it in `PLUGINS_AND_SKILLS.md`
+3. **Verify** — Run `make analyze` to confirm no duplicates or conflicts
+4. **Sync other devices** — On any other machine, run `make sync` to install the same plugins and skills from `PLUGINS_AND_SKILLS.md`
+
 ## Manifest (`manifest.json`) - for now unused index file
 
 Auto-generated index of all rules, skills, and agents. Each entry lists:
