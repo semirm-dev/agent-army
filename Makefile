@@ -1,4 +1,4 @@
-.PHONY: help build manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test sync update-plugins-skills analyze
+.PHONY: help build manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test sync update-plugins-skills analyze analyze-fix
 
 ARMY := army/army
 
@@ -33,6 +33,7 @@ help: ## Show available targets
 	@echo "  update-plugins-skills  Regenerate PLUGINS_AND_SKILLS.md from system state."
 	@echo ""
 	@echo "  analyze        Analyze installed plugins and skills, report duplicates."
+	@echo "  analyze-fix    Analyze and fix skill lock drift (remove stale entries)."
 
 $(ARMY): $(shell find army -name '*.go')
 	cd army && go build -o army ./cmd/army
@@ -71,3 +72,6 @@ update-plugins-skills: | $(ARMY) ## Regenerate PLUGINS_AND_SKILLS.md from system
 
 analyze: | $(ARMY) ## Analyze installed plugins and skills, report duplicates
 	$(ARMY) analyze
+
+analyze-fix: | $(ARMY) ## Analyze and fix skill lock drift
+	$(ARMY) analyze --fix

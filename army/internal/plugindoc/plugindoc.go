@@ -746,6 +746,70 @@ func generateMCPSection(b *strings.Builder, plugins installedPluginsFile) {
 	}
 }
 
+// DriftEntry represents a skill listed in the lock file whose directory no longer exists on disk.
+type DriftEntry struct {
+	Name   string
+	Source string
+}
+
+// DetectDrift returns skills listed in .skill-lock.json whose SKILL.md no longer exists on disk.
+func DetectDrift() ([]DriftEntry, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, fmt.Errorf("getting home dir: %w", err)
+	}
+
+	skillLock := loadSkillLock(home)
+	skillNames := sortedKeys(skillLock.Skills)
+
+	var entries []DriftEntry
+	for _, skillName := range skillNames {
+		skillMD := filepath.Join(home, ".agents", "skills", skillName, "SKILL.md")
+		if _, err := os.Stat(skillMD); os.IsNotExist(err) {
+			entries = append(entries, DriftEntry{
+				Name:   skillName,
+				Source: skillLock.Skills[skillName].Source,
+			})
+		}
+	}
+	return entries, nil
+}
+
+// RemoveDriftEntries removes the specified skill entries from ~/.agents/.skill-lock.json.
+func RemoveDriftEntries(entries []DriftEntry) error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("getting home dir: %w", err)
+	}
+
+	lockPath := filepath.Join(home, ".agents", ".skill-lock.json")
+	data, err := os.ReadFile(lockPath)
+	if err != nil {
+		return fmt.Errorf("reading skill-lock: %w", err)
+	}
+
+	var lock map[string]interface{}
+	if err := json.Unmarshal(data, &lock); err != nil {
+		return fmt.Errorf("parsing skill-lock: %w", err)
+	}
+
+	skills, ok := lock["skills"].(map[string]interface{})
+	if !ok {
+		return nil
+	}
+
+	for _, e := range entries {
+		delete(skills, e.Name)
+	}
+
+	out, err := json.MarshalIndent(lock, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshalling skill-lock: %w", err)
+	}
+	out = append(out, '\n')
+	return os.WriteFile(lockPath, out, 0644)
+}
+
 // Analyze produces a terminal-friendly report of installed plugins, skills, and duplicates.
 func Analyze() (string, error) {
 	home, err := os.UserHomeDir()
@@ -906,21 +970,14 @@ func Analyze() (string, error) {
 	b.WriteString("\n")
 
 	// --- Skill Lock Drift ---
-	var missingSkills []string
-	for _, skillName := range skillNames {
-		skillMD := filepath.Join(home, ".agents", "skills", skillName, "SKILL.md")
-		if _, err := os.Stat(skillMD); os.IsNotExist(err) {
-			missingSkills = append(missingSkills, skillName)
-		}
-	}
+	driftEntries, _ := DetectDrift()
 
-	b.WriteString(termcolor.Header("Skill Lock Drift", len(missingSkills)))
-	if len(missingSkills) == 0 {
+	b.WriteString(termcolor.Header("Skill Lock Drift", len(driftEntries)))
+	if len(driftEntries) == 0 {
 		b.WriteString("  " + termcolor.Success("No drift detected.") + "\n")
 	} else {
-		for _, name := range missingSkills {
-			src := skillLock.Skills[name].Source
-			b.WriteString("  " + termcolor.Err(fmt.Sprintf("\"%s\" in lock file but missing from filesystem (source: %s)", name, src)) + "\n")
+		for _, entry := range driftEntries {
+			b.WriteString("  " + termcolor.Err(fmt.Sprintf("\"%s\" in lock file but missing from filesystem (source: %s)", entry.Name, entry.Source)) + "\n")
 		}
 	}
 

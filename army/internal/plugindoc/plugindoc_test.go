@@ -194,6 +194,101 @@ func TestDuplicateSkillExclusion(t *testing.T) {
 	}
 }
 
+func TestDetectDrift(t *testing.T) {
+	origHome := os.Getenv("HOME")
+	tmpHome := t.TempDir()
+	os.Setenv("HOME", tmpHome)
+	defer os.Setenv("HOME", origHome)
+
+	// Create .agents directory with lock file
+	agentsDir := filepath.Join(tmpHome, ".agents")
+	os.MkdirAll(agentsDir, 0755)
+
+	// Create lock file with two skills
+	lockData := `{"skills":{"existing-skill":{"source":"owner/repo","sourceUrl":"https://github.com/owner/repo"},"missing-skill":{"source":"other/repo","sourceUrl":"https://github.com/other/repo"}}}`
+	os.WriteFile(filepath.Join(agentsDir, ".skill-lock.json"), []byte(lockData), 0644)
+
+	// Create directory for existing-skill only
+	skillDir := filepath.Join(agentsDir, "skills", "existing-skill")
+	os.MkdirAll(skillDir, 0755)
+	os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte("---\nname: existing-skill\n---\n"), 0644)
+
+	entries, err := DetectDrift()
+	if err != nil {
+		t.Fatalf("DetectDrift() error: %v", err)
+	}
+
+	if len(entries) != 1 {
+		t.Fatalf("expected 1 drift entry, got %d", len(entries))
+	}
+	if entries[0].Name != "missing-skill" {
+		t.Errorf("expected drift entry name 'missing-skill', got %q", entries[0].Name)
+	}
+	if entries[0].Source != "other/repo" {
+		t.Errorf("expected drift entry source 'other/repo', got %q", entries[0].Source)
+	}
+}
+
+func TestDetectDrift_noDrift(t *testing.T) {
+	origHome := os.Getenv("HOME")
+	tmpHome := t.TempDir()
+	os.Setenv("HOME", tmpHome)
+	defer os.Setenv("HOME", origHome)
+
+	// No lock file at all
+	entries, err := DetectDrift()
+	if err != nil {
+		t.Fatalf("DetectDrift() error: %v", err)
+	}
+	if len(entries) != 0 {
+		t.Errorf("expected 0 drift entries, got %d", len(entries))
+	}
+}
+
+func TestRemoveDriftEntries(t *testing.T) {
+	origHome := os.Getenv("HOME")
+	tmpHome := t.TempDir()
+	os.Setenv("HOME", tmpHome)
+	defer os.Setenv("HOME", origHome)
+
+	agentsDir := filepath.Join(tmpHome, ".agents")
+	os.MkdirAll(agentsDir, 0755)
+
+	lockData := `{
+  "skills": {
+    "keep-me": {"source": "a/b", "sourceUrl": "https://github.com/a/b"},
+    "remove-me": {"source": "c/d", "sourceUrl": "https://github.com/c/d"},
+    "also-remove": {"source": "e/f", "sourceUrl": "https://github.com/e/f"}
+  }
+}`
+	lockPath := filepath.Join(agentsDir, ".skill-lock.json")
+	os.WriteFile(lockPath, []byte(lockData), 0644)
+
+	err := RemoveDriftEntries([]DriftEntry{
+		{Name: "remove-me", Source: "c/d"},
+		{Name: "also-remove", Source: "e/f"},
+	})
+	if err != nil {
+		t.Fatalf("RemoveDriftEntries() error: %v", err)
+	}
+
+	// Read back and verify
+	data, err := os.ReadFile(lockPath)
+	if err != nil {
+		t.Fatalf("reading lock file: %v", err)
+	}
+	content := string(data)
+	if strings.Contains(content, "remove-me") {
+		t.Error("expected remove-me to be removed from lock file")
+	}
+	if strings.Contains(content, "also-remove") {
+		t.Error("expected also-remove to be removed from lock file")
+	}
+	if !strings.Contains(content, "keep-me") {
+		t.Error("expected keep-me to remain in lock file")
+	}
+}
+
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && containsStr(s, substr)
 }

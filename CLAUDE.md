@@ -21,6 +21,7 @@ make edit-deps          # Interactively add/remove dependency entries
 make sync               # Install all plugins and skills from PLUGINS_AND_SKILLS.md
 make update-plugins-skills  # Regenerate PLUGINS_AND_SKILLS.md from system state
 make analyze            # Analyze installed plugins and skills, report duplicates
+make analyze-fix        # Analyze and fix skill lock drift (remove stale entries)
 ```
 
 Run a single test package:
