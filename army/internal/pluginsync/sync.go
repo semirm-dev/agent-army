@@ -1,10 +1,12 @@
 package pluginsync
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -26,6 +28,9 @@ func (DefaultRunner) Run(name string, args []string) error {
 	cmd.Stdin = nil // prevent interactive prompts from consuming input
 	return cmd.Run()
 }
+
+// userHomeDir is overridden in tests to use a temp directory.
+var userHomeDir = os.UserHomeDir
 
 var pluginCmdRe = regexp.MustCompile(`/plugin install ([^\s|` + "`" + `]+)`)
 var skillCmdRe = regexp.MustCompile("`(npx skills add [^`]+)`")
@@ -97,12 +102,11 @@ func Run(docPath string, w io.Writer, runner CommandRunner) error {
 		fmt.Fprintln(w, termcolor.Header("Cleaning Up Redundant Skills", len(redundantMatches)))
 		for _, m := range redundantMatches {
 			skillName := m[1]
-			cmdParts := []string{"skills", "remove", skillName, "-y"}
-			cmdStr := "npx " + strings.Join(cmdParts, " ")
-			fmt.Fprintln(w, termcolor.Arrow(cmdStr))
-			if err := runner.Run("npx", cmdParts); err != nil {
-				fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+cmdStr))
-				failures = append(failures, cmdStr)
+			if err := removeSkillDirect(skillName); err != nil {
+				fmt.Fprintln(w, "  "+termcolor.Err(fmt.Sprintf("Failed to remove %s: %v", skillName, err)))
+				failures = append(failures, "remove "+skillName)
+			} else {
+				fmt.Fprintln(w, "  "+termcolor.Success("Removed standalone skill: "+skillName))
 			}
 		}
 	}
@@ -114,4 +118,48 @@ func Run(docPath string, w io.Writer, runner CommandRunner) error {
 
 	fmt.Fprint(w, termcolor.DoneMsg("All plugins and skills installed."))
 	return nil
+}
+
+// removeSkillDirect removes a standalone skill by deleting its directory
+// and removing its entry from .skill-lock.json. This bypasses `npx skills remove`
+// which refuses to remove skills that have a pluginName field in the lock file.
+func removeSkillDirect(skillName string) error {
+	home, err := userHomeDir()
+	if err != nil {
+		return err
+	}
+
+	// Remove skill directory
+	skillDir := filepath.Join(home, ".agents", "skills", skillName)
+	if err := os.RemoveAll(skillDir); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("removing skill dir: %w", err)
+	}
+
+	// Remove entry from .skill-lock.json
+	lockPath := filepath.Join(home, ".agents", ".skill-lock.json")
+	data, err := os.ReadFile(lockPath)
+	if err != nil {
+		return nil // no lock file, nothing to clean
+	}
+
+	var lock map[string]interface{}
+	if err := json.Unmarshal(data, &lock); err != nil {
+		return fmt.Errorf("parsing skill-lock: %w", err)
+	}
+
+	skills, ok := lock["skills"].(map[string]interface{})
+	if !ok {
+		return nil
+	}
+
+	if _, exists := skills[skillName]; !exists {
+		return nil
+	}
+	delete(skills, skillName)
+
+	out, err := json.MarshalIndent(lock, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshalling skill-lock: %w", err)
+	}
+	return os.WriteFile(lockPath, append(out, '\n'), 0644)
 }

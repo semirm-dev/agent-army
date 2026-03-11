@@ -517,6 +517,15 @@ func generateSkillsSection(b *strings.Builder, plugins installedPluginsFile, ski
 		}
 	}
 
+	// Emit redundant standalone skills blockquote for sync to pick up
+	if len(duplicates) > 0 {
+		b.WriteString("> **Redundant standalone skills:** These are already provided by plugins and can be removed:\n")
+		for _, d := range duplicates {
+			b.WriteString(fmt.Sprintf("> - `npx skills remove %s`\n", d.skillName))
+		}
+		b.WriteString("\n")
+	}
+
 	b.WriteString("\n---\n\n")
 }
 

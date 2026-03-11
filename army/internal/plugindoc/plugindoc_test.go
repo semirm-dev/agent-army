@@ -177,12 +177,16 @@ func TestDuplicateSkillExclusion(t *testing.T) {
 	generateSkillsSection(&b, plugins, skillLock, pluginRepoMap, pluginSkillNames)
 	output := b.String()
 
-	// Duplicate standalone skills should be excluded entirely
-	if contains(output, "my-skill") {
-		t.Error("expected duplicate skill to be excluded from output")
+	// Duplicate standalone skills should be excluded from skill tables
+	// but listed in the redundant blockquote for sync to remove
+	if contains(output, "| `my-skill`") {
+		t.Error("expected duplicate skill to be excluded from skill tables")
 	}
-	if contains(output, "redundant") {
-		t.Error("expected no redundancy warnings in output")
+	if !contains(output, "Redundant standalone skills") {
+		t.Error("expected redundant standalone skills blockquote")
+	}
+	if !contains(output, "npx skills remove my-skill") {
+		t.Error("expected removal command for duplicate skill")
 	}
 	// Total should be 0: 0 plugin-provided + 0 standalone (1 excluded as duplicate)
 	if !contains(output, "## Skills (0)") {

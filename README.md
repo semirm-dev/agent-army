@@ -60,6 +60,16 @@ The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` 
 | `make new-agent` | Scaffold a new agent with interactive prompts |
 | `make bootstrap` | Generate model-specific rules, skills, and agents (output in `.build/`) |
 | `make sync` | Install all plugins and skills listed in `PLUGINS_AND_SKILLS.md` |
+| `make update-plugins-skills` | Regenerate `PLUGINS_AND_SKILLS.md` from installed system state |
+| `make analyze` | Show installed plugins, skills, and duplicate report (terminal only) |
+
+## Plugin & Skill Management
+
+Three commands manage Claude Code plugins and standalone skills:
+
+1. **`make update-plugins-skills`** — Scans installed Claude Code plugins and standalone skills, writes `PLUGINS_AND_SKILLS.md`, and flags redundant standalone skills already covered by plugins.
+2. **`make sync`** — Reads `PLUGINS_AND_SKILLS.md` and installs all listed plugins and skills. Also removes standalone skills flagged as redundant.
+3. **`make analyze`** — Read-only terminal report showing installed plugins, skills, and any duplicates. Use for verification without modifying anything.
 
 ## Manifest (`manifest.json`) - for now unused index file
 

@@ -35,7 +35,7 @@ Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l
 
 | Skill | Description | Install |
 |-------|-------------|--------|
-| `browser-use` |  | `npx skills add browser-use/browser-use -g -s browser-use` |
+| `browser-use` | Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, or extract information from web pages. | `npx skills add browser-use/browser-use -g -s browser-use` |
 
 ### From [jeffallan/claude-skills](https://github.com/jeffallan/claude-skills) (17 skills)
 
@@ -63,13 +63,13 @@ Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l
 
 | Skill | Description | Install |
 |-------|-------------|--------|
-| `database-schema-designer` |  | `npx skills add softaworks/agent-toolkit -g -s database-schema-designer` |
+| `database-schema-designer` | Design robust, scalable database schemas for SQL and NoSQL databases. Provides normalization guidelines, indexing strategies, migration patterns, constraint design, and performance optimization. Ensures data integrity, query performance, and maintainable data models. | `npx skills add softaworks/agent-toolkit -g -s database-schema-designer` |
 
 ### From [vercel-labs/skills](https://github.com/vercel-labs/skills) (1 skill)
 
 | Skill | Description | Install |
 |-------|-------------|--------|
-| `find-skills` |  | `npx skills add vercel-labs/skills -g -s find-skills` |
+| `find-skills` | Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill. | `npx skills add vercel-labs/skills -g -s find-skills` |
 
 ### Plugin-Provided Skills
 

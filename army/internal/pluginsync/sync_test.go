@@ -131,6 +131,19 @@ func TestRunWithCleanup(t *testing.T) {
 	docPath := filepath.Join(dir, "PLUGINS_AND_SKILLS.md")
 	os.WriteFile(docPath, []byte(sampleDocWithRedundant), 0644)
 
+	// Set up fake home with skill dirs and lock file
+	fakeHome := t.TempDir()
+	origHomeDir := userHomeDir
+	userHomeDir = func() (string, error) { return fakeHome, nil }
+	t.Cleanup(func() { userHomeDir = origHomeDir })
+
+	agentsDir := filepath.Join(fakeHome, ".agents", "skills")
+	os.MkdirAll(filepath.Join(agentsDir, "frontend-design"), 0755)
+	os.MkdirAll(filepath.Join(agentsDir, "skill-creator"), 0755)
+
+	lockData := `{"version":3,"skills":{"frontend-design":{"source":"anthropics/skills"},"skill-creator":{"source":"anthropics/skills"},"other-skill":{"source":"someone/repo"}}}`
+	os.WriteFile(filepath.Join(fakeHome, ".agents", ".skill-lock.json"), []byte(lockData), 0644)
+
 	runner := &mockRunner{}
 	var buf bytes.Buffer
 	err := Run(docPath, &buf, runner)
@@ -138,22 +151,37 @@ func TestRunWithCleanup(t *testing.T) {
 		t.Fatalf("Run() error: %v", err)
 	}
 
-	// Should have 2 plugin installs + 1 skill install + 2 cleanup removals = 5
-	if len(runner.commands) != 5 {
-		t.Fatalf("expected 5 commands, got %d: %v", len(runner.commands), runner.commands)
-	}
-
-	// Verify cleanup commands
-	if runner.commands[3] != "npx skills remove frontend-design -y" {
-		t.Errorf("cmd[3] = %q, want cleanup of frontend-design", runner.commands[3])
-	}
-	if runner.commands[4] != "npx skills remove skill-creator -y" {
-		t.Errorf("cmd[4] = %q, want cleanup of skill-creator", runner.commands[4])
+	// Should have 2 plugin installs + 1 skill install (cleanup is direct, not via runner)
+	if len(runner.commands) != 3 {
+		t.Fatalf("expected 3 commands, got %d: %v", len(runner.commands), runner.commands)
 	}
 
 	output := buf.String()
 	if !strings.Contains(output, "Cleaning Up Redundant Skills") {
 		t.Error("expected cleanup section header in output")
+	}
+	if !strings.Contains(output, "Removed standalone skill: frontend-design") {
+		t.Error("expected success message for frontend-design removal")
+	}
+	if !strings.Contains(output, "Removed standalone skill: skill-creator") {
+		t.Error("expected success message for skill-creator removal")
+	}
+
+	// Verify skill directories were removed
+	if _, err := os.Stat(filepath.Join(agentsDir, "frontend-design")); !os.IsNotExist(err) {
+		t.Error("expected frontend-design directory to be removed")
+	}
+	if _, err := os.Stat(filepath.Join(agentsDir, "skill-creator")); !os.IsNotExist(err) {
+		t.Error("expected skill-creator directory to be removed")
+	}
+
+	// Verify lock file was updated (other-skill should remain)
+	lockBytes, _ := os.ReadFile(filepath.Join(fakeHome, ".agents", ".skill-lock.json"))
+	if strings.Contains(string(lockBytes), "frontend-design") {
+		t.Error("expected frontend-design removed from lock file")
+	}
+	if !strings.Contains(string(lockBytes), "other-skill") {
+		t.Error("expected other-skill to remain in lock file")
 	}
 }
 

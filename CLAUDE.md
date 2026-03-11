@@ -19,6 +19,8 @@ make new-skill          # Scaffold a new skill
 make new-agent          # Scaffold a new agent
 make edit-deps          # Interactively add/remove dependency entries
 make sync               # Install all plugins and skills from PLUGINS_AND_SKILLS.md
+make update-plugins-skills  # Regenerate PLUGINS_AND_SKILLS.md from system state
+make analyze            # Analyze installed plugins and skills, report duplicates
 ```
 
 Run a single test package:
@@ -42,6 +44,9 @@ Key internal packages:
 - **`editor/`** — Interactive dependency editor (TUI)
 - **`resolver/`** — Conflict resolution for transitive dependencies
 - **`model/`** — Core data types: Rule, Skill, Agent
+- **`plugindoc/`** — Generates PLUGINS_AND_SKILLS.md and terminal analysis reports for installed plugins/skills
+- **`pluginsync/`** — Reads PLUGINS_AND_SKILLS.md and executes plugin/skill install + redundant skill cleanup
+- **`termcolor/`** — ANSI color helpers for formatted CLI output
 
 Dependencies: `cobra` (CLI framework), `gopkg.in/yaml.v3` (YAML parsing)
 
@@ -59,6 +64,7 @@ All specs use YAML frontmatter + Markdown content:
 - **`manifest.json`** — Auto-generated index of all specs with resolved transitive dependencies. Regenerate with `make manifest` after any spec change.
 - **`Makefile`** — All build orchestration
 - **`.build/`** — Generated output directory (gitignored)
+- **`PLUGINS_AND_SKILLS.md`** — Auto-generated report of installed Claude Code plugins and skills. Regenerate with `make update-plugins-skills`.
 
 ## Development Workflow
 
