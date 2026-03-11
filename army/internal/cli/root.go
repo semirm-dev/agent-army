@@ -19,6 +19,8 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newEditCmd())
 	cmd.AddCommand(newNewCmd())
 	cmd.AddCommand(newBootstrapCmd())
+	cmd.AddCommand(newUpdatePluginsSkillsCmd())
+	cmd.AddCommand(newSyncCmd())
 
 	return cmd
 }
