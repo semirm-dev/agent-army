@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/semir/agent-army/internal/termcolor"
 )
 
 // CommandRunner abstracts command execution for testability.
@@ -40,37 +42,40 @@ func Run(docPath string, w io.Writer, runner CommandRunner) error {
 	var failures []string
 
 	// Install plugins
-	fmt.Fprintln(w, "=== Installing Plugins ===")
-	for _, m := range pluginCmdRe.FindAllStringSubmatch(content, -1) {
+	pluginMatches := pluginCmdRe.FindAllStringSubmatch(content, -1)
+	fmt.Fprintln(w, termcolor.Header("Installing Plugins", len(pluginMatches)))
+	for _, m := range pluginMatches {
 		pluginRef := m[1]
 		args := []string{"plugin", "install", pluginRef}
 		cmdStr := "claude " + strings.Join(args, " ")
-		fmt.Fprintf(w, "\u2192 %s\n", cmdStr)
+		fmt.Fprintln(w, termcolor.Arrow(cmdStr))
 		if err := runner.Run("claude", args); err != nil {
-			fmt.Fprintf(w, "  \u2717 Failed: %s\n", cmdStr)
+			fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+cmdStr))
 			failures = append(failures, cmdStr)
 		}
 	}
 
 	// Install skills (only from sections before "### Plugin-Provided Skills")
-	fmt.Fprintln(w, "\n=== Installing Skills ===")
 	skillContent := content
 	if idx := strings.Index(content, "### Plugin-Provided Skills"); idx >= 0 {
 		skillContent = content[:idx]
 	}
 
+	var skillCommands [][]string
 	for _, m := range skillCmdRe.FindAllStringSubmatch(skillContent, -1) {
-		cmdParts := strings.Fields(m[1])
-		// Skip commands containing < (template placeholders)
 		if strings.Contains(m[1], "<") {
 			continue
 		}
-		// Append -y flag for non-interactive
+		skillCommands = append(skillCommands, strings.Fields(m[1]))
+	}
+
+	fmt.Fprintln(w, termcolor.Header("Installing Skills", len(skillCommands)))
+	for _, cmdParts := range skillCommands {
 		cmdParts = append(cmdParts, "-y")
 		cmdStr := strings.Join(cmdParts, " ")
-		fmt.Fprintf(w, "\u2192 %s\n", cmdStr)
+		fmt.Fprintln(w, termcolor.Arrow(cmdStr))
 		if err := runner.Run(cmdParts[0], cmdParts[1:]); err != nil {
-			fmt.Fprintf(w, "  \u2717 Failed: %s\n", cmdStr)
+			fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+cmdStr))
 			failures = append(failures, cmdStr)
 		}
 	}
@@ -88,24 +93,25 @@ func Run(docPath string, w io.Writer, runner CommandRunner) error {
 	}
 
 	if redundantSection != "" {
-		fmt.Fprintln(w, "\n=== Cleaning Up Redundant Skills ===")
-		for _, m := range redundantSkillRe.FindAllStringSubmatch(redundantSection, -1) {
+		redundantMatches := redundantSkillRe.FindAllStringSubmatch(redundantSection, -1)
+		fmt.Fprintln(w, termcolor.Header("Cleaning Up Redundant Skills", len(redundantMatches)))
+		for _, m := range redundantMatches {
 			skillName := m[1]
 			cmdParts := []string{"skills", "remove", skillName, "-y"}
 			cmdStr := "npx " + strings.Join(cmdParts, " ")
-			fmt.Fprintf(w, "\u2192 %s\n", cmdStr)
+			fmt.Fprintln(w, termcolor.Arrow(cmdStr))
 			if err := runner.Run("npx", cmdParts); err != nil {
-				fmt.Fprintf(w, "  \u2717 Failed: %s\n", cmdStr)
+				fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+cmdStr))
 				failures = append(failures, cmdStr)
 			}
 		}
 	}
 
 	if len(failures) > 0 {
-		fmt.Fprintf(w, "\nSome commands failed. Check output above.\n")
+		fmt.Fprint(w, termcolor.ErrMsg("Some commands failed. Check output above."))
 		return fmt.Errorf("%d commands failed", len(failures))
 	}
 
-	fmt.Fprintln(w, "\nDone. All plugins and skills installed.")
+	fmt.Fprint(w, termcolor.DoneMsg("All plugins and skills installed."))
 	return nil
 }

@@ -20,7 +20,7 @@
 
 ---
 
-## Skills (44)
+## Skills (42)
 
 Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l` to list available skills before installing.
 
@@ -30,13 +30,6 @@ Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l
 > - `superpowers:brainstorm` → use `superpowers:brainstorming`
 > - `superpowers:execute-plan` → use `superpowers:executing-plans`
 > - `superpowers:write-plan` → use `superpowers:writing-plans`
-
-### From [anthropics/skills](https://github.com/anthropics/skills) (2 skills)
-
-| Skill | Description | Install |
-|-------|-------------|--------|
-| `frontend-design` | Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics. | `npx skills add anthropics/skills -g -s frontend-design` |
-| `skill-creator` | Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy. | `npx skills add anthropics/skills -g -s skill-creator` |
 
 ### From [browser-use/browser-use](https://github.com/browser-use/browser-use) (1 skill)
 

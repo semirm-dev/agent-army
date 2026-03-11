@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/semir/agent-army/internal/plugindoc"
+	"github.com/semir/agent-army/internal/termcolor"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,7 @@ func newUpdatePluginsSkillsCmd() *cobra.Command {
 			if err := plugindoc.WritePluginsAndSkills(out); err != nil {
 				return err
 			}
-			fmt.Printf("Generated %s\n", out)
+			fmt.Print(termcolor.DoneMsg("Generated " + out))
 			return nil
 		},
 	}

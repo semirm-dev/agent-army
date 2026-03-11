@@ -159,7 +159,7 @@ func TestBuildPluginSkillNames(t *testing.T) {
 	}
 }
 
-func TestDuplicateSkillAnnotation(t *testing.T) {
+func TestDuplicateSkillExclusion(t *testing.T) {
 	plugins := installedPluginsFile{
 		Plugins: map[string][]pluginInstance{},
 	}
@@ -177,16 +177,14 @@ func TestDuplicateSkillAnnotation(t *testing.T) {
 	generateSkillsSection(&b, plugins, skillLock, pluginRepoMap, pluginSkillNames)
 	output := b.String()
 
-	if !contains(output, "*(redundant — provided by **cool-plugin** plugin)*") {
-		t.Error("expected redundancy annotation in skill row")
+	// Duplicate standalone skills should be excluded entirely
+	if contains(output, "my-skill") {
+		t.Error("expected duplicate skill to be excluded from output")
 	}
-	if !contains(output, "> **Redundant standalone skills:**") {
-		t.Error("expected redundant skills blockquote warning")
+	if contains(output, "redundant") {
+		t.Error("expected no redundancy warnings in output")
 	}
-	if !contains(output, "`npx skills remove my-skill`") {
-		t.Error("expected removal command in warning")
-	}
-	// Total should subtract duplicates: 0 plugin-provided + 1 standalone - 1 duplicate = 0
+	// Total should be 0: 0 plugin-provided + 0 standalone (1 excluded as duplicate)
 	if !contains(output, "## Skills (0)") {
 		t.Errorf("expected Skills (0) in output, got: %s", output[:200])
 	}

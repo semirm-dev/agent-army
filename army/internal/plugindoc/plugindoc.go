@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/semir/agent-army/internal/frontmatter"
+	"github.com/semir/agent-army/internal/termcolor"
 )
 
 // --- JSON types ---
@@ -390,11 +391,31 @@ func generateSkillsSection(b *strings.Builder, plugins installedPluginsFile, ski
 
 	// Count plugin-provided skills (from plugin dirs)
 	pluginSkillCount := countPluginProvidedSkills(plugins)
+
+	// Remove duplicate standalone skills (already provided by plugins)
+	duplicateSet := map[string]bool{}
+	for _, d := range duplicates {
+		duplicateSet[d.skillName] = true
+	}
+	for src, g := range standaloneGroups {
+		filtered := g.skills[:0]
+		for _, s := range g.skills {
+			if !duplicateSet[s.name] {
+				filtered = append(filtered, s)
+			}
+		}
+		g.skills = filtered
+		if len(filtered) == 0 {
+			delete(standaloneGroups, src)
+		}
+	}
+
+	// Count after filtering duplicates
 	standaloneCount := 0
 	for _, g := range standaloneGroups {
 		standaloneCount += len(g.skills)
 	}
-	totalSkills := standaloneCount + pluginSkillCount - len(duplicates)
+	totalSkills := standaloneCount + pluginSkillCount
 
 	b.WriteString(fmt.Sprintf("## Skills (%d)\n\n", totalSkills))
 	b.WriteString("Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l` to list available skills before installing.\n\n")
@@ -420,12 +441,6 @@ func generateSkillsSection(b *strings.Builder, plugins installedPluginsFile, ski
 		b.WriteString("\n")
 	}
 
-	// Build set of duplicate skill names for quick lookup
-	duplicateSet := map[string]string{}
-	for _, d := range duplicates {
-		duplicateSet[d.skillName] = d.pluginName
-	}
-
 	// Standalone skill groups (sorted by source)
 	groupSources := make([]string, 0, len(standaloneGroups))
 	for src := range standaloneGroups {
@@ -447,20 +462,7 @@ func generateSkillsSection(b *strings.Builder, plugins installedPluginsFile, ski
 
 		sort.Slice(g.skills, func(i, j int) bool { return g.skills[i].name < g.skills[j].name })
 		for _, s := range g.skills {
-			desc := s.desc
-			if pname, isDup := duplicateSet[s.name]; isDup {
-				desc += fmt.Sprintf(" *(redundant — provided by **%s** plugin)*", pname)
-			}
-			b.WriteString(fmt.Sprintf("| `%s` | %s | `npx skills add %s -g -s %s` |\n", s.name, desc, src, s.name))
-		}
-		b.WriteString("\n")
-	}
-
-	// Emit redundant skills warning blockquote
-	if len(duplicates) > 0 {
-		b.WriteString("> **Redundant standalone skills:** These are already provided by plugins and can be removed:\n")
-		for _, d := range duplicates {
-			b.WriteString(fmt.Sprintf("> - `%s` (provided by **%s** plugin) — `npx skills remove %s`\n", d.skillName, d.pluginName, d.skillName))
+			b.WriteString(fmt.Sprintf("| `%s` | %s | `npx skills add %s -g -s %s` |\n", s.name, s.desc, src, s.name))
 		}
 		b.WriteString("\n")
 	}
@@ -733,6 +735,166 @@ func generateMCPSection(b *strings.Builder, plugins installedPluginsFile) {
 	for _, s := range servers {
 		b.WriteString(fmt.Sprintf("| `%s` | %s | %s |\n", s.name, s.transport, s.endpoint))
 	}
+}
+
+// Analyze produces a terminal-friendly report of installed plugins, skills, and duplicates.
+func Analyze() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("getting home dir: %w", err)
+	}
+
+	plugins := loadInstalledPlugins(home)
+	skillLock := loadSkillLock(home)
+	pluginRepoMap := buildPluginRepoMap(plugins)
+	pluginSkillNames := buildPluginSkillNames(plugins)
+
+	var b strings.Builder
+
+	// --- Installed Plugins ---
+	pluginKeys := sortedKeys(plugins.Plugins)
+	b.WriteString(termcolor.Header("Installed Plugins", len(pluginKeys)))
+	for i, key := range pluginKeys {
+		instances := plugins.Plugins[key]
+		if len(instances) == 0 {
+			continue
+		}
+		meta := loadPluginMeta(instances[0].InstallPath)
+		name := meta.Name
+		if name == "" {
+			name = strings.SplitN(key, "@", 2)[0]
+		}
+		ver := meta.Version
+		if ver == "" {
+			ver = instances[0].Version
+		}
+		verDisplay := ""
+		if ver != "" && isSemanticVersion(ver) {
+			verDisplay = fmt.Sprintf(" (v%s)", ver)
+		}
+		b.WriteString(termcolor.Numbered(i+1, name, verDisplay) + "\n")
+	}
+	b.WriteString("\n")
+
+	// --- Plugin-Provided Skills (grouped by plugin) ---
+	type pluginSkillInfo struct {
+		name string
+		desc string
+	}
+	pluginSkillsByPlugin := map[string][]pluginSkillInfo{}
+	for _, key := range pluginKeys {
+		instances := plugins.Plugins[key]
+		if len(instances) == 0 {
+			continue
+		}
+		installPath := instances[0].InstallPath
+		meta := loadPluginMeta(installPath)
+		pname := meta.Name
+		if pname == "" {
+			pname = strings.SplitN(key, "@", 2)[0]
+		}
+
+		skillsDir := filepath.Join(installPath, "skills")
+		if entries, err := os.ReadDir(skillsDir); err == nil {
+			for _, entry := range entries {
+				if entry.IsDir() {
+					skillMD := filepath.Join(skillsDir, entry.Name(), "SKILL.md")
+					desc := shortDescription(extractDescription(skillMD))
+					pluginSkillsByPlugin[pname] = append(pluginSkillsByPlugin[pname], pluginSkillInfo{name: entry.Name(), desc: desc})
+				}
+			}
+		}
+
+		cmdsDir := filepath.Join(installPath, "commands")
+		if entries, err := os.ReadDir(cmdsDir); err == nil {
+			for _, entry := range entries {
+				if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
+					continue
+				}
+				cmdFile := filepath.Join(cmdsDir, entry.Name())
+				desc := extractDescription(cmdFile)
+				if strings.Contains(strings.ToLower(desc), "deprecated") {
+					continue
+				}
+				cmdName := strings.TrimSuffix(entry.Name(), ".md")
+				pluginSkillsByPlugin[pname] = append(pluginSkillsByPlugin[pname], pluginSkillInfo{name: cmdName, desc: shortDescription(desc)})
+			}
+		}
+	}
+
+	totalPluginSkills := 0
+	for _, skills := range pluginSkillsByPlugin {
+		totalPluginSkills += len(skills)
+	}
+	b.WriteString(termcolor.Header("Plugin-Provided Skills", totalPluginSkills))
+	pnames := sortedKeys(pluginSkillsByPlugin)
+	for _, pname := range pnames {
+		skills := pluginSkillsByPlugin[pname]
+		b.WriteString(termcolor.Section(pname) + "\n")
+		for _, s := range skills {
+			b.WriteString(termcolor.Item(s.name) + "\n")
+		}
+	}
+	b.WriteString("\n")
+
+	// --- Standalone Skills (grouped by source) ---
+	type standaloneSkillInfo struct {
+		name string
+		desc string
+	}
+	standaloneBySource := map[string][]standaloneSkillInfo{}
+	skillNames := sortedKeys(skillLock.Skills)
+	for _, skillName := range skillNames {
+		entry := skillLock.Skills[skillName]
+		if _, isPlugin := pluginRepoMap[entry.Source]; isPlugin {
+			continue
+		}
+		skillMD := filepath.Join(home, ".agents", "skills", skillName, "SKILL.md")
+		desc := shortDescription(extractDescription(skillMD))
+		standaloneBySource[entry.Source] = append(standaloneBySource[entry.Source], standaloneSkillInfo{name: skillName, desc: desc})
+	}
+
+	totalStandalone := 0
+	for _, skills := range standaloneBySource {
+		totalStandalone += len(skills)
+	}
+	b.WriteString(termcolor.Header("Standalone Skills", totalStandalone))
+	sources := sortedKeys(standaloneBySource)
+	for _, src := range sources {
+		skills := standaloneBySource[src]
+		b.WriteString(termcolor.Section(src) + "\n")
+		for _, s := range skills {
+			b.WriteString(termcolor.Item(s.name) + "\n")
+		}
+	}
+	b.WriteString("\n")
+
+	// --- Duplicates ---
+	type dupInfo struct {
+		skillName  string
+		pluginName string
+	}
+	var duplicates []dupInfo
+	for _, src := range sources {
+		for _, s := range standaloneBySource[src] {
+			if pname, ok := pluginSkillNames[s.name]; ok {
+				duplicates = append(duplicates, dupInfo{skillName: s.name, pluginName: pname})
+			}
+		}
+	}
+	sort.Slice(duplicates, func(i, j int) bool { return duplicates[i].skillName < duplicates[j].skillName })
+
+	b.WriteString(termcolor.Header("Duplicates", len(duplicates)))
+	if len(duplicates) == 0 {
+		b.WriteString("  " + termcolor.Success("No duplicates found.") + "\n")
+	} else {
+		for _, d := range duplicates {
+			b.WriteString("  " + termcolor.Warn(fmt.Sprintf("\"%s\" installed standalone AND provided by plugin \"%s\"", d.skillName, d.pluginName)) + "\n")
+			b.WriteString(fmt.Sprintf("    %s→%s Remove standalone: %snpx skills remove %s%s\n", termcolor.Dim, termcolor.Reset, termcolor.Bold, d.skillName, termcolor.Reset))
+		}
+	}
+
+	return b.String(), nil
 }
 
 // WritePluginsAndSkills generates the doc and writes it atomically.
