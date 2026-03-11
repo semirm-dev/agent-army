@@ -20,28 +20,11 @@
 
 ---
 
-## Skills (37)
+## Skills (19)
 
 Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l` to list available skills before installing.
 
-### From [obra/superpowers](https://github.com/obra/superpowers) (14 skills)
-
-| Skill | Description | Install |
-|-------|-------------|---------|
-| `brainstorming` | Explore user intent, requirements, and design before implementation. Required before any creative work. | `npx skills add obra/superpowers -g -s brainstorming` |
-| `systematic-debugging` | Structured debugging workflow — use before proposing fixes for any bug or test failure. | `npx skills add obra/superpowers -g -s systematic-debugging` |
-| `test-driven-development` | TDD workflow — use before writing implementation code for any feature or bugfix. | `npx skills add obra/superpowers -g -s test-driven-development` |
-| `writing-plans` | Design implementation plans from specs/requirements before touching code. | `npx skills add obra/superpowers -g -s writing-plans` |
-| `executing-plans` | Execute written plans in a separate session with review checkpoints. | `npx skills add obra/superpowers -g -s executing-plans` |
-| `dispatching-parallel-agents` | Parallelize 2+ independent tasks that don't share state. | `npx skills add obra/superpowers -g -s dispatching-parallel-agents` |
-| `subagent-driven-development` | Execute plans with independent tasks using subagents in the current session. | `npx skills add obra/superpowers -g -s subagent-driven-development` |
-| `finishing-a-development-branch` | Guide completion of dev work — merge, PR, or cleanup options. | `npx skills add obra/superpowers -g -s finishing-a-development-branch` |
-| `receiving-code-review` | Handle code review feedback with technical rigor, not blind agreement. | `npx skills add obra/superpowers -g -s receiving-code-review` |
-| `requesting-code-review` | Verify work meets requirements after completing tasks or major features. | `npx skills add obra/superpowers -g -s requesting-code-review` |
-| `using-git-worktrees` | Create isolated git worktrees for feature work or plan execution. | `npx skills add obra/superpowers -g -s using-git-worktrees` |
-| `using-superpowers` | Establishes how to find and use skills at conversation start. | `npx skills add obra/superpowers -g -s using-superpowers` |
-| `verification-before-completion` | Run verification commands before claiming work is done. Evidence before assertions. | `npx skills add obra/superpowers -g -s verification-before-completion` |
-| `writing-skills` | Create, edit, or verify skills before deployment. | `npx skills add obra/superpowers -g -s writing-skills` |
+> **Note:** The 14 [obra/superpowers](https://github.com/obra/superpowers) skills (brainstorming, systematic-debugging, TDD, writing-plans, executing-plans, dispatching-parallel-agents, subagent-driven-development, finishing-a-development-branch, receiving-code-review, requesting-code-review, using-git-worktrees, using-superpowers, verification-before-completion, writing-skills) are provided by the **superpowers plugin** and invoked via the `superpowers:` prefix (e.g., `superpowers:brainstorming`). They are not installed as standalone skills.
 
 ### From [jeffallan/claude-skills](https://github.com/jeffallan/claude-skills) (17 skills)
 
@@ -72,32 +55,23 @@ Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l
 | `frontend-design` | Distinctive, production-grade frontend interfaces with high design quality. | `npx skills add anthropics/skills -g -s frontend-design` |
 | `skill-creator` | Create new skills, modify existing, measure performance with evals. | `npx skills add anthropics/skills -g -s skill-creator` |
 
-### From other sources (4 skills)
-
-| Skill | Source | Description | Install |
-|-------|--------|-------------|---------|
-| `find-skills` | [vercel-labs/skills](https://github.com/vercel-labs/skills) | Discover and find new skills to install. | `npx skills add vercel-labs/skills -g -s find-skills` |
-| `browser-use` | [browser-use/browser-use](https://github.com/browser-use/browser-use) | Browser automation skill. | `npx skills add browser-use/browser-use -g -s browser-use` |
-| `database-schema-designer` | [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) | Database schema design skill. | `npx skills add softaworks/agent-toolkit -g -s database-schema-designer` |
-
 ---
 
-## Custom Agents (2)
+## Custom Agents (3)
 
 | Agent | Description | Provided By |
 |-------|-------------|-------------|
 | `superpowers:code-reviewer` | Reviews completed code against plan and coding standards. Use after major implementation steps. | superpowers plugin |
 | `code-simplifier:code-simplifier` | Simplifies code for clarity, consistency, and maintainability. Focuses on recently modified code. | code-simplifier plugin |
+| `coderabbit:code-reviewer` | AI-powered code review with CodeRabbit analysis of code changes. | coderabbit plugin |
 
 ---
 
-## Plugin Marketplaces (3)
+## Plugin Marketplaces (1)
 
 | Marketplace | Source | Browse |
 |-------------|--------|--------|
 | `claude-plugins-official` | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | `/plugins` |
-| `superpowers-marketplace` | [obra/superpowers](https://github.com/obra/superpowers) | — |
-| `context7-marketplace` | [upstash/context7](https://github.com/upstash/context7) | — |
 
 ---
 
