@@ -20,11 +20,16 @@
 
 ---
 
-## Skills (19)
+## Skills (28)
 
 Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l` to list available skills before installing.
 
 > **Note:** The 14 [obra/superpowers](https://github.com/obra/superpowers) skills (brainstorming, systematic-debugging, TDD, writing-plans, executing-plans, dispatching-parallel-agents, subagent-driven-development, finishing-a-development-branch, receiving-code-review, requesting-code-review, using-git-worktrees, using-superpowers, verification-before-completion, writing-skills) are provided by the **superpowers plugin** and invoked via the `superpowers:` prefix (e.g., `superpowers:brainstorming`). They are not installed as standalone skills.
+>
+> **Deprecated aliases:** The following superpowers skill names are deprecated but still functional:
+> - `superpowers:brainstorm` → use `superpowers:brainstorming`
+> - `superpowers:write-plan` → use `superpowers:writing-plans`
+> - `superpowers:execute-plan` → use `superpowers:executing-plans`
 
 ### From [jeffallan/claude-skills](https://github.com/jeffallan/claude-skills) (17 skills)
 
@@ -54,6 +59,22 @@ Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l
 |-------|-------------|---------|
 | `frontend-design` | Distinctive, production-grade frontend interfaces with high design quality. | `npx skills add anthropics/skills -g -s frontend-design` |
 | `skill-creator` | Create new skills, modify existing, measure performance with evals. | `npx skills add anthropics/skills -g -s skill-creator` |
+
+### Plugin-Provided Skills (9)
+
+Skills exposed by installed plugins, invoked via the `Skill` tool or `/skill-name` shorthand. These do not require separate installation.
+
+| Skill | Description | Plugin Source |
+|-------|-------------|---------------|
+| `simplify` | Review changed code for reuse, quality, and efficiency, then fix issues found. | code-simplifier |
+| `keybindings-help` | Customize keyboard shortcuts, rebind keys, add chord bindings, modify keybindings.json. | built-in |
+| `loop` | Run a prompt or slash command on a recurring interval (e.g., `/loop 5m /foo`). | built-in |
+| `claude-api` | Build apps with the Claude API or Anthropic SDK. Triggers on `anthropic`/`@anthropic-ai/sdk` imports. | built-in |
+| `code-review:code-review` | Code review a pull request. | code-review |
+| `claude-md-management:revise-claude-md` | Update CLAUDE.md with learnings from the current session. | claude-md-management |
+| `claude-md-management:claude-md-improver` | Audit and improve CLAUDE.md files in repositories. | claude-md-management |
+| `claude-code-setup:claude-automation-recommender` | Analyze a codebase and recommend Claude Code automations (hooks, subagents, skills, plugins, MCP servers). | claude-code-setup |
+| `coderabbit:review` | Run CodeRabbit AI code review on your changes. | coderabbit |
 
 ---
 
