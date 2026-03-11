@@ -903,6 +903,27 @@ func Analyze() (string, error) {
 		}
 	}
 
+	b.WriteString("\n")
+
+	// --- Skill Lock Drift ---
+	var missingSkills []string
+	for _, skillName := range skillNames {
+		skillMD := filepath.Join(home, ".agents", "skills", skillName, "SKILL.md")
+		if _, err := os.Stat(skillMD); os.IsNotExist(err) {
+			missingSkills = append(missingSkills, skillName)
+		}
+	}
+
+	b.WriteString(termcolor.Header("Skill Lock Drift", len(missingSkills)))
+	if len(missingSkills) == 0 {
+		b.WriteString("  " + termcolor.Success("No drift detected.") + "\n")
+	} else {
+		for _, name := range missingSkills {
+			src := skillLock.Skills[name].Source
+			b.WriteString("  " + termcolor.Err(fmt.Sprintf("\"%s\" in lock file but missing from filesystem (source: %s)", name, src)) + "\n")
+		}
+	}
+
 	return b.String(), nil
 }
 
