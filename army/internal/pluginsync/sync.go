@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/semir/agent-army/internal/termcolor"
 )
@@ -46,17 +47,39 @@ func Run(docPath string, w io.Writer, runner CommandRunner) error {
 
 	var failures []string
 
-	// Install plugins
+	// Install plugins in parallel
+	type result struct {
+		cmdStr string
+		err    error
+	}
+
 	pluginMatches := pluginCmdRe.FindAllStringSubmatch(content, -1)
 	fmt.Fprintln(w, termcolor.Header("Installing Plugins", len(pluginMatches)))
+
+	var pluginWg sync.WaitGroup
+	pluginResults := make(chan result, len(pluginMatches))
+
 	for _, m := range pluginMatches {
 		pluginRef := m[1]
 		args := []string{"plugin", "install", pluginRef}
 		cmdStr := "claude " + strings.Join(args, " ")
 		fmt.Fprintln(w, termcolor.Arrow(cmdStr))
-		if err := runner.Run("claude", args); err != nil {
-			fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+cmdStr))
-			failures = append(failures, cmdStr)
+
+		pluginWg.Add(1)
+		go func(cmdStr string, args []string) {
+			defer pluginWg.Done()
+			err := runner.Run("claude", args)
+			pluginResults <- result{cmdStr, err}
+		}(cmdStr, args)
+	}
+
+	pluginWg.Wait()
+	close(pluginResults)
+
+	for r := range pluginResults {
+		if r.err != nil {
+			fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+r.cmdStr))
+			failures = append(failures, r.cmdStr)
 		}
 	}
 
@@ -75,13 +98,30 @@ func Run(docPath string, w io.Writer, runner CommandRunner) error {
 	}
 
 	fmt.Fprintln(w, termcolor.Header("Installing Skills", len(skillCommands)))
+
+	var skillWg sync.WaitGroup
+	skillResults := make(chan result, len(skillCommands))
+
 	for _, cmdParts := range skillCommands {
 		cmdParts = append(cmdParts, "-y")
 		cmdStr := strings.Join(cmdParts, " ")
 		fmt.Fprintln(w, termcolor.Arrow(cmdStr))
-		if err := runner.Run(cmdParts[0], cmdParts[1:]); err != nil {
-			fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+cmdStr))
-			failures = append(failures, cmdStr)
+
+		skillWg.Add(1)
+		go func(cmdStr string, name string, args []string) {
+			defer skillWg.Done()
+			err := runner.Run(name, args)
+			skillResults <- result{cmdStr, err}
+		}(cmdStr, cmdParts[0], cmdParts[1:])
+	}
+
+	skillWg.Wait()
+	close(skillResults)
+
+	for r := range skillResults {
+		if r.err != nil {
+			fmt.Fprintln(w, "  "+termcolor.Err("Failed: "+r.cmdStr))
+			failures = append(failures, r.cmdStr)
 		}
 	}
 

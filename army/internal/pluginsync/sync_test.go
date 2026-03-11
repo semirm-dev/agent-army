@@ -5,18 +5,23 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
+	"sync"
 	"testing"
 )
 
 type mockRunner struct {
+	mu       sync.Mutex
 	commands []string
 	failOn   map[string]bool
 }
 
 func (m *mockRunner) Run(name string, args []string) error {
 	cmd := name + " " + strings.Join(args, " ")
+	m.mu.Lock()
 	m.commands = append(m.commands, cmd)
+	m.mu.Unlock()
 	if m.failOn != nil && m.failOn[cmd] {
 		return fmt.Errorf("mock failure: %s", cmd)
 	}
@@ -91,19 +96,22 @@ func TestRunWithMockRunner(t *testing.T) {
 		t.Fatalf("Run() error: %v", err)
 	}
 
-	// Should have 2 plugin installs + 1 skill install
+	// Should have 2 plugin installs + 1 skill install (order is non-deterministic)
 	if len(runner.commands) != 3 {
 		t.Fatalf("expected 3 commands, got %d: %v", len(runner.commands), runner.commands)
 	}
 
-	if runner.commands[0] != "claude plugin install foo@marketplace" {
-		t.Errorf("cmd[0] = %q", runner.commands[0])
+	if !slices.Contains(runner.commands, "claude plugin install foo@marketplace") {
+		t.Errorf("missing foo@marketplace install in %v", runner.commands)
 	}
-	if runner.commands[1] != "claude plugin install bar@marketplace" {
-		t.Errorf("cmd[1] = %q", runner.commands[1])
+	if !slices.Contains(runner.commands, "claude plugin install bar@marketplace") {
+		t.Errorf("missing bar@marketplace install in %v", runner.commands)
 	}
-	if !strings.HasPrefix(runner.commands[2], "npx skills add owner/repo -g -s my-skill") {
-		t.Errorf("cmd[2] = %q", runner.commands[2])
+	hasSkill := slices.ContainsFunc(runner.commands, func(s string) bool {
+		return strings.HasPrefix(s, "npx skills add owner/repo -g -s my-skill")
+	})
+	if !hasSkill {
+		t.Errorf("missing skill install in %v", runner.commands)
 	}
 }
 
