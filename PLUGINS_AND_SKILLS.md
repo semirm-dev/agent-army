@@ -24,13 +24,6 @@
 
 Install skills globally with `npx skills add <repo> -g -s <skill-name>`. Add `-l` to list available skills before installing.
 
-> **Note:** The 14 [obra/superpowers](https://github.com/obra/superpowers) skills (brainstorming, dispatching-parallel-agents, executing-plans, finishing-a-development-branch, receiving-code-review, requesting-code-review, subagent-driven-development, systematic-debugging, test-driven-development, using-git-worktrees, using-superpowers, verification-before-completion, writing-plans, writing-skills) are provided by the **superpowers plugin** and invoked via the `superpowers:` prefix (e.g., `superpowers:brainstorming`). They are not installed as standalone skills.
->
-> **Deprecated aliases:** The following superpowers skill names are deprecated but still functional:
-> - `superpowers:brainstorm` → use `superpowers:brainstorming`
-> - `superpowers:execute-plan` → use `superpowers:executing-plans`
-> - `superpowers:write-plan` → use `superpowers:writing-plans`
-
 ### From [browser-use/browser-use](https://github.com/browser-use/browser-use) (1 skill)
 
 | Skill | Description | Install |
