@@ -3,7 +3,7 @@ name: observability
 description: Guide structured logging, metrics (RED/USE methods), distributed tracing, health checks, alerting design, SLO-based monitoring, and observability maturity progression for production services.
 scope: universal
 languages: []
-uses_skills: [cross-cutting]
+uses_skills: []
 ---
 
 # Observability Patterns

@@ -3,7 +3,7 @@ name: code-architecture
 description: Guides structuring new projects and modules using vertical slice architecture, package-by-feature layouts, dependency injection, and interface boundaries across Go, TypeScript, and Python.
 scope: universal
 languages: []
-uses_skills: [cross-cutting, code-quality]
+uses_skills: [code-quality]
 ---
 
 # Code Architecture Skill

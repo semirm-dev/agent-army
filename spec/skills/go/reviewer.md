@@ -3,7 +3,7 @@ name: go/reviewer
 description: Structures Go code reviews with a prioritized checklist — correctness, concurrency safety, performance red flags, security hardening, and anti-pattern detection — to catch issues before merge.
 scope: language-specific
 languages: [go]
-uses_skills: [go/testing]
+uses_skills: [go/tester]
 ---
 
 # Go Reviewer Skill

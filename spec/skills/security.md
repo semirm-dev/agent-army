@@ -3,7 +3,7 @@ name: security
 description: Enforce authentication, authorization, input sanitization, secrets management, transport security, injection prevention, data lifecycle controls, and guide auth flow selection, CORS configuration, rate limiting setup, and session hardening.
 scope: universal
 languages: []
-uses_skills: [api-design]
+uses_skills: []
 ---
 
 # Security Patterns

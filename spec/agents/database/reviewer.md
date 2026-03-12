@@ -5,7 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [sql]
 access: read-only
-uses_skills: [data-modeling, security, migration-safety, database-schema-designer, error-handling, refactoring-patterns]
+uses_skills: [data-modeling, security, migration-safety, error-handling, refactoring-patterns]
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---
@@ -90,7 +90,7 @@ Database patterns and security standards are loaded via skills.
 
 1. Read the orchestrator's description of what was changed
 2. For migration reviews, invoke the `migration-safety` skill for the structured safety checklist
-3. For schema design reviews, load the `database-schema-designer` skill for normalization, indexing, and constraint patterns
+3. For schema design reviews, load the `data-modeling` skill for normalization, indexing, constraint, and physical schema patterns
 4. For error handling in repository/store code, invoke the `error-handling` skill for taxonomy and propagation patterns
 5. When suggesting data access code restructuring, invoke the `refactoring-patterns` skill
 6. Read every changed migration, query, and schema file

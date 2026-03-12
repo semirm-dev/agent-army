@@ -7,7 +7,7 @@ languages: []
 
 # Database Patterns
 
-For migrations, see the `migration-safety` skill. For schema design, see `database-schema-designer`. For SQL vs NoSQL selection, see `data-modeling`.
+For migrations, see the `migration-safety` skill. For schema design, SQL vs NoSQL selection, and physical schema patterns, see `data-modeling`.
 
 ## Connection Pooling
 - **Always pool.** Never create per-request connections.
@@ -31,11 +31,8 @@ For migrations, see the `migration-safety` skill. For schema design, see `databa
 - **Query timeouts:** Set statement-level timeouts on all queries. A runaway query without a timeout can exhaust the connection pool.
 
 ## Indexes
-- **Index `WHERE`, `JOIN`, `ORDER BY` columns.** Review query plans with `EXPLAIN ANALYZE` for N+1 detection.
-- **Composite indexes:** Order columns by selectivity (most selective first).
-- **Partial indexes:** Use for filtered queries on large tables (e.g., `WHERE status = 'active'`).
-- **Monitor:** Watch for unused indexes (bloat) and missing indexes (slow queries).
-- **N+1 prevention:** Detect and eliminate N+1 query patterns. Use eager loading, joins, or batch queries instead of querying in loops.
+
+For indexing strategy, see the `data-modeling` skill.
 
 ## Backup & Recovery
 - **Automated backups:** Schedule regular backups (daily minimum for production). Use the database's native backup tooling (e.g., `pg_dump`, managed service snapshots).

@@ -3,7 +3,7 @@ name: typescript/reviewer
 description: Review TypeScript PRs systematically — audit type safety (any/assertions/enums), detect async anti-patterns (floating promises), flag performance issues (bundle size, re-renders), and verify security at input boundaries.
 scope: language-specific
 languages: [typescript]
-uses_skills: [typescript/testing]
+uses_skills: [typescript/tester]
 ---
 
 # TypeScript Reviewer Skill

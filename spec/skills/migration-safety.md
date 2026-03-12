@@ -3,7 +3,7 @@ name: migration-safety
 description: Review database migrations for backward compatibility, lock safety, and rollback readiness using expand-contract patterns, lock time estimation, and anti-pattern detection.
 scope: universal
 languages: []
-uses_skills: [database, cross-cutting]
+uses_skills: [database]
 ---
 
 # Migration Safety Checklist

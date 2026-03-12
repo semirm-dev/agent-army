@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [sql]
 access: read-write
-uses_skills: [data-modeling, database-schema-designer, migration-safety, error-handling, code-architecture, refactoring-patterns, caching-strategy]
+uses_skills: [data-modeling, migration-safety, error-handling, code-architecture, refactoring-patterns, caching-strategy]
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
@@ -36,7 +36,7 @@ The orchestrator activates you when database-related code needs to be written or
 
 Database patterns, migration safety, transactions, and ORM guidance are loaded via the `data-modeling` skill.
 
-Load the `database-schema-designer` skill when designing new schemas or significant schema changes.
+The `data-modeling` skill covers both logical modeling and physical schema design (column types, constraints, partitioning, temporal patterns).
 
 ## Key Patterns
 
@@ -66,7 +66,7 @@ Load the `database-schema-designer` skill when designing new schemas or signific
 
 ## Workflow
 
-1. Load the `database-schema-designer` skill for schema design or significant schema changes
+1. For schema design or significant schema changes, invoke the `data-modeling` skill
 2. For migration tasks, invoke the `migration-safety` skill for safety checklist
 3. For error type design or error propagation in repository code, invoke the `error-handling` skill
 4. For new repository/store module creation, invoke the `code-architecture` skill for structure guidance

@@ -3,7 +3,7 @@ name: python/reviewer
 description: Review Python PRs with a structured checklist covering type safety, async correctness, anti-pattern detection (mutable defaults, bare except, blocking in async), performance red flags (N+1, O(n2)), and security audit (SQL injection, secret handling).
 scope: language-specific
 languages: [python]
-uses_skills: [python/testing]
+uses_skills: [python/tester]
 ---
 
 # Python Reviewer Skill

@@ -3,7 +3,7 @@ name: testing
 description: Plan test coverage using the testing pyramid, apply language-agnostic test structure, isolation, mocking boundaries, async testing, flaky prevention, coverage strategy, CI pipeline integration, and property-based and performance testing across unit, integration, and e2e tests.
 scope: universal
 languages: []
-uses_skills: [cross-cutting]
+uses_skills: []
 ---
 
 # Testing Patterns

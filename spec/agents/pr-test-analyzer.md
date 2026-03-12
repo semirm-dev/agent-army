@@ -29,7 +29,7 @@ The orchestrator activates you when a pull request needs test coverage analysis 
 
 ## Standards
 
-Testing patterns, coverage targets, and pyramid guidance are loaded via the `testing` skill (which references `cross-cutting` standards for specific coverage thresholds).
+Testing patterns, coverage targets, and pyramid guidance are loaded via the `testing` skill.
 
 ## Checklist
 

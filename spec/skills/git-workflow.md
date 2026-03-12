@@ -20,3 +20,8 @@ languages: []
 - **Rebase Policy:** Rebase only local, unshared feature branches. Never force-push shared or published branches.
 - **Branch Protection:** Require code review approval and passing CI before merge to main/trunk. No direct pushes to protected branches.
 - **Release Tagging:** Use semantic versioning tags (`vMAJOR.MINOR.PATCH`). Tag from main after merge. Use annotated tags with a changelog summary in the tag message.
+
+## Dependency Update Policy
+- **Security patches:** Apply immediately. No waiting for a release cycle.
+- **Minor versions:** Review and update monthly. Check changelogs for breaking behavior changes despite semver.
+- **Major versions:** Evaluate breaking changes, plan migration, test in isolation before upgrading. Create a dedicated branch for major upgrades.

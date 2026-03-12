@@ -3,7 +3,7 @@ name: react/reviewer
 description: Structures React PR reviews with ordered checklists for hook correctness, anti-pattern detection, accessibility audits, performance red flags, and frontend security vulnerabilities.
 scope: language-specific
 languages: [react]
-uses_skills: [react/testing]
+uses_skills: [react/tester]
 ---
 
 # React Reviewer Skill
