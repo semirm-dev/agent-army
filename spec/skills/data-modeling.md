@@ -1,9 +1,9 @@
 ---
 name: data-modeling
-description: Data modeling workflow — SQL vs NoSQL decision tree, normalization guidance, schema design steps, index strategy selection, relationship modeling, and zero-downtime migration strategy.
+description: Guides logical data modeling decisions including SQL vs NoSQL selection, entity identification, relationship patterns (1:1, 1:N, M:N, hierarchical), normalization level, index strategy, and zero-downtime migration planning for new or evolving data stores.
 scope: universal
 languages: []
-uses_rules: [database, cross-cutting, security]
+uses_skills: [database, security]
 ---
 
 # Data Modeling Skill
@@ -164,26 +164,4 @@ Avoid polymorphic FKs (`commentable_type` + `commentable_id`) — they break ref
 - Add a partial index on active rows (e.g., `WHERE deleted_at IS NULL`) to keep queries fast and avoid scanning deleted records.
 - Filter deleted rows at the query level or via a repository/middleware layer. Be consistent — choose one approach per project.
 
-## Zero-Downtime Migration Strategy
-
-For changes that cannot be applied in a single step:
-
-```
-Step 1: Add new column (nullable, no constraint)
-         --> Deploy migration
-         --> Application ignores new column
-
-Step 2: Backfill data
-         --> Run in batches to avoid long locks
-         --> Verify data integrity
-
-Step 3: Add constraint (NOT NULL, CHECK, etc.)
-         --> Deploy migration
-         --> Application starts using new column
-
-Step 4: Remove old column (if replacing)
-         --> Deploy application code that no longer reads old column
-         --> Deploy migration to drop old column
-```
-
-Use your project's migration tool for executing these steps.
+For migration strategies and expand-contract patterns, see the `migration-safety` skill.

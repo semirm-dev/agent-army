@@ -1,9 +1,9 @@
 ---
 name: typescript/coder
-description: TypeScript implementation workflow — code placement, type design decisions, error handling patterns, async patterns, dependency management, and pre-PR verification.
+description: Drive TypeScript feature implementation end-to-end — types-first design, code placement decisions (controller/service/schema/component), typed error handling, dependency vetting, and pre-PR verification checklist.
 scope: language-specific
 languages: [typescript]
-uses_rules: [typescript/patterns]
+uses_skills: [typescript/patterns]
 ---
 
 # TypeScript Coder Skill

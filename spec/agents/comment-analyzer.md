@@ -5,8 +5,7 @@ role: analyzer
 scope: universal
 languages: []
 access: read-only
-uses_skills: []
-uses_rules: [ai-assisted-development]
+uses_skills: [ai-assisted-development]
 uses_plugins: []
 delegates_to: []
 ---

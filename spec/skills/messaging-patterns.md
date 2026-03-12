@@ -1,9 +1,9 @@
 ---
 name: messaging-patterns
-description: Messaging workflow — queue pattern selection, idempotency design, DLQ setup, event schema conventions, delivery guarantee trade-offs, and transactional outbox guidance.
+description: Design async messaging flows including queue pattern selection, delivery guarantees, idempotent consumers, event schemas, DLQ setup, and transactional outbox patterns.
 scope: universal
 languages: []
-uses_rules: [messaging-patterns, cross-cutting, observability]
+uses_skills: [observability]
 ---
 
 # Messaging Patterns Skill
@@ -92,7 +92,7 @@ Every event must include an envelope:
 ```
 
 - **Naming:** Past tense — `user.created`, `order.shipped`, `payment.failed`
-- **Versioning:** Bump `version` on breaking schema changes. Consumers must handle N-1.
+- **Versioning:** Bump `version` on breaking schema changes. Consumers must handle N-1. Use schema registry for contract validation.
 - **Size:** Keep messages under 256KB. Store large payloads in blob storage and pass a reference.
 
 ## DLQ and Retry Configuration
@@ -121,6 +121,20 @@ Is the consumer falling behind (queue depth growing)?
   ├── Downstream is slow → Circuit breaker, stop consuming until healthy
   └── Burst traffic → Set prefetch limit to control per-consumer concurrency
 ```
+
+## Message Processing Timeout
+
+- **Set explicit processing timeouts on consumers.** No consumer should process a message indefinitely.
+- **Timeout < visibility timeout:** Processing timeout must be shorter than the queue's visibility timeout to allow automatic redelivery.
+- **Escalation:** Log and route to DLQ when processing consistently exceeds the timeout threshold.
+
+## Anti-Patterns
+
+- **Fire-and-forget without DLQ:** Every async operation must have failure handling. Silent drops lose data.
+- **Unbounded queues:** Always set max queue size or TTL on messages. Prevent memory exhaustion.
+- **Giant messages:** Keep messages small (< 256KB). Store large payloads in blob storage and pass a reference.
+- **Synchronous patterns over queues:** Don't use request-reply when a direct HTTP call is simpler and sufficient.
+- **No schema validation:** Validate event schema at producer and consumer boundaries.
 
 ## Pre-Implementation Checklist
 

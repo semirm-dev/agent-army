@@ -6,7 +6,6 @@ scope: universal
 languages: []
 access: read-only
 uses_skills: []
-uses_rules: []
 uses_plugins: []
 delegates_to: []
 ---

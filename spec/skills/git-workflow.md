@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Branch naming, commit messages, PR conventions, merge strategy, and release tagging
+description: Standardizes Git branch naming, Conventional Commits message format, PR size and review conventions, merge/rebase strategy, and semantic version release tagging
 scope: universal
 languages: []
 ---

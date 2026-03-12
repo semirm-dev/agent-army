@@ -5,8 +5,7 @@ role: tester
 scope: language-specific
 languages: [sql]
 access: read-write
-uses_skills: [data-modeling, testing-strategy]
-uses_rules: []
+uses_skills: [data-modeling, testing]
 uses_plugins: []
 delegates_to: []
 ---
@@ -82,7 +81,7 @@ When testing list operations, verify query count:
 ## Workflow
 
 1. Read the task description and the database code to test
-2. For new test suites or coverage planning, invoke the `testing-strategy` skill
+2. For new test suites or coverage planning, invoke the `testing` skill
 3. Identify the project's test framework and database tooling
 4. Set up test database fixtures and helpers if they don't exist
 5. Write tests for each migration (up/down/round-trip)

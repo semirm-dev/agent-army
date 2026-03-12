@@ -1,9 +1,9 @@
 ---
 name: react/coder
-description: React implementation workflow — component placement, hook design, state management, accessibility, form handling, and pre-PR verification.
+description: Drives end-to-end React implementation from props-first component design through hook extraction, state management selection, accessibility compliance, and pre-PR verification checklists.
 scope: language-specific
 languages: [react]
-uses_rules: [react/patterns]
+uses_skills: [react/patterns]
 ---
 
 # React Coder Skill

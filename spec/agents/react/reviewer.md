@@ -5,8 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [react]
 access: read-only
-uses_skills: [react/reviewer, concurrency, error-handling, api-designer, caching-strategy]
-uses_rules: []
+uses_skills: [react/reviewer, concurrency, error-handling, api-design, caching-strategy]
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---
@@ -103,7 +102,7 @@ React patterns, TypeScript standards, and security patterns are loaded via skill
 2. Read every changed file
 3. Read surrounding code for context (imports, callers, hooks, shared components)
 4. For error handling reviews, invoke the `error-handling` skill for taxonomy and propagation patterns
-5. For API endpoint or data-fetching reviews, invoke the `api-designer` skill for endpoint design and error format conventions
+5. For API endpoint or data-fetching reviews, invoke the `api-design` skill for endpoint design and error format conventions
 6. For caching-related reviews, invoke the `caching-strategy` skill for cache patterns and invalidation
 7. For concurrency concerns (race conditions, stale closures, concurrent features), invoke the `concurrency` skill
 8. Run `tsc --noEmit` and lint tools (`npx eslint`)

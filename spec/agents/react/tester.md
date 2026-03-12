@@ -5,8 +5,7 @@ role: tester
 scope: language-specific
 languages: [react]
 access: read-write
-uses_skills: [react/tester, testing-strategy]
-uses_rules: []
+uses_skills: [react/tester, testing]
 uses_plugins: []
 delegates_to: []
 ---
@@ -115,7 +114,7 @@ Follow the coverage thresholds:
 ## Workflow
 
 1. Read the list of changed files from the orchestrator
-2. For new test suites or coverage planning, invoke the `testing-strategy` skill
+2. For new test suites or coverage planning, invoke the `testing` skill
 3. Read each changed component/hook to understand behavior
 4. Detect the test framework used in the project
 5. Find existing tests and MSW handlers

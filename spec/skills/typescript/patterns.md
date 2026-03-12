@@ -1,9 +1,9 @@
 ---
 name: typescript/patterns
-description: Strict mode, type safety, naming, imports, error handling, and async patterns
+description: Enforce TypeScript strict mode, type safety (no any, branded types, discriminated unions), naming conventions, import ordering, async/await patterns, and runtime validation at boundaries.
 scope: language-specific
 languages: [typescript]
-uses_rules: [code-quality, security, cross-cutting, observability]
+uses_skills: [code-quality, security, observability]
 ---
 
 # TypeScript Coding Patterns

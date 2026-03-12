@@ -1,9 +1,9 @@
 ---
 name: react/patterns
-description: Component structure, state management, data fetching, accessibility, and performance
+description: Enforces React component structure, state management strategies, data fetching with loading/error states, accessibility standards, and performance optimization rules for functional component codebases.
 scope: language-specific
 languages: [react]
-uses_rules: [typescript/patterns]
+uses_skills: [typescript/patterns]
 ---
 
 # React & Frontend Patterns

@@ -1,9 +1,9 @@
 ---
 name: migration-safety
-description: Structured checklist for reviewing database migration safety — backward compatibility, expand-contract patterns, lock time estimation, rollback decision trees, and common anti-patterns.
+description: Review database migrations for backward compatibility, lock safety, and rollback readiness using expand-contract patterns, lock time estimation, and anti-pattern detection.
 scope: universal
 languages: []
-uses_rules: [database, cross-cutting]
+uses_skills: [database, cross-cutting]
 ---
 
 # Migration Safety Checklist

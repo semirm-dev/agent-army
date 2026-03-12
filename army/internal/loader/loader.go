@@ -30,41 +30,6 @@ func FindMDFiles(dir string) ([]string, error) {
 	return files, nil
 }
 
-// LoadRules loads all rules from root/rules/ directory.
-func LoadRules(root string) ([]model.Rule, error) {
-	rulesDir := filepath.Join(root, "spec", "rules")
-	if !isDir(rulesDir) {
-		return nil, nil
-	}
-
-	files, err := FindMDFiles(rulesDir)
-	if err != nil {
-		return nil, err
-	}
-
-	var rules []model.Rule
-	for _, fp := range files {
-		content, err := os.ReadFile(fp)
-		if err != nil {
-			return nil, err
-		}
-		fm := frontmatter.ParseFrontmatter(string(content))
-		rel, _ := filepath.Rel(rulesDir, fp)
-		name := strings.TrimSuffix(rel, ".md")
-
-		rules = append(rules, model.Rule{
-			Name:        name,
-			Description: frontmatter.ExtractH1(string(content)),
-			Summary:     fm.StringVal("description", ""),
-			Scope:       fm.StringVal("scope", "universal"),
-			Languages:   ensureList(fm, "languages"),
-			UsesRules:   ensureList(fm, "uses_rules"),
-			Path:        filepath.Join("spec", "rules", rel),
-		})
-	}
-	return rules, nil
-}
-
 // LoadSkills loads all skills from root/skills/ directory.
 func LoadSkills(root string) ([]model.Skill, error) {
 	skillsDir := filepath.Join(root, "spec", "skills")
@@ -93,7 +58,7 @@ func LoadSkills(root string) ([]model.Skill, error) {
 			Summary:     fm.StringVal("description", ""),
 			Scope:       fm.StringVal("scope", "universal"),
 			Languages:   ensureList(fm, "languages"),
-			UsesRules:   ensureList(fm, "uses_rules"),
+			UsesSkills:  ensureList(fm, "uses_skills"),
 			Path:        filepath.Join("spec", "skills", rel),
 		})
 	}
@@ -131,7 +96,6 @@ func LoadAgents(root string) ([]model.Agent, error) {
 			Access:      fm.StringVal("access", "read-write"),
 			Languages:   ensureList(fm, "languages"),
 			UsesSkills:  ensureList(fm, "uses_skills"),
-			UsesRules:   ensureList(fm, "uses_rules"),
 			UsesPlugins: ensureList(fm, "uses_plugins"),
 			DelegatesTo: ensureList(fm, "delegates_to"),
 			Path:        filepath.Join("spec", "agents", rel),

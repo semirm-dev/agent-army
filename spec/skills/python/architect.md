@@ -1,9 +1,9 @@
 ---
 name: python/architect
-description: Python project architecture — layout selection, module decomposition, dependency direction, async architecture decisions, package organization, and evolution planning.
+description: Design Python project architecture including layout selection (web API, CLI, library), module decomposition, dependency direction enforcement, sync vs async architecture decisions, and dependency injection patterns.
 scope: language-specific
 languages: [python]
-uses_rules: [python/patterns]
+uses_skills: [python/patterns]
 ---
 
 # Python Architect Skill

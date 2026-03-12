@@ -1,9 +1,9 @@
 ---
 name: python/reviewer
-description: Python code review workflow — review order, async audit, type safety verification, performance red flags, security checklist, and anti-pattern detection.
+description: Review Python PRs with a structured checklist covering type safety, async correctness, anti-pattern detection (mutable defaults, bare except, blocking in async), performance red flags (N+1, O(n2)), and security audit (SQL injection, secret handling).
 scope: language-specific
 languages: [python]
-uses_rules: [python/testing]
+uses_skills: [python/testing]
 ---
 
 # Python Reviewer Skill

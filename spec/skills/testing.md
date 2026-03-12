@@ -1,12 +1,12 @@
 ---
-name: testing-strategy
-description: Testing pyramid guidance, test type decision tree, what NOT to test, contract testing, test data management, CI integration, property-based testing, and performance testing.
+name: testing
+description: Plan test coverage using the testing pyramid, apply language-agnostic test structure, isolation, mocking boundaries, async testing, flaky prevention, coverage strategy, CI pipeline integration, and property-based and performance testing across unit, integration, and e2e tests.
 scope: universal
 languages: []
-uses_rules: [testing-patterns, cross-cutting]
+uses_skills: [cross-cutting]
 ---
 
-# Testing Strategy Skill
+# Testing Patterns
 
 ## When to Use
 
@@ -70,20 +70,16 @@ Full user journey across multiple services/pages?
 - **Configuration wiring:** Test that the app starts, not every config combination
 - **Private functions:** Test through the public API. If a private function is complex enough to need its own test, it should probably be a public function in a smaller package
 
-## Contract Testing
+## Test Naming
+- Describe behavior, not implementation: "returns error when user not found" not "test getUserById."
+- Test names should read as documentation. A failing test name alone should tell you what broke.
+- Use a consistent naming convention per project.
 
-Use contract tests at service boundaries:
-
-**When:**
-- Service A calls Service B's API
-- Frontend calls backend API
-- Any cross-team or cross-service dependency
-
-**How:**
-- Define expected request/response shapes as contracts
-- Provider verifies it satisfies contracts
-- Consumer verifies it correctly handles provider responses
-- Tools: Pact, HTTP mocking libraries (framework-specific interceptors, WireMock), schema validation
+## Test Organization
+- One test file per source file, co-located or mirrored in a tests directory.
+- Group related tests with describe blocks or subtests.
+- Use setup/teardown hooks for shared fixture creation and resource cleanup.
+- Order tests logically: happy path first, then edge cases, then error paths.
 
 ## Test Data Management
 
@@ -114,6 +110,72 @@ What kind of test needs data?
 - **No randomness:** Deterministic values only. Random data hides bugs and causes flaky tests.
 - **Composable:** Factories can call other factories for nested objects. `factory.orderWithItems()` creates both order and line items.
 
+## Test Isolation
+- **Database tests:** Wrap each test in a transaction, rollback after. No test should depend on another test's data.
+- **File system tests:** Use temp directories. Clean up in teardown.
+- **In-memory databases:** Use in-memory storage for fast unit tests when full database features are not needed.
+- **Network isolation:** No real HTTP calls in unit tests. Use fakes or recorded responses.
+
+## Mocking Philosophy
+- Prefer fakes and thin interfaces over heavy mocking frameworks.
+- Mock at system boundaries (HTTP, DB, message queues), not between internal modules.
+- Use spy/mock tools only for call verification, not for replacing internal module behavior.
+
+## Async Testing
+- Always await async operations. Unawaited assertions silently pass and hide real failures.
+- Test both resolved (success) and rejected (error) paths for every async operation.
+- Set explicit timeouts on async tests to catch hangs rather than waiting indefinitely.
+- Clean up async resources (timers, subscriptions, listeners) in teardown to prevent leaks between tests.
+
+## Error Path Testing
+- Every happy path needs a corresponding error path test.
+- Test that errors contain useful context: type, message, and machine-readable code where applicable.
+- Test error propagation. Verify errors are wrapped with context, not swallowed or replaced with generic messages.
+- Test boundary validation: missing fields, wrong types, out-of-range values, empty inputs.
+
+## Snapshot Testing
+- Avoid snapshot tests for rendered UI output -- large diffs with no diagnostic signal. Use snapshot tests only for serialized contracts (API response shapes, CLI output, config schemas) where the exact shape is the specification.
+
+## Contract Testing
+
+Use contract tests at service boundaries:
+
+**When:**
+- Service A calls Service B's API
+- Frontend calls backend API
+- Any cross-team or cross-service dependency
+
+**How:**
+- Define expected request/response shapes as contracts
+- Provider verifies it satisfies contracts
+- Consumer verifies it correctly handles provider responses
+- Tools: Pact, HTTP mocking libraries (framework-specific interceptors, WireMock), schema validation
+
+## Flaky Test Prevention
+
+- **No sleep-based synchronization.** Use polling, event-based waiting, or signaling mechanisms.
+- **No network calls in unit tests.** Mock at the boundary.
+- **Deterministic test data.** Use factories with fixed values, not random generators.
+- **Isolated test state.** Each test creates its own data. No shared mutable fixtures.
+- **Explicit timeouts.** Set test timeouts to catch hangs. CI timeouts should be stricter than local.
+
+### Flaky Test Quarantine
+
+When a test fails intermittently:
+
+1. Mark it as quarantined (skip in CI gate, run in a separate non-blocking job)
+2. File a ticket with the flaky test name, failure frequency, and last failure log
+3. Fix within one sprint — quarantined tests that linger erode trust in the suite
+4. After fixing, remove quarantine and monitor for one week
+
+## Coverage
+- **Prefer branch coverage over line coverage.** Line coverage misses untested conditional paths.
+- Run coverage as part of CI, not just locally.
+- Set coverage thresholds as CI gates. Fail the build if coverage drops below the threshold.
+- **Critical paths** (auth, payments, data mutations): 80%+ line coverage.
+- **Utilities and shared libraries:** 90%+ line coverage.
+- **Generated code** (protobuf, OpenAPI stubs): No coverage requirement.
+
 ## CI Integration
 
 ### Test Pipeline Ordering
@@ -137,15 +199,6 @@ Are tests independent (no shared state)?
   NO  --> Fix the shared state first.
           Then parallelize.
 ```
-
-### Flaky Test Quarantine
-
-When a test fails intermittently:
-
-1. Mark it as quarantined (skip in CI gate, run in a separate non-blocking job)
-2. File a ticket with the flaky test name, failure frequency, and last failure log
-3. Fix within one sprint — quarantined tests that linger erode trust in the suite
-4. After fixing, remove quarantine and monitor for one week
 
 ## Property-Based Testing
 
@@ -199,7 +252,7 @@ Is the service deployed to production (or staging)?
           Use unit-level benchmarks for hot paths in the meantime.
 ```
 
-### Pre-Ship Test Checklist
+## Pre-Ship Test Checklist
 
 1. [ ] Unit tests cover all business logic branches
 2. [ ] Integration tests cover database queries and external service contracts

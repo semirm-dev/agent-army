@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/semir/agent-army/internal/graph"
 	"github.com/semir/agent-army/internal/loader"
 	"github.com/semir/agent-army/internal/model"
 	"github.com/semir/agent-army/internal/tui"
@@ -38,10 +37,6 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 		return err
 	}
 
-	rules, err := loader.LoadRules(root)
-	if err != nil {
-		return err
-	}
 	skills, err := loader.LoadSkills(root)
 	if err != nil {
 		return err
@@ -51,13 +46,8 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 		return err
 	}
 
-	allRuleNames := names(rules, func(r model.Rule) string { return r.Name })
 	allSkillNames := names(skills, func(s model.Skill) string { return s.Name })
 	allSkillSet := makeSet(allSkillNames)
-	ruleLookup := make(map[string][]string)
-	for _, r := range rules {
-		ruleLookup[r.Name] = r.UsesRules
-	}
 
 	// Select agents
 	selectedAgentNames, err := selectEntities(p, w, "agents", names(agents, func(a model.Agent) string { return a.Name }))
@@ -83,46 +73,9 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 		return err
 	}
 
-	// Auto-compute rules transitively
-	var ruleSeeds []string
-	seenRules := make(map[string]bool)
 	skillObjs := filterSkills(skills, finalSkillNames)
-	for _, s := range skillObjs {
-		for _, r := range s.UsesRules {
-			if !seenRules[r] {
-				ruleSeeds = append(ruleSeeds, r)
-				seenRules[r] = true
-			}
-		}
-	}
-	for _, a := range agentObjs {
-		for _, r := range a.UsesRules {
-			if !seenRules[r] {
-				ruleSeeds = append(ruleSeeds, r)
-				seenRules[r] = true
-			}
-		}
-	}
 
-	existingRuleSet := makeSet(allRuleNames)
-	resolved := graph.ResolveTransitive(ruleSeeds, func(name string) []string {
-		return ruleLookup[name]
-	})
-	var autoRuleNames []string
-	for _, r := range resolved {
-		if existingRuleSet[r] {
-			autoRuleNames = append(autoRuleNames, r)
-		}
-	}
-
-	finalRuleNames, err := selectAdditionalEntities(p, w, "rules", autoRuleNames, allRuleNames)
-	if err != nil {
-		return err
-	}
-
-	ruleObjs := filterRules(rules, finalRuleNames)
-
-	total := len(ruleObjs) + len(skillObjs) + len(agentObjs)
+	total := len(skillObjs) + len(agentObjs)
 	if total == 0 {
 		fmt.Fprintln(w, "\nNo entities selected. Nothing to generate.")
 		return nil
@@ -131,7 +84,6 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 	fmt.Fprintln(w, "\n--- Preview ---")
 	fmt.Fprintf(w, "  Target:      %s\n", target)
 	fmt.Fprintf(w, "  Destination: %s\n", dest)
-	fmt.Fprintf(w, "  Rules:       %d files\n", len(ruleObjs))
 	fmt.Fprintf(w, "  Skills:      %d files\n", len(skillObjs))
 	fmt.Fprintf(w, "  Agents:      %d files\n", len(agentObjs))
 	fmt.Fprintf(w, "  Total:       %d files\n", total)
@@ -146,7 +98,7 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 		return nil
 	}
 
-	written, cursorRuleNames, err := generateAll(root, dest, ruleObjs, skillObjs, agentObjs, skills, agents, ruleLookup, target)
+	written, err := generateAll(root, dest, skillObjs, agentObjs, skills, agents, target)
 	if err != nil {
 		return err
 	}
@@ -174,7 +126,7 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 			}
 			plugins, _ := loader.LoadPlugins(root)
 			templatePath := filepath.Join(root, "spec", "claude", "CLAUDE.md")
-			if err := generateClaudeMD(dest, templatePath, agentObjs, skillObjs, ruleObjs, plugins); err != nil {
+			if err := generateClaudeMD(dest, templatePath); err != nil {
 				return fmt.Errorf("generate CLAUDE.md: %w", err)
 			}
 			fmt.Fprintln(w, "CLAUDE.md generated.")
@@ -204,7 +156,7 @@ func MainBootstrap(root string, p tui.Prompter, w io.Writer) error {
 				}
 			}
 			templatePath := filepath.Join(root, "spec", "cursor", "AGENTS.md")
-			if err := generateAgentsMD(dest, templatePath, agentObjs, skillObjs, ruleObjs, cursorRuleNames); err != nil {
+			if err := generateAgentsMD(dest, templatePath); err != nil {
 				return fmt.Errorf("generate AGENTS.md: %w", err)
 			}
 			fmt.Fprintln(w, "AGENTS.md generated.")
@@ -417,25 +369,23 @@ func selectAdditionalEntities(p tui.Prompter, w io.Writer, entityType string, au
 
 func generateAll(
 	root, dest string,
-	rules []model.Rule,
 	skills []model.Skill,
 	agents []model.Agent,
 	allSkills []model.Skill,
 	allAgents []model.Agent,
-	ruleLookup map[string][]string,
 	target string,
-) (int, map[string]string, error) {
+) (int, error) {
 	written := 0
 
 	// Clean stale output from previous runs to prevent duplicate files
 	// (e.g., resolveCollision creating _2 variants when target already exists).
 	agentSubdir := "agents"
-	subdirs := []string{"rules", "skills", agentSubdir}
+	subdirs := []string{"skills", agentSubdir}
 	for _, subdir := range subdirs {
 		dirPath := filepath.Join(dest, subdir)
 		if _, err := os.Stat(dirPath); err == nil {
 			if err := os.RemoveAll(dirPath); err != nil {
-				return 0, nil, fmt.Errorf("clean %s: %w", subdir, err)
+				return 0, fmt.Errorf("clean %s: %w", subdir, err)
 			}
 		}
 	}
@@ -445,54 +395,9 @@ func generateAll(
 	for _, s := range allSkills {
 		skillMap[s.Name] = s
 	}
-	ruleMap := make(map[string]model.Rule, len(rules))
-	for _, r := range rules {
-		ruleMap[r.Name] = r
-	}
 	agentMap := make(map[string]model.Agent, len(allAgents))
 	for _, a := range allAgents {
 		agentMap[a.Name] = a
-	}
-
-	// Pre-compute Cursor rule name mapping for enrichment
-	var cursorRuleNames map[string]string
-	if target == TargetCursor && len(rules) > 0 {
-		assignments := assignCursorNumbers(rules)
-		cursorRuleNames = make(map[string]string, len(rules))
-		for i, r := range rules {
-			cursorRuleNames[r.Name] = fmt.Sprintf("%d-%s.mdc", assignments[i].Number, assignments[i].ShortName)
-		}
-	}
-
-	// Generate rules
-	if len(rules) > 0 {
-		if target == TargetCursor {
-			assignments := assignCursorNumbers(rules)
-			for i, r := range rules {
-				content, err := ruleToCursor(root, r)
-				if err != nil {
-					return written, cursorRuleNames, err
-				}
-				rel := filepath.Join("rules", fmt.Sprintf("%d-%s.mdc", assignments[i].Number, assignments[i].ShortName))
-				rel = resolveCollision(dest, rel)
-				if err := writeOutput(dest, rel, content); err != nil {
-					return written, cursorRuleNames, err
-				}
-				written++
-			}
-		} else {
-			for _, r := range rules {
-				content, err := ruleToClaude(root, r)
-				if err != nil {
-					return written, cursorRuleNames, err
-				}
-				rel := filepath.Join("rules", flattenName(r.Name)+".md")
-				if err := writeOutput(dest, rel, content); err != nil {
-					return written, cursorRuleNames, err
-				}
-				written++
-			}
-		}
 	}
 
 	// Generate skills
@@ -507,11 +412,11 @@ func generateAll(
 			content, err = skillToClaude(root, s)
 		}
 		if err != nil {
-			return written, cursorRuleNames, err
+			return written, err
 		}
 		rel := filepath.Join("skills", flat, "SKILL.md")
 		if err := writeOutput(dest, rel, content); err != nil {
-			return written, cursorRuleNames, err
+			return written, err
 		}
 		written++
 	}
@@ -519,26 +424,26 @@ func generateAll(
 	// Generate agents with enriched bodies
 	for _, a := range agents {
 		flat := flattenName(a.Name)
-		deps := buildResolvedDeps(a, skillMap, ruleMap, agentMap, ruleLookup)
+		deps := buildResolvedDeps(a, skillMap, agentMap)
 		var content string
 		var err error
 		switch target {
 		case TargetCursor:
-			content, err = agentToCursor(root, a, deps, cursorRuleNames)
+			content, err = agentToCursor(root, a, deps)
 		default:
 			content, err = agentToClaude(root, a, deps)
 		}
 		if err != nil {
-			return written, cursorRuleNames, err
+			return written, err
 		}
 		rel := filepath.Join(agentSubdir, flat+".md")
 		if err := writeOutput(dest, rel, content); err != nil {
-			return written, cursorRuleNames, err
+			return written, err
 		}
 		written++
 	}
 
-	return written, cursorRuleNames, nil
+	return written, nil
 }
 
 func names[T any](items []T, key func(T) string) []string {
@@ -555,17 +460,6 @@ func makeSet(items []string) map[string]bool {
 		m[s] = true
 	}
 	return m
-}
-
-func filterRules(rules []model.Rule, selected []string) []model.Rule {
-	set := makeSet(selected)
-	var result []model.Rule
-	for _, r := range rules {
-		if set[r.Name] {
-			result = append(result, r)
-		}
-	}
-	return result
 }
 
 func filterSkills(skills []model.Skill, selected []string) []model.Skill {

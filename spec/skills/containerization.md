@@ -1,9 +1,9 @@
 ---
 name: containerization
-description: Container and CI/CD workflow — Dockerfile design decisions, Docker Compose for development, CI/CD caching strategies, deployment gates, image security, and health check configuration.
+description: Build production-ready containers and CI/CD pipelines covering Dockerfile multi-stage builds, Docker Compose dev setup, image security hardening, deployment strategies, and health check configuration.
 scope: universal
 languages: []
-uses_rules: [infrastructure, observability, security, cross-cutting]
+uses_skills: [observability, security]
 ---
 
 # Containerization Skill
@@ -94,6 +94,15 @@ Before deploying to production, verify:
 4. Smoke tests pass in staging
 5. Rollback path is confirmed (previous known-good image tag)
 
+### Pipeline Order
+Lint → build → test → security scan → deploy. Tests must pass before deploy — no manual bypass mechanism.
+
+### Image Tagging
+Tag images with the commit SHA. Never rely on `latest` for deployment — it is ambiguous and not rollback-friendly.
+
+### Artifact Signing
+Sign container images and verify signatures before deployment to prevent supply chain tampering. Use cosign or Notary for signing.
+
 ## Image Security Checklist
 
 Before shipping a container image, verify:
@@ -102,6 +111,32 @@ Before shipping a container image, verify:
 2. [ ] **No unnecessary capabilities:** Drop all Linux capabilities and add back only what is needed.
 3. [ ] **SBOM generated:** Software Bill of Materials produced for the image in CycloneDX or SPDX format. Store SBOM artifacts alongside release artifacts. Verify against known vulnerability databases before deploying to production.
 4. [ ] **.dockerignore present:** Build context excludes version control, environment files, and other unnecessary files.
+
+## Image Lifecycle
+- **Scan images in CI** before pushing to registry. Fail the pipeline on critical or high-severity CVEs.
+- **Re-scan periodically.** New CVEs are discovered after image build. Schedule weekly scans of deployed images.
+- **Base image updates:** Monitor base image updates and rebuild when security patches are available.
+- **Pin base image versions** by digest or specific tag for reproducibility. Floating tags (`latest`) cause non-deterministic builds.
+
+## Secrets in Containers
+- **Never bake secrets into images.** No ENV with credentials, no COPY of .env files, no ARG for sensitive values.
+- **Runtime injection:** Pass secrets via environment variables from a secret manager (Vault, AWS Secrets Manager, GCP Secret Manager) or orchestrator secrets (Kubernetes Secrets, Docker Secrets).
+- **Build-time secrets:** Use Docker BuildKit secret mounts (`--mount=type=secret`) for secrets needed only during build (private registry tokens, license keys). These are not persisted in image layers.
+
+## Resource Limits
+Always set CPU and memory limits in deployment manifests. Containers without limits can starve co-located workloads.
+
+## Deployment Strategy
+- **Default to rolling updates.** Replace instances incrementally, verifying health at each step. Zero-downtime for stateless services.
+- **Blue/green deployments:** Use for high-risk releases or when instant rollback is required. Run both versions simultaneously, switch traffic atomically.
+- **Canary deployments:** Route a small percentage of traffic (1-5%) to the new version first. Monitor error rate and latency before full rollout.
+- **Rollback:** Every deployment must have a documented rollback path. For container deployments, rollback means redeploying the previous image tag (commit SHA). Verify rollback works before relying on it.
+- **Post-deploy verification:** Run smoke tests or synthetic checks against the new deployment. Verify health check endpoints return healthy before routing production traffic.
+- **Schema migrations and application deploys are separate steps.** Apply backward-compatible migrations before deploying new code. Never couple a breaking migration with the deploy that requires it.
+
+## Environment Parity
+- **Keep dev, staging, and production as similar as possible.** Same base images, same configuration structure, same database engine.
+- **Differences between environments should be limited to:** credentials, resource sizing, and feature flags. Not architecture.
 
 ## Health Check Configuration
 

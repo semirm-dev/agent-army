@@ -10,40 +10,6 @@ import (
 	"github.com/semir/agent-army/internal/tui"
 )
 
-func TestScaffoldRule(t *testing.T) {
-	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "spec", "rules"), 0755)
-
-	// name → description(enter=default) → scope(enter=universal) → no deps available → confirm(y)
-	p := tui.NewFakePrompter(
-		"security",  // name
-		"",          // description (default)
-		"",          // scope (default=universal)
-		"y",         // confirm
-	)
-
-	err := ScaffoldFlow(root, "rule", p, io.Discard)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	content, err := os.ReadFile(filepath.Join(root, "spec", "rules", "security.md"))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s := string(content)
-	if !strings.Contains(s, "name: security") {
-		t.Error("missing name in frontmatter")
-	}
-	if !strings.Contains(s, "scope: universal") {
-		t.Error("missing scope in frontmatter")
-	}
-	if !strings.Contains(s, "# Security Patterns") {
-		t.Error("missing title in body")
-	}
-}
-
 func TestScaffoldSkill(t *testing.T) {
 	root := t.TempDir()
 	os.MkdirAll(filepath.Join(root, "spec", "skills"), 0755)
@@ -78,7 +44,7 @@ func TestScaffoldAgent(t *testing.T) {
 	root := t.TempDir()
 	os.MkdirAll(filepath.Join(root, "spec", "agents"), 0755)
 
-	// name → description → role(enter=coder) → scope(enter=universal) → access(enter=read-write) → confirm
+	// name -> description -> role(enter=coder) -> scope(enter=universal) -> access(enter=read-write) -> confirm
 	p := tui.NewFakePrompter(
 		"go-coder",     // name
 		"Go coder",     // description
@@ -116,8 +82,6 @@ func TestDefaultDescription(t *testing.T) {
 		name       string
 		want       string
 	}{
-		{"rule", "security", "Security patterns and conventions"},
-		{"rule", "go/testing", "Go Testing patterns and conventions"},
 		{"skill", "api-designer", "Api Designer workflow and decision tree"},
 		{"agent", "go-coder", "Go Coder specialist agent"},
 	}

@@ -1,9 +1,9 @@
 ---
 name: typescript/testing
-description: Vitest/Jest config, table-driven tests, async error testing, and test doubles
+description: Guide TypeScript test implementation with Vitest/Jest — table-driven tests via it.each, async error assertions, mock/spy patterns (vi.fn, vi.spyOn), test isolation, and CI parallelization config.
 scope: language-specific
 languages: [typescript]
-uses_rules: [typescript/patterns, testing-patterns]
+uses_skills: [typescript/patterns, testing]
 ---
 
 # TypeScript Testing Patterns

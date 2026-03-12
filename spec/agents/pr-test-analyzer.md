@@ -5,8 +5,7 @@ role: analyzer
 scope: universal
 languages: []
 access: read-only
-uses_skills: [testing-strategy]
-uses_rules: []
+uses_skills: [testing]
 uses_plugins: []
 delegates_to: []
 ---
@@ -30,7 +29,7 @@ The orchestrator activates you when a pull request needs test coverage analysis 
 
 ## Standards
 
-Testing patterns, coverage targets, and pyramid guidance are loaded via the `testing-strategy` skill (which references `cross-cutting` standards for specific coverage thresholds).
+Testing patterns, coverage targets, and pyramid guidance are loaded via the `testing` skill (which references `cross-cutting` standards for specific coverage thresholds).
 
 ## Checklist
 
@@ -78,7 +77,7 @@ Testing patterns, coverage targets, and pyramid guidance are loaded via the `tes
 1. Read the orchestrator's description of the PR and changes
 2. Run `git diff` (or equivalent) to identify changed files
 3. Identify new code paths and branches
-4. Invoke the `testing-strategy` skill for patterns
+4. Invoke the `testing` skill for patterns
 5. Read test files corresponding to changed implementation
 6. Run coverage commands if available
 7. Map implementation changes to test coverage

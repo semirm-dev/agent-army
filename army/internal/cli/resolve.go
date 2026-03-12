@@ -20,10 +20,6 @@ func newResolveCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := findRoot()
 
-			rules, err := loader.LoadRules(root)
-			if err != nil {
-				return err
-			}
 			skills, err := loader.LoadSkills(root)
 			if err != nil {
 				return err
@@ -37,8 +33,8 @@ func newResolveCmd() *cobra.Command {
 				return err
 			}
 
-			errors := resolver.ValidateAllRefs(rules, skills, agents, model.PluginNames(plugins))
-			fixes := resolver.ComputeAllFixes(rules, skills, agents, root)
+			errors := resolver.ValidateAllRefs(skills, agents, model.PluginNames(plugins))
+			fixes := resolver.ComputeAllFixes(skills, agents, root)
 
 			report := resolver.FormatReport(errors, fixes)
 			fmt.Println(report)

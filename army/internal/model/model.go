@@ -1,16 +1,5 @@
 package model
 
-// Rule loaded from rules/*.md frontmatter.
-type Rule struct {
-	Name        string
-	Description string // H1 heading (title)
-	Summary     string // frontmatter description (brief summary)
-	Scope       string
-	Languages   []string
-	UsesRules   []string
-	Path        string
-}
-
 // Skill loaded from skills/*.md frontmatter.
 type Skill struct {
 	Name        string
@@ -18,7 +7,7 @@ type Skill struct {
 	Summary     string // frontmatter description (brief summary)
 	Scope       string
 	Languages   []string
-	UsesRules   []string
+	UsesSkills  []string
 	Path        string
 }
 
@@ -48,7 +37,6 @@ func PluginNames(plugins []Plugin) []string {
 // ResolvedDeps holds the fully resolved dependency information for an agent.
 type ResolvedDeps struct {
 	Skills      []Skill
-	Rules       []Rule
 	Plugins     []string
 	DelegatesTo []Agent
 }
@@ -63,7 +51,6 @@ type Agent struct {
 	Access      string
 	Languages   []string
 	UsesSkills  []string
-	UsesRules   []string
 	UsesPlugins []string
 	DelegatesTo []string
 	Path        string

@@ -1,9 +1,9 @@
 ---
 name: refactoring-patterns
-description: Safe refactoring workflow, common patterns (extract, inline, move, rename), red flags, and pre-ship checklist.
+description: Enables safe, test-backed code restructuring using extract, inline, move, rename, and polymorphism patterns with step-by-step workflow, red-flag guards, and a pre-ship checklist to prevent behavior regressions.
 scope: universal
 languages: []
-uses_rules: [code-quality, testing-patterns, cross-cutting]
+uses_skills: [code-quality, testing]
 ---
 
 # Refactoring Patterns Skill

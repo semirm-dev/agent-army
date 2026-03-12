@@ -24,46 +24,12 @@ func TestFindMDFiles(t *testing.T) {
 	}
 }
 
-func TestLoadRules(t *testing.T) {
-	root := t.TempDir()
-	rulesDir := filepath.Join(root, "spec", "rules", "go")
-	os.MkdirAll(rulesDir, 0755)
-
-	content := "---\nscope: language-specific\nlanguages: [go]\nuses_rules: [cross-cutting]\n---\n\n# Go Patterns\n"
-	os.WriteFile(filepath.Join(rulesDir, "patterns.md"), []byte(content), 0644)
-
-	rules, err := LoadRules(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(rules) != 1 {
-		t.Fatalf("got %d rules, want 1", len(rules))
-	}
-
-	r := rules[0]
-	if r.Name != filepath.Join("go", "patterns") {
-		t.Errorf("name = %q", r.Name)
-	}
-	if r.Description != "Go Patterns" {
-		t.Errorf("description = %q", r.Description)
-	}
-	if r.Scope != "language-specific" {
-		t.Errorf("scope = %q", r.Scope)
-	}
-	if len(r.Languages) != 1 || r.Languages[0] != "go" {
-		t.Errorf("languages = %v", r.Languages)
-	}
-	if len(r.UsesRules) != 1 || r.UsesRules[0] != "cross-cutting" {
-		t.Errorf("uses_rules = %v", r.UsesRules)
-	}
-}
-
 func TestLoadSkills(t *testing.T) {
 	root := t.TempDir()
 	skillsDir := filepath.Join(root, "spec", "skills")
 	os.MkdirAll(skillsDir, 0755)
 
-	content := "---\nname: api-designer\nscope: universal\nuses_rules: [api-design]\n---\n\n# API Designer\n"
+	content := "---\nname: api-designer\nscope: universal\nuses_skills: [error-handling]\n---\n\n# API Designer\n"
 	os.WriteFile(filepath.Join(skillsDir, "api-designer.md"), []byte(content), 0644)
 
 	skills, err := LoadSkills(root)
@@ -81,6 +47,9 @@ func TestLoadSkills(t *testing.T) {
 	if s.Description != "API Designer" {
 		t.Errorf("description = %q", s.Description)
 	}
+	if len(s.UsesSkills) != 1 || s.UsesSkills[0] != "error-handling" {
+		t.Errorf("uses_skills = %v", s.UsesSkills)
+	}
 }
 
 func TestLoadAgents(t *testing.T) {
@@ -88,7 +57,7 @@ func TestLoadAgents(t *testing.T) {
 	agentsDir := filepath.Join(root, "spec", "agents", "go")
 	os.MkdirAll(agentsDir, 0755)
 
-	content := "---\nname: go-coder\ndescription: Go code writer\nrole: coder\nscope: language-specific\naccess: read-write\nlanguages: [go]\nuses_skills: [golang-pro]\nuses_rules: [go/patterns]\nuses_plugins: [context7]\ndelegates_to: []\n---\n\n# Go Coder\n"
+	content := "---\nname: go-coder\ndescription: Go code writer\nrole: coder\nscope: language-specific\naccess: read-write\nlanguages: [go]\nuses_skills: [golang-pro]\nuses_plugins: [context7]\ndelegates_to: []\n---\n\n# Go Coder\n"
 	os.WriteFile(filepath.Join(agentsDir, "coder.md"), []byte(content), 0644)
 
 	agents, err := LoadAgents(root)
@@ -225,16 +194,5 @@ func TestLoadPluginsConfig_NoFile(t *testing.T) {
 	}
 	if raw != nil {
 		t.Errorf("got %v, want nil", raw)
-	}
-}
-
-func TestLoadRules_NoDir(t *testing.T) {
-	root := t.TempDir()
-	rules, err := LoadRules(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if rules != nil {
-		t.Errorf("got %v, want nil", rules)
 	}
 }

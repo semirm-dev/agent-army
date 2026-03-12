@@ -1,9 +1,9 @@
 ---
 name: python/coder
-description: Python implementation workflow — code placement, error handling patterns, async decisions, type safety enforcement, dependency management, and pre-PR verification.
+description: Drive Python feature implementation with a models-first workflow covering code placement decisions, sync vs async selection, error handling design, dependency addition, and pre-PR lint/type/test verification.
 scope: language-specific
 languages: [python]
-uses_rules: [python/patterns]
+uses_skills: [python/patterns]
 ---
 
 # Python Coder Skill

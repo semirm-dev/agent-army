@@ -1,9 +1,9 @@
 ---
 name: go/architect
-description: Go project architecture — layout selection, package decomposition, dependency direction, interface boundary design, module organization, and evolution planning.
+description: Designs Go project structure from scratch or restructures existing codebases — covering layout selection, package decomposition, dependency direction rules, interface boundaries, and architecture evolution.
 scope: language-specific
 languages: [go]
-uses_rules: [go/patterns]
+uses_skills: [go/patterns]
 ---
 
 # Go Architect Skill

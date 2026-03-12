@@ -11,18 +11,8 @@ import (
 func newNewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "new",
-		Short: "Scaffold a new rule, skill, or agent",
+		Short: "Scaffold a new skill or agent",
 	}
-
-	cmd.AddCommand(&cobra.Command{
-		Use:   "rule",
-		Short: "Create a new rule",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			root := findRoot()
-			p := tui.NewStdinPrompter(os.Stdin, os.Stdout)
-			return scaffold.ScaffoldFlow(root, "rule", p, os.Stdout)
-		},
-	})
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "skill",

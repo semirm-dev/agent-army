@@ -1,9 +1,9 @@
 ---
 name: react/tester
-description: React testing workflow — component test design, testing-library patterns, MSW setup, hook testing, accessibility testing, visual regression, and coverage analysis.
+description: Orchestrates React test creation with decision trees for test type selection, mock-vs-real boundaries, MSW integration setup, hook testing patterns, accessibility automation, and coverage analysis workflows.
 scope: language-specific
 languages: [react]
-uses_rules: [react/testing]
+uses_skills: [react/testing]
 ---
 
 # React Tester Skill

@@ -1,9 +1,9 @@
 ---
 name: react/testing
-description: Testing Library patterns, user-centric queries, MSW mocking, and component tests
+description: Guides writing React component and hook tests using Testing Library user-centric queries, MSW network-level API mocking, and automated accessibility checks with jest-axe/vitest-axe.
 scope: language-specific
 languages: [react]
-uses_rules: [react/patterns, testing-patterns]
+uses_skills: [react/patterns, testing]
 ---
 
 # React Testing Patterns

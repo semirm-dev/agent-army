@@ -5,8 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [go]
 access: read-only
-uses_skills: [go/reviewer, concurrency, error-handling, api-designer, caching-strategy, messaging-patterns]
-uses_rules: []
+uses_skills: [go/reviewer, concurrency, error-handling, api-design, caching-strategy, messaging-patterns]
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---
@@ -103,7 +102,7 @@ Go coding patterns, security standards, and observability patterns are loaded vi
 2. Read every changed file
 3. Read surrounding code for context (imports, callers, interfaces)
 4. For error handling reviews, invoke the `error-handling` skill for taxonomy and propagation patterns
-5. For API endpoint reviews, invoke the `api-designer` skill for endpoint design and error format conventions
+5. For API endpoint reviews, invoke the `api-design` skill for endpoint design and error format conventions
 6. For caching-related reviews, invoke the `caching-strategy` skill for cache patterns and invalidation
 7. For messaging or event-driven patterns, invoke the `messaging-patterns` skill for queue and event design
 8. Run `go vet ./...` and lint tools

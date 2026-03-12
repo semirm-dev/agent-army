@@ -1,9 +1,9 @@
 ---
 name: error-handling
-description: Error taxonomy, per-language error creation patterns, propagation decision tree, and user-facing error guidelines following project standards.
+description: Classify errors by domain/infrastructure/system level, apply per-language creation patterns, decide wrap vs translate at boundaries, and format user-facing error responses.
 scope: universal
 languages: []
-uses_rules: [cross-cutting, api-design, observability]
+uses_skills: [api-design, observability]
 ---
 
 # Error Handling Skill

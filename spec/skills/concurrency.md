@@ -1,9 +1,9 @@
 ---
 name: concurrency
-description: Concurrency decision trees — race condition prevention, deadlock avoidance, worker pool sizing, backpressure design, structured concurrency, graceful shutdown, and distributed coordination.
+description: Select concurrency models, size worker pools, prevent deadlocks and races, design backpressure, implement graceful shutdown, and coordinate distributed tasks.
 scope: universal
 languages: []
-uses_rules: [concurrency, cross-cutting, observability]
+uses_skills: [observability]
 ---
 
 # Concurrency Skill
@@ -106,6 +106,23 @@ Is this a one-at-a-time singleton task (cron, migration)?
   YES → Leader election via coordination service or DB advisory lock.
   NO  → Distributed lock with lease-based TTL + fencing tokens.
 ```
+
+## Structured Concurrency
+
+- Scope concurrent task lifetimes to a parent. When the parent completes or fails, all child tasks are joined or canceled.
+- Never fire-and-forget goroutines, threads, or async tasks without a mechanism to await or cancel them.
+
+## Cancellation Propagation
+
+- Pass cancellation tokens/contexts through the call chain.
+- Check for cancellation before expensive operations.
+- Respect cancellation in loops and retry logic.
+
+## Observability
+
+- Monitor active concurrent task/worker count — unbounded growth indicates a leak.
+- Track queue depth and processing latency for work queues.
+- Propagate trace context across concurrent boundaries.
 
 ## Pre-Implementation Checklist
 

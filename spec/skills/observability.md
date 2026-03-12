@@ -1,12 +1,12 @@
 ---
-name: observability-setup
-description: Observability implementation workflow -- maturity decision tree, log level guide, health endpoint patterns, metrics RED/USE selection, and alert design.
+name: observability
+description: Guide structured logging, metrics (RED/USE methods), distributed tracing, health checks, alerting design, SLO-based monitoring, and observability maturity progression for production services.
 scope: universal
 languages: []
-uses_rules: [observability, cross-cutting]
+uses_skills: [cross-cutting]
 ---
 
-# Observability Setup Skill
+# Observability Patterns
 
 ## When to Use
 
@@ -56,7 +56,23 @@ What observability does the service have today?
 | 2 | Logging + metrics + health | /healthz, /readyz, RED metrics, dashboards |
 | 3 | Full observability | Distributed tracing, OTel collector, correlated signals |
 
-## Structured Logging Setup
+## Health Checks
+- Expose a **liveness** endpoint (`/healthz`): confirms the process is running and not deadlocked. Returns 200 with no dependency checks.
+- Expose a **readiness** endpoint (`/readyz`): confirms dependencies (database, cache, queues) are connected and responsive. Checks critical dependencies with a timeout.
+- Liveness failures trigger restarts. Readiness failures remove the instance from load balancing.
+- Neither endpoint requires authentication.
+
+## Structured Logging
+- Always log as structured key-value pairs (JSON or equivalent). Include: `timestamp`, `level`, `message`, `request_id`, `user_id` (when available), `duration_ms` (for operations).
+- **Log at boundaries:** incoming requests, outgoing calls, and state transitions.
+- **Log levels:**
+  - `ERROR` -- Unhandled failures requiring human action. If no one needs to act, it is not an error.
+  - `WARN` -- Degraded but recoverable. The system compensated but the condition should be investigated.
+  - `INFO` -- Normal business operations. Request served, job completed, config loaded.
+  - `DEBUG` -- Development diagnostics only. Never enable in production by default.
+- Never log at ERROR for expected conditions (validation failures, not-found, rate-limited requests).
+- Never log secrets, tokens, passwords, or PII. Mask or redact sensitive fields.
+- **Log sampling:** For high-throughput paths, sample repetitive log entries to prevent log volume from overwhelming storage and budgets.
 
 ### Log Level Decision Guide
 
@@ -74,18 +90,12 @@ Is this a normal business operation?
   NO  --> DEBUG (dev only, never enable in production by default)
 ```
 
-Use your language's structured logging library.
+## Metrics
 
-## Health Endpoint Patterns
-
-For health check implementation details, orchestrator probe configuration, and the full checklist, see the `containerization` skill.
-
-Key points for observability maturity:
-- `/healthz` returns 200 with no dependency checks (liveness)
-- `/readyz` checks critical dependencies with a timeout (readiness)
-- Neither endpoint requires authentication
-
-## Metrics Selection Guide
+- **Naming pattern:** `<namespace>_<subsystem>_<name>_<unit>` (e.g., `app_http_requests_total`, `app_db_query_duration_seconds`).
+- **Standard metrics:** request count, error rate, latency histogram, active connections, queue depth (if applicable).
+- **Cardinality warning:** Avoid high-cardinality label values (user IDs, request IDs, full URLs). Use bounded categories (status codes, endpoint names, error types).
+- Use histograms for latency, not averages. Averages hide tail latency.
 
 ### RED Method (Request-Driven Services)
 
@@ -119,7 +129,16 @@ Is this an infrastructure resource (DB pool, CPU, queue)?
   NO  --> Start with RED -- it covers most cases
 ```
 
-## Alert Design Principles
+## Distributed Tracing
+- **Context propagation:** Use W3C TraceContext (`traceparent`, `tracestate`) across all service boundaries. Log `trace_id` in every log entry.
+- **Span naming:** `{service}.{operation}` in verb form (e.g., `auth.validateToken`, `orders.processPayment`).
+- **Span attributes:** Add business context (entity IDs, tenant, operation type). Never add PII as span attributes.
+- **Sampling:** Sample 100% of errors and slow requests. Configurable percentage for success (start at 10%). Use a collector to batch, filter, and route telemetry -- never send directly from application to backend in production.
+
+## Resource Attributes
+- Every trace, metric, and log must carry: `service.name`, `service.version`, `deployment.environment`.
+
+## Alerting Strategy
 
 ### Alert on Symptoms, Not Causes
 
@@ -138,6 +157,9 @@ GOOD: Alert when write error rate > 1% for 2 minutes
 ```
 
 Exception: alert on resource exhaustion when it is the direct cause of user-facing impact (disk full causing write failures).
+
+- **Every alert must have:** severity level, link to a runbook, and expected response time.
+- **Tiered severity:** Critical (pages on-call, immediate), Warning (next business day), Info (dashboard only).
 
 ### Alert Fatigue Prevention
 
@@ -161,3 +183,8 @@ Fixes:
 4. [ ] Alert uses a time window (not instant) to avoid flapping
 5. [ ] Alert has a clear severity level and response expectation
 6. [ ] Someone has verified the alert fires correctly (test in staging)
+
+## Service Level Indicators & Objectives
+- **Define SLIs per service:** availability (success rate), latency (p50/p95/p99), error rate. Derived from metrics, not logs.
+- **Set SLO targets:** e.g., 99.9% availability, p95 latency < 200ms. Base on user expectations and business requirements.
+- **Error budget:** Track remaining error budget. When budget is exhausted, prioritize reliability over features.

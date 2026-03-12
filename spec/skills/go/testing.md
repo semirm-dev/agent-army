@@ -1,9 +1,9 @@
 ---
 name: go/testing
-description: Table-driven tests, race detection, benchmarks, and Go test helpers
+description: Guides writing Go tests using table-driven patterns, t.Helper/t.Cleanup idioms, fuzz testing, benchmarks with benchstat, and integration tests via testcontainers with race detection.
 scope: language-specific
 languages: [go]
-uses_rules: [go/patterns, testing-patterns]
+uses_skills: [go/patterns, testing]
 ---
 
 # Go Testing Patterns

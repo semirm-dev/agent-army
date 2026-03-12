@@ -1,9 +1,9 @@
 ---
 name: typescript/reviewer
-description: TypeScript code review workflow — review order, type safety audit, async verification, performance red flags, security checklist, and anti-pattern detection.
+description: Review TypeScript PRs systematically — audit type safety (any/assertions/enums), detect async anti-patterns (floating promises), flag performance issues (bundle size, re-renders), and verify security at input boundaries.
 scope: language-specific
 languages: [typescript]
-uses_rules: [typescript/testing]
+uses_skills: [typescript/testing]
 ---
 
 # TypeScript Reviewer Skill

@@ -1,9 +1,9 @@
 ---
 name: python/patterns
-description: Type hints, formatting, error handling, async patterns, and project structure
+description: Enforce Python coding standards including type hints, async/await patterns, error handling, naming conventions, project structure, and dependency tooling (ruff, mypy, uv).
 scope: language-specific
 languages: [python]
-uses_rules: [code-quality, security, cross-cutting, observability]
+uses_skills: [code-quality, security, observability]
 ---
 
 # Python Coding Patterns

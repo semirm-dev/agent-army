@@ -6,7 +6,6 @@ scope: universal
 languages: []
 access: read-only
 uses_skills: [containerization, refactoring-patterns]
-uses_rules: []
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---

@@ -1,9 +1,9 @@
 ---
 name: python/testing
-description: Pytest conventions, parametrize, fixtures, and async test support
+description: Guide pytest test structure including parametrize, fixtures with yield teardown, async test setup via pytest-asyncio, mocking strategies, CI parallelization with xdist, and property-based testing with hypothesis.
 scope: language-specific
 languages: [python]
-uses_rules: [python/patterns, testing-patterns]
+uses_skills: [python/patterns, testing]
 ---
 
 # Python Testing Patterns

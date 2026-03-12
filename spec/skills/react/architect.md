@@ -1,9 +1,9 @@
 ---
 name: react/architect
-description: React project architecture — component hierarchy design, state management selection, routing strategy, project layout, feature decomposition, and evolution planning.
+description: Plans React project architecture with decision trees for project layout, component hierarchy, state management selection, routing strategy, feature decomposition, and scalable module boundaries.
 scope: language-specific
 languages: [react]
-uses_rules: [react/patterns]
+uses_skills: [react/patterns]
 ---
 
 # React Architect Skill

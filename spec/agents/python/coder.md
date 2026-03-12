@@ -5,8 +5,7 @@ role: coder
 scope: language-specific
 languages: [python]
 access: read-write
-uses_skills: [python/coder, python/architect, error-handling, code-architecture, api-designer, refactoring-patterns, caching-strategy, messaging-patterns, observability-setup]
-uses_rules: []
+uses_skills: [python/coder, python/architect, error-handling, code-architecture, api-design, refactoring-patterns, caching-strategy, messaging-patterns, observability]
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
@@ -116,12 +115,12 @@ async def get_user_orders(user_id: str) -> list[Order]:
 2. Explore the codebase: find related packages, classes, and existing patterns
 3. For error type design or error propagation tasks, invoke the `error-handling` skill
 4. For new package/module creation, invoke the `code-architecture` skill for structure guidance
-5. For API endpoint implementation, invoke the `api-designer` skill for endpoint and error format conventions
+5. For API endpoint implementation, invoke the `api-design` skill for endpoint and error format conventions
 6. For restructuring existing code, invoke the `refactoring-patterns` skill
 7. For project scaffolding or major restructuring, invoke the `python/architect` skill
 8. For caching-related tasks, invoke the `caching-strategy` skill
 9. For messaging or event-driven communication, invoke the `messaging-patterns` skill
-10. For logging, metrics, or health check setup, invoke the `observability-setup` skill
+10. For logging, metrics, or health check setup, invoke the `observability` skill
 11. Write code following the standards above
 12. Run `ruff check .` to catch lint issues
 13. Run `ruff format --check .` to verify formatting

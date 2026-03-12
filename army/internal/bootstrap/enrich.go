@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/semir/agent-army/internal/graph"
 	"github.com/semir/agent-army/internal/model"
 )
 
@@ -13,9 +12,7 @@ import (
 func buildResolvedDeps(
 	agent model.Agent,
 	skillMap map[string]model.Skill,
-	ruleMap map[string]model.Rule,
 	agentMap map[string]model.Agent,
-	ruleLookup map[string][]string,
 ) model.ResolvedDeps {
 	var deps model.ResolvedDeps
 
@@ -23,34 +20,6 @@ func buildResolvedDeps(
 	for _, name := range agent.UsesSkills {
 		if s, ok := skillMap[name]; ok {
 			deps.Skills = append(deps.Skills, s)
-		}
-	}
-
-	// Collect rule seeds from agent + all skills
-	seen := make(map[string]bool)
-	var ruleSeeds []string
-	for _, r := range agent.UsesRules {
-		if !seen[r] {
-			ruleSeeds = append(ruleSeeds, r)
-			seen[r] = true
-		}
-	}
-	for _, s := range deps.Skills {
-		for _, r := range s.UsesRules {
-			if !seen[r] {
-				ruleSeeds = append(ruleSeeds, r)
-				seen[r] = true
-			}
-		}
-	}
-
-	// Resolve rules transitively
-	resolved := graph.ResolveTransitive(ruleSeeds, func(name string) []string {
-		return ruleLookup[name]
-	})
-	for _, name := range resolved {
-		if r, ok := ruleMap[name]; ok {
-			deps.Rules = append(deps.Rules, r)
 		}
 	}
 
@@ -69,41 +38,18 @@ func buildResolvedDeps(
 
 // enrichAgentBody injects a "Resources Available" section into the agent body
 // and rewrites body text references to be target-native.
-func enrichAgentBody(body string, deps model.ResolvedDeps, target string, cursorRuleNames map[string]string) string {
-	resources := buildResourcesSection(deps, target, cursorRuleNames)
+func enrichAgentBody(body string, deps model.ResolvedDeps, target string) string {
+	resources := buildResourcesSection(deps, target)
 	body = injectSection(body, resources)
 	body = rewriteBodyRefs(body, target)
 	return body
 }
 
 // buildResourcesSection generates the "## Resources Available" markdown section.
-func buildResourcesSection(deps model.ResolvedDeps, target string, cursorRuleNames map[string]string) string {
+func buildResourcesSection(deps model.ResolvedDeps, target string) string {
 	var sb strings.Builder
 
 	sb.WriteString("## Resources Available\n")
-
-	// Rules section
-	if len(deps.Rules) > 0 {
-		sb.WriteString("\n")
-		switch target {
-		case TargetClaude:
-			sb.WriteString("### Rules (Auto-Loaded)\n")
-			sb.WriteString("The following rules are automatically loaded into context. Follow them:\n")
-			for _, r := range deps.Rules {
-				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", flattenName(r.Name), ruleDescription(r)))
-			}
-		case TargetCursor:
-			sb.WriteString("### Rules (Auto-Applied)\n")
-			sb.WriteString("The following rules are automatically applied based on file type. Follow them:\n")
-			for _, r := range deps.Rules {
-				displayName := flattenName(r.Name) + ".mdc"
-				if cn, ok := cursorRuleNames[r.Name]; ok {
-					displayName = cn
-				}
-				sb.WriteString(fmt.Sprintf("- `%s` -- %s\n", displayName, ruleDescription(r)))
-			}
-		}
-	}
 
 	// Skills section
 	if len(deps.Skills) > 0 {
@@ -194,20 +140,4 @@ func rewriteBodyRefs(body string, target string) string {
 		body = viaSkillToolBacktickRe.ReplaceAllString(body, "")
 	}
 	return body
-}
-
-// ruleDescription returns a brief description for a rule, preferring Summary over Description.
-func ruleDescription(r model.Rule) string {
-	if r.Summary != "" {
-		return r.Summary
-	}
-	return r.Description
-}
-
-// skillDescription returns a brief description for a skill, preferring Summary over Description.
-func skillDescription(s model.Skill) string {
-	if s.Summary != "" {
-		return s.Summary
-	}
-	return s.Description
 }

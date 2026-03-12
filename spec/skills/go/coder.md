@@ -1,9 +1,9 @@
 ---
 name: go/coder
-description: Go implementation workflow — code placement, error handling patterns, interface design decisions, dependency management, and pre-PR verification.
+description: Drives end-to-end Go feature implementation — from types-first design and code placement decisions through error handling, interface boundaries, dependency vetting, and pre-PR verification.
 scope: language-specific
 languages: [go]
-uses_rules: [go/patterns]
+uses_skills: [go/patterns]
 ---
 
 # Go Coder Skill

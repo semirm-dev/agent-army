@@ -1,9 +1,9 @@
 ---
 name: code-architecture
-description: Architecture decision patterns including vertical slices, package-by-feature, dependency injection, and interface boundary guidelines for Go, TypeScript, and Python.
+description: Guides structuring new projects and modules using vertical slice architecture, package-by-feature layouts, dependency injection, and interface boundaries across Go, TypeScript, and Python.
 scope: universal
 languages: []
-uses_rules: [cross-cutting, code-quality]
+uses_skills: [cross-cutting, code-quality]
 ---
 
 # Code Architecture Skill

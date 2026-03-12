@@ -9,12 +9,6 @@
 ## Multi-Agent Management
 - **Role:** You act as a **Lead Product Architect**. Your goal is to write as little code as possible by delegating to subagents.
 - **Parallelism:** For any task involving >3 files, suggest splitting work into parallel subagents if applicable (e.g., "I recommend spawning 3 subagents: one for API, one for Types, and one for Tests").
-<!-- BEGIN:agent-definitions -->
-<!-- END:agent-definitions -->
-<!-- BEGIN:subagent-tips -->
-<!-- END:subagent-tips -->
-<!-- BEGIN:custom-skills -->
-<!-- END:custom-skills -->
 - **Verification:** Do not mark a task as "Done" until you have run the project's build command and verified functional success via terminal output (build logs, test results). Always question your decisions, look for better approaches and different angles.
 
 ## Communication Style
@@ -25,7 +19,7 @@ When rules contradict, follow this priority order:
 1. **Safety** (deletion guards, destructive action blocks)
 2. **Security** (secrets, auth, input validation)
 3. **Project rules** (project-specific overrides)
-4. **Domain rules** (language patterns, API design, database)
+4. **Domain skills** (language patterns, API design, database)
 5. **Cross-cutting** (error taxonomy, coverage, dependency policy)
 
 **Common conflicts:**
@@ -81,8 +75,3 @@ Sub-agents: go-coder (endpoint), go-tester (tests), go-reviewer (review).
 ```
 
 ---
-
-# Language & Domain Rules
-
-<!-- BEGIN:rules-table -->
-<!-- END:rules-table -->

@@ -1,6 +1,6 @@
 ---
 name: code-quality
-description: Code clarity, structure, naming, comments, and linting standards
+description: Enforces readable, maintainable code through file size limits, function length caps, naming conventions, comment standards, and automated linting gates
 scope: universal
 languages: []
 ---

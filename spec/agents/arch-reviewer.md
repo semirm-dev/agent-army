@@ -5,8 +5,7 @@ role: reviewer
 scope: universal
 languages: []
 access: read-only
-uses_skills: [api-designer, refactoring-patterns]
-uses_rules: []
+uses_skills: [api-design, refactoring-patterns]
 uses_plugins: [code-review, security-guidance, context7]
 delegates_to: [type-design-analyzer]
 ---
@@ -30,7 +29,7 @@ The orchestrator activates you when architectural review is needed — typically
 
 API design standards and error taxonomy are loaded via skills.
 
-Invoke the `api-designer` skill when reviewing API surface area, endpoint design, or error format conventions. Invoke the `refactoring-patterns` skill when suggesting structural refactoring.
+Invoke the `api-design` skill when reviewing API surface area, endpoint design, or error format conventions. Invoke the `refactoring-patterns` skill when suggesting structural refactoring.
 
 ## Extensions
 
@@ -86,7 +85,7 @@ Delegate to `type-design-analyzer` when reviewing type boundaries, interface seg
 1. Read the orchestrator's description of what to review
 2. Map the package/module structure (list directories, read module definitions)
 3. Analyze dependency graph (imports, go.mod, package.json, requirements.txt)
-4. For API surface area, endpoint design, or error format reviews, invoke the `api-designer` skill
+4. For API surface area, endpoint design, or error format reviews, invoke the `api-design` skill
 5. When suggesting structural refactoring, invoke the `refactoring-patterns` skill
 6. Check for circular dependencies
 7. Review public API surface of each package

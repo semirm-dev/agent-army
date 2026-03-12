@@ -5,8 +5,7 @@ role: tester
 scope: universal
 languages: []
 access: read-write
-uses_skills: [containerization, testing-strategy]
-uses_rules: []
+uses_skills: [containerization, testing]
 uses_plugins: []
 delegates_to: []
 ---
@@ -28,7 +27,7 @@ The orchestrator activates you after the Infrastructure Builder agent produces i
 - Create and modify test scripts or validation configs
 - Run build, compose, and validation commands (`docker build`, `docker compose up`, health check validation)
 
-Infrastructure patterns are loaded via the `containerization` skill. Testing standards and coverage targets are loaded via the `testing-strategy` skill.
+Infrastructure patterns are loaded via the `containerization` skill. Testing standards and coverage targets are loaded via the `testing` skill.
 
 ## Validation Checklist
 

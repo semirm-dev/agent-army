@@ -16,22 +16,20 @@ import (
 )
 
 var entityDirs = map[string]string{
-	"rule":  "spec/rules",
 	"skill": "spec/skills",
 	"agent": "spec/agents",
 }
 
 var entityFields = map[string][]string{
-	"rule":  {"uses_rules"},
-	"skill": {"uses_rules"},
-	"agent": {"uses_rules", "uses_skills", "uses_plugins", "delegates_to"},
+	"skill": {"uses_skills"},
+	"agent": {"uses_skills", "uses_plugins", "delegates_to"},
 }
 
 // EditFlow runs the full interactive dependency editor.
 func EditFlow(root string, p tui.Prompter, w io.Writer) error {
 	fmt.Fprintln(w, "=== Edit Dependencies ===")
 
-	entityType, err := tui.SelectOne(p, w, "Choose entity type:", []string{"rule", "skill", "agent"})
+	entityType, err := tui.SelectOne(p, w, "Choose entity type:", []string{"skill", "agent"})
 	if err != nil {
 		return err
 	}
@@ -198,13 +196,6 @@ func actionRemove(p tui.Prompter, w io.Writer, field string, current []string) (
 
 func loadValidValues(field, root string) []string {
 	switch field {
-	case "uses_rules":
-		rules, _ := loader.LoadRules(root)
-		names := make([]string, len(rules))
-		for i, r := range rules {
-			names[i] = r.Name
-		}
-		return names
 	case "uses_skills":
 		skills, _ := loader.LoadSkills(root)
 		names := make([]string, len(skills))
@@ -230,47 +221,24 @@ func checkRedundancy(w io.Writer, field string, newValues []string, entityType, 
 	if len(newValues) == 0 {
 		return
 	}
-	if field == "uses_rules" {
-		checkRuleRedundancy(w, newValues, entityType, filePath, root)
+	if field == "uses_skills" {
+		checkSkillRedundancy(w, newValues, root)
 	} else if field == "delegates_to" {
 		checkDelegateRedundancy(w, newValues, root)
 	}
 }
 
-func checkRuleRedundancy(w io.Writer, newValues []string, entityType, filePath, root string) {
-	rules, _ := loader.LoadRules(root)
-	ruleLookup := make(map[string][]string)
-	for _, r := range rules {
-		ruleLookup[r.Name] = r.UsesRules
-	}
-
-	redundancies := graph.FindRedundant(newValues, func(name string) []string {
-		return ruleLookup[name]
-	})
-	printRedundancyWarnings(w, redundancies, "rule-to-rule")
-
-	if entityType != "agent" {
-		return
-	}
-
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return
-	}
-	fm := frontmatter.ParseFrontmatter(string(content))
-	agentSkills := fm.ListVal("uses_skills")
-	if len(agentSkills) == 0 {
-		return
-	}
-
+func checkSkillRedundancy(w io.Writer, newValues []string, root string) {
 	skills, _ := loader.LoadSkills(root)
 	skillLookup := make(map[string][]string)
 	for _, s := range skills {
-		skillLookup[s.Name] = s.UsesRules
+		skillLookup[s.Name] = s.UsesSkills
 	}
 
-	skillRedundancies := graph.FindRedundantViaSkills(newValues, agentSkills, skillLookup, ruleLookup)
-	printRedundancyWarnings(w, skillRedundancies, "covered via skills")
+	redundancies := graph.FindRedundant(newValues, func(name string) []string {
+		return skillLookup[name]
+	})
+	printRedundancyWarnings(w, redundancies, "skill-to-skill")
 }
 
 func checkDelegateRedundancy(w io.Writer, newValues []string, root string) {

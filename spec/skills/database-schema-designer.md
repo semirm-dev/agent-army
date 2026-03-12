@@ -1,9 +1,9 @@
 ---
 name: database-schema-designer
-description: Physical schema implementation — column type selection, constraint design, multi-tenant strategies, partitioning, temporal data patterns, and pre-ship checklist.
+description: Guides column type selection, constraint design, partitioning, multi-tenant isolation (RLS), and temporal data patterns (audit trails, SCD, event sourcing) when implementing or reviewing physical database schemas.
 scope: universal
 languages: []
-uses_rules: [database, security, cross-cutting]
+uses_skills: [database, security]
 ---
 
 # Database Schema Designer

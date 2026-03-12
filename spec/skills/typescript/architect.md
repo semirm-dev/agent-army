@@ -1,9 +1,9 @@
 ---
 name: typescript/architect
-description: TypeScript project architecture — layout selection, module decomposition, dependency direction, type architecture decisions, barrel file strategy, and evolution planning.
+description: Design TypeScript project structure — backend/frontend/library layout selection, module decomposition, dependency direction rules, type architecture (shared vs domain-scoped), barrel file strategy, and circular import prevention.
 scope: language-specific
 languages: [typescript]
-uses_rules: [typescript/patterns]
+uses_skills: [typescript/patterns]
 ---
 
 # TypeScript Architect Skill

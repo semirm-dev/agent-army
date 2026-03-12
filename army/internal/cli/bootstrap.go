@@ -11,7 +11,7 @@ import (
 func newBootstrapCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "bootstrap",
-		Short: "Generate model-specific rules, skills, and agents",
+		Short: "Generate model-specific skills and agents",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := findRoot()
 			p := tui.NewStdinPrompter(os.Stdin, os.Stdout)

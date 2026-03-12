@@ -1,17 +1,13 @@
 ---
 name: database
-description: Migrations, connection pooling, transactions, query safety, indexes, schema conventions, backup recovery, and observability
+description: Guides database operations including migration safety, connection pooling, transaction boundaries, query optimization, indexing strategy, schema conventions, backup/recovery, and DB observability
 scope: universal
 languages: []
 ---
 
 # Database Patterns
 
-## Migrations
-- **Versioned, forward-only.** Never edit an already-applied migration. Create a new one.
-- **Tools:** Use the migration tool appropriate for your language stack.
-- **Naming:** Use timestamps: `20260225120000_create_users.sql`. Include both `up` and `down` migrations.
-- **Review:** Every migration must be reviewed for data safety. DROP/ALTER on production tables requires explicit confirmation.
+For migrations, see the `migration-safety` skill. For schema design, see `database-schema-designer`. For SQL vs NoSQL selection, see `data-modeling`.
 
 ## Connection Pooling
 - **Always pool.** Never create per-request connections.
@@ -41,13 +37,6 @@ languages: []
 - **Monitor:** Watch for unused indexes (bloat) and missing indexes (slow queries).
 - **N+1 prevention:** Detect and eliminate N+1 query patterns. Use eager loading, joins, or batch queries instead of querying in loops.
 
-## Schema Conventions
-- **Primary keys:** UUID for distributed systems, BIGINT/SERIAL for single-database systems.
-- **Timestamps:** Use timestamp with timezone for all date/time columns. Never store timestamps without timezone.
-- **Audit columns:** `created_at` and `updated_at` on every table. Set `created_at` at insert, update `updated_at` via trigger or application.
-- **Soft deletes:** Use `deleted_at` timestamp instead of physical deletion when audit trail matters.
-- **Naming:** `snake_case` for tables and columns. Plural table names (`users`, `orders`). Foreign keys: `<table>_id` (e.g., `user_id`).
-
 ## Backup & Recovery
 - **Automated backups:** Schedule regular backups (daily minimum for production). Use the database's native backup tooling (e.g., `pg_dump`, managed service snapshots).
 - **Point-in-time recovery:** Enable WAL archiving or equivalent continuous backup for production databases. Know your Recovery Point Objective (RPO).
@@ -65,6 +54,3 @@ languages: []
 - Monitor replication lag on read replicas. Route reads to primary if lag exceeds threshold.
 - Log query execution plans for queries that exceed performance budgets.
 
-## Technology Choices
-- **SQL vs NoSQL:** Choose based on query patterns, consistency requirements, and schema flexibility needs. Document the rationale.
-- **ORMs vs Raw SQL:** Pick one approach per entity. Never mix ORM and raw SQL queries for the same table.

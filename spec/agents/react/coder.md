@@ -5,8 +5,7 @@ role: coder
 scope: language-specific
 languages: [react]
 access: read-write
-uses_skills: [react/coder, react/architect, error-handling, code-architecture, api-designer, refactoring-patterns, caching-strategy]
-uses_rules: []
+uses_skills: [react/coder, react/architect, error-handling, code-architecture, api-design, refactoring-patterns, caching-strategy]
 uses_plugins: [code-simplifier, context7, frontend-design]
 delegates_to: []
 ---
@@ -105,7 +104,7 @@ export function useDebounce<T>(value: T, delayMs: number): T {
 3. For UI layout, design systems, or component structure decisions, invoke the `frontend-design` plugin for production-grade UI patterns
 4. For error type design or error propagation tasks, invoke the `error-handling` skill
 5. For new module/component library creation, invoke the `code-architecture` skill for structure guidance
-6. For API integration or data-fetching patterns, invoke the `api-designer` skill for endpoint and error format conventions
+6. For API integration or data-fetching patterns, invoke the `api-design` skill for endpoint and error format conventions
 7. For restructuring existing components, invoke the `refactoring-patterns` skill
 8. For project scaffolding or major component library restructuring, invoke the `react/architect` skill
 9. For caching-related tasks (query caching, memoization strategies), invoke the `caching-strategy` skill

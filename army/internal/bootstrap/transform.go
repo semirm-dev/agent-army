@@ -15,59 +15,13 @@ const (
 	claudeToolsRO = "Read, Glob, Grep, Bash"
 )
 
-var languageGlobs = map[string]string{
-	"go":         `"**/*.go"`,
-	"typescript": `"**/*.ts,**/*.tsx,**/*.js,**/*.jsx"`,
-	"python":     `"**/*.py"`,
-	"react":      `"**/*.tsx,**/*.jsx"`,
-}
-
-var cursorLangNames = map[string]string{
-	"go/patterns":         "golang",
-	"go/testing":          "golang-testing",
-	"typescript/patterns": "typescript",
-	"typescript/testing":  "typescript-testing",
-	"python/patterns":     "python",
-	"python/testing":      "python-testing",
-	"react/patterns":      "react",
-	"react/testing":       "react-testing",
-}
-
-func ruleToClaude(root string, rule model.Rule) (string, error) {
-	return extractBody(filepath.Join(root, rule.Path))
-}
-
-func ruleToCursor(root string, rule model.Rule) (string, error) {
-	body, err := extractBody(filepath.Join(root, rule.Path))
-	if err != nil {
-		return "", err
-	}
-
-	lines := []string{"---"}
-	lines = append(lines, fmt.Sprintf("description: %s", rule.Description))
-
-	lang := detectLanguage(rule)
-	if lang != "" {
-		if glob, ok := languageGlobs[lang]; ok {
-			lines = append(lines, fmt.Sprintf("globs: %s", glob))
-		} else {
-			lines = append(lines, "alwaysApply: true")
-		}
-	} else {
-		lines = append(lines, "alwaysApply: true")
-	}
-	lines = append(lines, "---")
-
-	return strings.Join(lines, "\n") + "\n\n" + body, nil
-}
-
 func agentToClaude(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
 	if err != nil {
 		return "", err
 	}
 
-	body = enrichAgentBody(body, deps, TargetClaude, nil)
+	body = enrichAgentBody(body, deps, TargetClaude)
 
 	flat := flattenName(agent.Name)
 	tools := claudeToolsRW
@@ -94,13 +48,13 @@ var (
 	bashRe = regexp.MustCompile("`Bash`")
 )
 
-func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps, cursorRuleNames map[string]string) (string, error) {
+func agentToCursor(root string, agent model.Agent, deps model.ResolvedDeps) (string, error) {
 	body, err := extractBody(filepath.Join(root, agent.Path))
 	if err != nil {
 		return "", err
 	}
 
-	body = enrichAgentBody(body, deps, TargetCursor, cursorRuleNames)
+	body = enrichAgentBody(body, deps, TargetCursor)
 
 	flat := flattenName(agent.Name)
 
@@ -192,18 +146,6 @@ func flattenName(name string) string {
 	return strings.ReplaceAll(name, "/", "-")
 }
 
-func detectLanguage(rule model.Rule) string {
-	for _, lang := range []string{"go", "typescript", "python", "react"} {
-		if strings.HasPrefix(rule.Name, lang+"/") {
-			return lang
-		}
-	}
-	if len(rule.Languages) > 0 {
-		return rule.Languages[0]
-	}
-	return ""
-}
-
 func writeOutput(dest, relPath, content string) error {
 	target := filepath.Join(dest, relPath)
 	if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
@@ -233,4 +175,12 @@ func resolveCollision(dest, relPath string) string {
 		}
 	}
 	return relPath
+}
+
+// skillDescription returns a brief description for a skill, preferring Summary over Description.
+func skillDescription(s model.Skill) string {
+	if s.Summary != "" {
+		return s.Summary
+	}
+	return s.Description
 }

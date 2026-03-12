@@ -9,48 +9,24 @@ import (
 
 func TestBuildResolvedDeps(t *testing.T) {
 	skillMap := map[string]model.Skill{
-		"error-handling": {Name: "error-handling", Summary: "Error taxonomy", UsesRules: []string{"cross-cutting", "api-design"}},
-		"go/coder":       {Name: "go/coder", Summary: "Go workflow", UsesRules: []string{"go/patterns"}},
-	}
-	ruleMap := map[string]model.Rule{
-		"cross-cutting": {Name: "cross-cutting", Summary: "Error taxonomy, deps"},
-		"api-design":    {Name: "api-design", Summary: "REST patterns"},
-		"go/patterns":   {Name: "go/patterns", Summary: "Go coding patterns"},
-		"security":      {Name: "security", Summary: "Auth, CORS"},
+		"error-handling": {Name: "error-handling", Summary: "Error taxonomy"},
+		"go/coder":       {Name: "go/coder", Summary: "Go workflow"},
 	}
 	agentMap := map[string]model.Agent{
 		"type-design-analyzer": {Name: "type-design-analyzer", Description: "Type analyzer"},
-	}
-	ruleLookup := map[string][]string{
-		"cross-cutting": {},
-		"api-design":    {"security"},
-		"go/patterns":   {},
-		"security":      {},
 	}
 
 	agent := model.Agent{
 		Name:        "go/coder",
 		UsesSkills:  []string{"go/coder", "error-handling"},
-		UsesRules:   []string{},
 		UsesPlugins: []string{"code-simplifier"},
 		DelegatesTo: []string{"type-design-analyzer"},
 	}
 
-	deps := buildResolvedDeps(agent, skillMap, ruleMap, agentMap, ruleLookup)
+	deps := buildResolvedDeps(agent, skillMap, agentMap)
 
 	if len(deps.Skills) != 2 {
 		t.Errorf("expected 2 skills, got %d", len(deps.Skills))
-	}
-
-	// Rules should be transitively resolved: go/patterns, cross-cutting, api-design, security
-	ruleNames := make(map[string]bool)
-	for _, r := range deps.Rules {
-		ruleNames[r.Name] = true
-	}
-	for _, expected := range []string{"go/patterns", "cross-cutting", "api-design", "security"} {
-		if !ruleNames[expected] {
-			t.Errorf("missing expected rule %q", expected)
-		}
 	}
 
 	if len(deps.Plugins) != 1 || deps.Plugins[0] != "code-simplifier" {
@@ -66,17 +42,13 @@ func TestBuildResolvedDeps_MissingRefs(t *testing.T) {
 	agent := model.Agent{
 		Name:        "test",
 		UsesSkills:  []string{"nonexistent-skill"},
-		UsesRules:   []string{"nonexistent-rule"},
 		DelegatesTo: []string{"nonexistent-agent"},
 	}
 
-	deps := buildResolvedDeps(agent, nil, nil, nil, nil)
+	deps := buildResolvedDeps(agent, nil, nil)
 
 	if len(deps.Skills) != 0 {
 		t.Errorf("expected 0 skills, got %d", len(deps.Skills))
-	}
-	if len(deps.Rules) != 0 {
-		t.Errorf("expected 0 rules, got %d", len(deps.Rules))
 	}
 	if len(deps.DelegatesTo) != 0 {
 		t.Errorf("expected 0 delegates, got %d", len(deps.DelegatesTo))
@@ -86,22 +58,15 @@ func TestBuildResolvedDeps_MissingRefs(t *testing.T) {
 func TestEnrichAgentBody_Claude(t *testing.T) {
 	body := "# Agent\n\n## Role\nDoes things.\n\n## Workflow\n1. Step one\n"
 	deps := model.ResolvedDeps{
-		Rules:   []model.Rule{{Name: "security", Summary: "Auth patterns"}},
 		Skills:  []model.Skill{{Name: "error-handling", Summary: "Error taxonomy"}},
 		Plugins: []string{"code-simplifier"},
 		DelegatesTo: []model.Agent{{Name: "type-design-analyzer", Description: "Type analysis"}},
 	}
 
-	result := enrichAgentBody(body, deps, TargetClaude, nil)
+	result := enrichAgentBody(body, deps, TargetClaude)
 
 	if !strings.Contains(result, "## Resources Available") {
 		t.Error("missing Resources Available section")
-	}
-	if !strings.Contains(result, "### Rules (Auto-Loaded)") {
-		t.Error("missing Rules subsection")
-	}
-	if !strings.Contains(result, "`security` -- Auth patterns") {
-		t.Error("missing rule entry")
 	}
 	if !strings.Contains(result, "### Skills (Invoke via Skill Tool)") {
 		t.Error("missing Skills subsection")
@@ -133,21 +98,13 @@ func TestEnrichAgentBody_Claude(t *testing.T) {
 func TestEnrichAgentBody_Cursor(t *testing.T) {
 	body := "# Agent\n\n## Workflow\n1. Step one\n"
 	deps := model.ResolvedDeps{
-		Rules:       []model.Rule{{Name: "security", Summary: "Auth patterns"}},
 		Skills:      []model.Skill{{Name: "error-handling", Summary: "Error taxonomy"}},
 		Plugins:     []string{"code-simplifier"},
 		DelegatesTo: []model.Agent{{Name: "type-design-analyzer", Description: "Type analysis"}},
 	}
-	cursorNames := map[string]string{"security": "500-security.mdc"}
 
-	result := enrichAgentBody(body, deps, TargetCursor, cursorNames)
+	result := enrichAgentBody(body, deps, TargetCursor)
 
-	if !strings.Contains(result, "### Rules (Auto-Applied)") {
-		t.Error("missing Cursor-style Rules subsection")
-	}
-	if !strings.Contains(result, "`500-security.mdc`") {
-		t.Error("missing Cursor rule filename")
-	}
 	if !strings.Contains(result, "### Workflow References") {
 		t.Error("missing Workflow References subsection")
 	}
@@ -167,14 +124,14 @@ func TestEnrichAgentBody_EmptyDeps(t *testing.T) {
 	body := "# Agent\n\n## Workflow\n1. Step one\n"
 	deps := model.ResolvedDeps{}
 
-	result := enrichAgentBody(body, deps, TargetClaude, nil)
+	result := enrichAgentBody(body, deps, TargetClaude)
 
 	// Should still have the section header but no subsections
 	if !strings.Contains(result, "## Resources Available") {
 		t.Error("should contain Resources Available even with empty deps")
 	}
-	if strings.Contains(result, "### Rules") {
-		t.Error("should not contain Rules subsection with no rules")
+	if strings.Contains(result, "### Skills") {
+		t.Error("should not contain Skills subsection with no skills")
 	}
 }
 
@@ -275,17 +232,5 @@ func TestInjectSection(t *testing.T) {
 				}
 			}
 		})
-	}
-}
-
-func TestRuleDescription(t *testing.T) {
-	r := model.Rule{Name: "test", Description: "H1 Title", Summary: "Brief summary"}
-	if got := ruleDescription(r); got != "Brief summary" {
-		t.Errorf("expected Summary, got %q", got)
-	}
-
-	r2 := model.Rule{Name: "test", Description: "H1 Title"}
-	if got := ruleDescription(r2); got != "H1 Title" {
-		t.Errorf("expected Description fallback, got %q", got)
 	}
 }

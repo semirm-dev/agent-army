@@ -1,6 +1,6 @@
 ---
 name: ai-assisted-development
-description: Safe practices for AI-generated code, verification patterns, and anti-patterns
+description: Guides safe review, verification, and testing of AI-generated code to catch subtle bugs, scope creep, and deprecated API usage before merge
 scope: universal
 languages: []
 ---

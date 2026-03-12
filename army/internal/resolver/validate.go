@@ -6,28 +6,21 @@ import (
 
 // ValidateAllRefs checks that every dependency reference points to an existing entity.
 func ValidateAllRefs(
-	rules []model.Rule,
 	skills []model.Skill,
 	agents []model.Agent,
 	plugins []string,
 ) []model.ValidationError {
-	ruleNames := makeSet(rules, func(r model.Rule) string { return r.Name })
 	skillNames := makeSet(skills, func(s model.Skill) string { return s.Name })
 	agentNames := makeSet(agents, func(a model.Agent) string { return a.Name })
 	pluginNames := makeStringSet(plugins)
 
 	var errors []model.ValidationError
 
-	for _, r := range rules {
-		errors = append(errors, checkRefs(r.Path, r.UsesRules, "uses_rules", ruleNames, "error")...)
-	}
-
 	for _, s := range skills {
-		errors = append(errors, checkRefs(s.Path, s.UsesRules, "uses_rules", ruleNames, "error")...)
+		errors = append(errors, checkRefs(s.Path, s.UsesSkills, "uses_skills", skillNames, "error")...)
 	}
 
 	for _, a := range agents {
-		errors = append(errors, checkRefs(a.Path, a.UsesRules, "uses_rules", ruleNames, "error")...)
 		errors = append(errors, checkRefs(a.Path, a.UsesSkills, "uses_skills", skillNames, "error")...)
 		errors = append(errors, checkRefs(a.Path, a.UsesPlugins, "uses_plugins", pluginNames, "warning")...)
 		errors = append(errors, checkRefs(a.Path, a.DelegatesTo, "delegates_to", agentNames, "error")...)

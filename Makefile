@@ -1,28 +1,26 @@
-.PHONY: help build manifest edit-deps resolve-deps new-rule new-skill new-agent bootstrap test sync update-plugins-skills analyze analyze-fix
+.PHONY: help build manifest edit-deps resolve-deps new-skill new-agent bootstrap test sync update-plugins-skills analyze analyze-fix
 
 ARMY := army/army
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
 	@echo ""
-	@echo "  manifest       Scan spec/rules/, spec/skills/, and spec/agents/ frontmatter and regenerate manifest.json."
-	@echo "                 Resolves uses_rules and delegates_to transitively, including rules inherited from skills."
+	@echo "  manifest       Scan spec/skills/ and spec/agents/ frontmatter and regenerate manifest.json."
+	@echo "                 Resolves delegates_to transitively, including skills inherited from agents."
 	@echo ""
-	@echo "  edit-deps      Interactively add or remove dependency entries (uses_rules, uses_skills,"
-	@echo "                 uses_plugins, delegates_to) on any rule, skill, or agent file."
+	@echo "  edit-deps      Interactively add or remove dependency entries (uses_skills,"
+	@echo "                 uses_plugins, delegates_to) on any skill or agent file."
 	@echo "                 Rewrites YAML frontmatter in-place, then auto-regenerates the manifest."
 	@echo ""
-	@echo "  resolve-deps   Validate all dependency references (uses_rules, uses_skills, uses_plugins,"
-	@echo "                 delegates_to) across spec/rules/, spec/skills/, and spec/agents/. Detect and remove redundant"
-	@echo "                 uses_rules and delegates_to entries covered by transitive dependencies."
-	@echo ""
-	@echo "  new-rule       Scaffold a new rule with interactive prompts."
+	@echo "  resolve-deps   Validate all dependency references (uses_skills, uses_plugins,"
+	@echo "                 delegates_to) across spec/skills/ and spec/agents/. Detect and remove redundant"
+	@echo "                 delegates_to entries covered by transitive dependencies."
 	@echo ""
 	@echo "  new-skill      Scaffold a new skill with interactive prompts."
 	@echo ""
 	@echo "  new-agent      Scaffold a new agent with interactive prompts."
 	@echo ""
-	@echo "  bootstrap      Generate model-specific rules, skills, and agents for Claude Code or Cursor."
+	@echo "  bootstrap      Generate model-specific skills and agents for Claude Code or Cursor."
 	@echo ""
 	@echo "  test           Run the Go test suite."
 	@echo ""
@@ -49,16 +47,13 @@ edit-deps: | $(ARMY) ## Add or remove dependency entries interactively
 resolve-deps: | $(ARMY) ## Validate all dependency references and remove redundancies
 	$(ARMY) resolve
 
-new-rule: | $(ARMY) ## Scaffold a new rule
-	$(ARMY) new rule
-
 new-skill: | $(ARMY) ## Scaffold a new skill
 	$(ARMY) new skill
 
 new-agent: | $(ARMY) ## Scaffold a new agent
 	$(ARMY) new agent
 
-bootstrap: | $(ARMY) ## Generate model-specific rules, skills, and agents
+bootstrap: | $(ARMY) ## Generate model-specific skills and agents
 	$(ARMY) bootstrap
 
 test: ## Run Go tests with race detection

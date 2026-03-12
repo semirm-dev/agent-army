@@ -1,9 +1,9 @@
 ---
 name: go/patterns
-description: Go coding conventions, error handling, project structure, and concurrency
+description: Enforces idiomatic Go conventions for naming, error wrapping, interface design, concurrency with context propagation, and dependency management to keep code consistent and production-safe.
 scope: language-specific
 languages: [go]
-uses_rules: [code-quality, security, cross-cutting, observability]
+uses_skills: [code-quality, security, observability]
 ---
 
 # Go Coding Patterns

@@ -12,14 +12,14 @@ func TestFormatEntry(t *testing.T) {
 	e := Entry{}
 	e.Add("name", "test")
 	e.Add("scope", "universal")
-	e.AddList("uses_rules", []string{"a", "b"})
+	e.AddList("uses_skills", []string{"a", "b"})
 
 	got := formatEntry(e)
 	if !strings.Contains(got, `"name": "test"`) {
 		t.Errorf("missing name field in: %s", got)
 	}
-	if !strings.Contains(got, `"uses_rules": ["a", "b"]`) {
-		t.Errorf("missing uses_rules in: %s", got)
+	if !strings.Contains(got, `"uses_skills": ["a", "b"]`) {
+		t.Errorf("missing uses_skills in: %s", got)
 	}
 	if !strings.HasPrefix(got, "{ ") || !strings.HasSuffix(got, " }") {
 		t.Errorf("wrong format: %s", got)
@@ -29,24 +29,24 @@ func TestFormatEntry(t *testing.T) {
 func TestFormatEntry_EmptyList(t *testing.T) {
 	e := Entry{}
 	e.Add("name", "test")
-	e.AddList("uses_rules", nil)
+	e.AddList("uses_skills", nil)
 
 	got := formatEntry(e)
-	if !strings.Contains(got, `"uses_rules": []`) {
+	if !strings.Contains(got, `"uses_skills": []`) {
 		t.Errorf("expected empty array in: %s", got)
 	}
 }
 
 func TestFormatManifestJSON(t *testing.T) {
 	e := Entry{}
-	e.Add("name", "test-rule")
+	e.Add("name", "test-skill")
 	e.Add("scope", "universal")
-	e.Add("path", "spec/rules/test.md")
+	e.Add("path", "spec/skills/test.md")
 
 	m := OrderedMap{
-		Keys: []string{"rules"},
+		Keys: []string{"skills"},
 		Sections: map[string][]Entry{
-			"rules": {e},
+			"skills": {e},
 		},
 	}
 
@@ -58,10 +58,10 @@ func TestFormatManifestJSON(t *testing.T) {
 	if !strings.HasSuffix(got, "}\n") {
 		t.Error("should end with }\\n")
 	}
-	if !strings.Contains(got, `  "rules": [`) {
+	if !strings.Contains(got, `  "skills": [`) {
 		t.Error("missing section header")
 	}
-	if !strings.Contains(got, `    { "name": "test-rule"`) {
+	if !strings.Contains(got, `    { "name": "test-skill"`) {
 		t.Error("missing entry")
 	}
 }
@@ -69,31 +69,25 @@ func TestFormatManifestJSON(t *testing.T) {
 func TestGenerateManifest(t *testing.T) {
 	root := t.TempDir()
 
-	// Create rules
-	rulesDir := filepath.Join(root, "spec", "rules")
-	os.MkdirAll(rulesDir, 0755)
-	os.WriteFile(filepath.Join(rulesDir, "security.md"),
-		[]byte("---\nscope: universal\n---\n\n# Security\n"), 0644)
-
 	// Create skills
 	skillsDir := filepath.Join(root, "spec", "skills")
 	os.MkdirAll(skillsDir, 0755)
 	os.WriteFile(filepath.Join(skillsDir, "api-designer.md"),
-		[]byte("---\nname: api-designer\nscope: universal\nuses_rules: [security]\n---\n\n# API Designer\n"), 0644)
+		[]byte("---\nname: api-designer\nscope: universal\nuses_skills: []\n---\n\n# API Designer\n"), 0644)
 
 	// Create agents
 	agentsDir := filepath.Join(root, "spec", "agents")
 	os.MkdirAll(agentsDir, 0755)
 	os.WriteFile(filepath.Join(agentsDir, "coder.md"),
-		[]byte("---\nname: go-coder\ndescription: Go coder\nrole: coder\nscope: universal\naccess: read-write\nuses_skills: [api-designer]\nuses_rules: []\nuses_plugins: []\ndelegates_to: []\n---\n\n# Coder\n"), 0644)
+		[]byte("---\nname: go-coder\ndescription: Go coder\nrole: coder\nscope: universal\naccess: read-write\nuses_skills: [api-designer]\nuses_plugins: []\ndelegates_to: []\n---\n\n# Coder\n"), 0644)
 
 	m, err := GenerateManifest(root)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if len(m.Sections["rules"]) != 1 {
-		t.Errorf("rules count = %d, want 1", len(m.Sections["rules"]))
+	if len(m.Keys) != 2 {
+		t.Errorf("keys count = %d, want 2", len(m.Keys))
 	}
 	if len(m.Sections["skills"]) != 1 {
 		t.Errorf("skills count = %d, want 1", len(m.Sections["skills"]))
@@ -102,14 +96,14 @@ func TestGenerateManifest(t *testing.T) {
 		t.Errorf("agents count = %d, want 1", len(m.Sections["agents"]))
 	}
 
-	// Check agent has transitive rules from skill
+	// Check agent has uses_skills
 	agentE := m.Sections["agents"][0]
-	usesRules, ok := agentE.Values["uses_rules"].([]string)
+	usesSkills, ok := agentE.Values["uses_skills"].([]string)
 	if !ok {
-		t.Fatal("uses_rules not a string slice")
+		t.Fatal("uses_skills not a string slice")
 	}
-	if len(usesRules) != 1 || usesRules[0] != "security" {
-		t.Errorf("agent uses_rules = %v, want [security]", usesRules)
+	if len(usesSkills) != 1 || usesSkills[0] != "api-designer" {
+		t.Errorf("agent uses_skills = %v, want [api-designer]", usesSkills)
 	}
 }
 
@@ -117,7 +111,7 @@ func TestGenerateManifest_WithPlugins(t *testing.T) {
 	root := t.TempDir()
 
 	// Create minimal spec dirs so loader doesn't error
-	for _, dir := range []string{"spec/rules", "spec/skills", "spec/agents", "spec/claude"} {
+	for _, dir := range []string{"spec/skills", "spec/agents", "spec/claude"} {
 		os.MkdirAll(filepath.Join(root, dir), 0755)
 	}
 
@@ -180,7 +174,7 @@ func TestGenerateManifest_NoPluginsFile(t *testing.T) {
 	root := t.TempDir()
 
 	// Create minimal spec dirs, no settings.json with plugin data
-	for _, dir := range []string{"spec/rules", "spec/skills", "spec/agents"} {
+	for _, dir := range []string{"spec/skills", "spec/agents"} {
 		os.MkdirAll(filepath.Join(root, dir), 0755)
 	}
 
@@ -189,9 +183,9 @@ func TestGenerateManifest_NoPluginsFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Should still have the base 3 keys
-	if len(m.Keys) != 3 {
-		t.Errorf("keys count = %d, want 3 (no plugin sections)", len(m.Keys))
+	// Should still have the base 2 keys
+	if len(m.Keys) != 2 {
+		t.Errorf("keys count = %d, want 2 (no plugin sections)", len(m.Keys))
 	}
 	if len(m.RawSections) != 0 {
 		t.Errorf("RawSections should be empty, got %d entries", len(m.RawSections))
@@ -200,14 +194,14 @@ func TestGenerateManifest_NoPluginsFile(t *testing.T) {
 
 func TestFormatManifestJSON_WithRawSections(t *testing.T) {
 	e := Entry{}
-	e.Add("name", "test-rule")
+	e.Add("name", "test-skill")
 
 	raw := json.RawMessage(`[{"name":"superpowers","marketplace":"official"}]`)
 
 	m := OrderedMap{
-		Keys: []string{"rules", "external_plugins"},
+		Keys: []string{"skills", "external_plugins"},
 		Sections: map[string][]Entry{
-			"rules": {e},
+			"skills": {e},
 		},
 		RawSections: map[string]json.RawMessage{
 			"external_plugins": raw,
@@ -216,8 +210,8 @@ func TestFormatManifestJSON_WithRawSections(t *testing.T) {
 
 	got := formatManifestJSON(m)
 
-	if !strings.Contains(got, `"rules": [`) {
-		t.Error("missing rules section")
+	if !strings.Contains(got, `"skills": [`) {
+		t.Error("missing skills section")
 	}
 	if !strings.Contains(got, `"external_plugins":`) {
 		t.Error("missing external_plugins section")
@@ -234,9 +228,9 @@ func TestFormatManifestJSON_WithRawSections(t *testing.T) {
 func TestWriteManifest(t *testing.T) {
 	root := t.TempDir()
 
-	rulesDir := filepath.Join(root, "spec", "rules")
-	os.MkdirAll(rulesDir, 0755)
-	os.WriteFile(filepath.Join(rulesDir, "test.md"),
+	skillsDir := filepath.Join(root, "spec", "skills")
+	os.MkdirAll(skillsDir, 0755)
+	os.WriteFile(filepath.Join(skillsDir, "test.md"),
 		[]byte("---\nscope: universal\n---\n\n# Test\n"), 0644)
 
 	if err := WriteManifest(root); err != nil {
@@ -247,15 +241,15 @@ func TestWriteManifest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(content), `"rules"`) {
-		t.Error("manifest should contain rules section")
+	if !strings.Contains(string(content), `"skills"`) {
+		t.Error("manifest should contain skills section")
 	}
 }
 
 func TestWriteManifest_WithPlugins(t *testing.T) {
 	root := t.TempDir()
 
-	for _, dir := range []string{"spec/rules", "spec/skills", "spec/agents", "spec/claude"} {
+	for _, dir := range []string{"spec/skills", "spec/agents", "spec/claude"} {
 		os.MkdirAll(filepath.Join(root, dir), 0755)
 	}
 

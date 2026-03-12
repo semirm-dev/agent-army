@@ -23,8 +23,6 @@ var (
 // ScaffoldFlow runs the interactive scaffold flow for creating a new entity.
 func ScaffoldFlow(root, entityType string, p tui.Prompter, w io.Writer) error {
 	switch entityType {
-	case "rule":
-		return scaffoldRule(root, p, w)
 	case "skill":
 		return scaffoldSkill(root, p, w)
 	case "agent":
@@ -32,51 +30,6 @@ func ScaffoldFlow(root, entityType string, p tui.Prompter, w io.Writer) error {
 	default:
 		return fmt.Errorf("unknown entity type: %s", entityType)
 	}
-}
-
-func scaffoldRule(root string, p tui.Prompter, w io.Writer) error {
-	fmt.Fprintln(w, "=== New Rule ===")
-	fmt.Fprintln(w)
-
-	name, err := p.Prompt("Rule name (e.g. 'security' or 'go/testing'): ")
-	if err != nil {
-		return err
-	}
-	name = strings.TrimSpace(name)
-
-	filePath := filepath.Join(root, "spec", "rules", name+".md")
-	if checkDuplicate(w, filePath) {
-		return nil
-	}
-
-	description, err := tui.PromptWithDefault(p, "Description", defaultDescription("rule", name))
-	if err != nil {
-		return err
-	}
-
-	scope, err := tui.SelectOneWithDefault(p, w, "Scope:", scopes, "universal")
-	if err != nil {
-		return err
-	}
-
-	languages, err := promptLanguages(p, w, scope)
-	if err != nil {
-		return err
-	}
-
-	availableRules := ruleNames(root)
-	usesRules, err := promptDependencies(p, w, "uses_rules", availableRules)
-	if err != nil {
-		return err
-	}
-
-	fields := buildFields(map[string]interface{}{
-		"name": name, "description": description, "scope": scope,
-		"languages": languages, "uses_rules": usesRules,
-	})
-	content := generateFrontmatter(fields) + "\n" + generateRuleBody(name)
-
-	return previewConfirmWrite(p, w, filePath, content, root)
 }
 
 func scaffoldSkill(root string, p tui.Prompter, w io.Writer) error {
@@ -109,15 +62,15 @@ func scaffoldSkill(root string, p tui.Prompter, w io.Writer) error {
 		return err
 	}
 
-	availableRules := ruleNames(root)
-	usesRules, err := promptDependencies(p, w, "uses_rules", availableRules)
+	availableSkills := skillNames(root)
+	usesSkills, err := promptDependencies(p, w, "uses_skills", availableSkills)
 	if err != nil {
 		return err
 	}
 
 	fields := buildFields(map[string]interface{}{
 		"name": name, "description": description, "scope": scope,
-		"languages": languages, "uses_rules": usesRules,
+		"languages": languages, "uses_skills": usesSkills,
 	})
 	content := generateFrontmatter(fields) + "\n" + generateSkillBody(name)
 
@@ -172,10 +125,6 @@ func scaffoldAgent(root string, p tui.Prompter, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	usesRules, err := promptDependencies(p, w, "uses_rules", ruleNames(root))
-	if err != nil {
-		return err
-	}
 	usesPlugins, err := promptDependencies(p, w, "uses_plugins", pluginNames(root))
 	if err != nil {
 		return err
@@ -188,7 +137,7 @@ func scaffoldAgent(root string, p tui.Prompter, w io.Writer) error {
 	fields := buildFields(map[string]interface{}{
 		"name": name, "description": description, "role": role, "scope": scope,
 		"languages": languages, "access": access,
-		"uses_skills": usesSkills, "uses_rules": usesRules,
+		"uses_skills": usesSkills,
 		"uses_plugins": usesPlugins, "delegates_to": delegatesTo,
 	})
 	content := generateFrontmatter(fields) + "\n" + generateAgentBody(name, access)
@@ -271,7 +220,6 @@ func defaultDescription(entityType, name string) string {
 	title := strings.Join(titled, " ")
 
 	suffixes := map[string]string{
-		"rule":  "patterns and conventions",
 		"skill": "workflow and decision tree",
 		"agent": "specialist agent",
 	}
@@ -294,7 +242,7 @@ type fieldEntry struct {
 
 func buildFields(m map[string]interface{}) []fieldEntry {
 	order := []string{"name", "description", "role", "scope", "languages", "access",
-		"uses_skills", "uses_rules", "uses_plugins", "delegates_to"}
+		"uses_skills", "uses_plugins", "delegates_to"}
 	var fields []fieldEntry
 	for _, k := range order {
 		if v, ok := m[k]; ok {
@@ -326,25 +274,6 @@ func generateFrontmatter(fields []fieldEntry) string {
 	}
 	lines = append(lines, "---")
 	return strings.Join(lines, "\n")
-}
-
-func generateRuleBody(name string) string {
-	title := nameToTitle(name)
-	return fmt.Sprintf(`
-# %s Patterns
-
-## Overview
-
-<!-- Describe the purpose and scope of these patterns. -->
-
-## Patterns
-
-<!-- List the key patterns, conventions, and best practices. -->
-
-## Anti-Patterns
-
-<!-- List common mistakes and what to do instead. -->
-`, title)
 }
 
 func generateSkillBody(name string) string {
@@ -453,15 +382,6 @@ func previewConfirmWrite(p tui.Prompter, w io.Writer, filePath, content, root st
 		fmt.Fprintf(w, "(manifest module not available: %v)\n", err)
 	}
 	return nil
-}
-
-func ruleNames(root string) []string {
-	rules, _ := loader.LoadRules(root)
-	names := make([]string, len(rules))
-	for i, r := range rules {
-		names[i] = r.Name
-	}
-	return names
 }
 
 func skillNames(root string) []string {
