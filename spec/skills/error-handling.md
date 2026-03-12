@@ -1,6 +1,6 @@
 ---
 name: error-handling
-description: Classify errors by domain/infrastructure/system level, apply per-language creation patterns, decide wrap vs translate at boundaries, and format user-facing error responses.
+description: Classify errors by domain/infrastructure/system level, decide wrap vs translate at boundaries, and format user-facing error responses. Delegates per-language error creation to language patterns skills.
 scope: universal
 languages: []
 uses_skills: [api-design, observability]
@@ -26,79 +26,9 @@ Categorize every error into one of three levels:
 | **Infrastructure** | Timeout, connection failure, service unavailable | 503 | WARN | Retry with backoff, return 503 with retry guidance |
 | **System** | Internal bug, panic recovery, unhandled state | 500 | ERROR | Log full stack trace, alert on-call, return generic 500 |
 
-## Per-Language Error Creation
+## Error Creation
 
-### Go
-
-```go
-// Domain errors: sentinel errors + wrapping
-var ErrNotFound = errors.New("not found")
-var ErrConflict = errors.New("conflict")
-
-// Always wrap with context
-fmt.Errorf("auth: validate token: %w", err)
-
-// Check errors with Is/As
-if errors.Is(err, ErrNotFound) { ... }
-
-// Custom error types for rich context
-type ValidationError struct {
-    Field   string
-    Message string
-}
-func (e *ValidationError) Error() string {
-    return fmt.Sprintf("validation: %s: %s", e.Field, e.Message)
-}
-```
-
-### TypeScript
-
-```typescript
-// Base error class for domain errors
-class DomainError extends Error {
-  constructor(
-    message: string,
-    public readonly code: string,
-    public readonly details?: unknown
-  ) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
-
-// Specific domain errors
-class NotFoundError extends DomainError {
-  constructor(resource: string, id: string) {
-    super(`${resource} not found: ${id}`, "NOT_FOUND");
-  }
-}
-
-class ValidationError extends DomainError {
-  constructor(field: string, message: string) {
-    super(`${field}: ${message}`, "VALIDATION_FAILED", { field, message });
-  }
-}
-```
-
-### Python
-
-```python
-class DomainError(Exception):
-    """Base class for domain errors."""
-    def __init__(self, message: str, code: str = "DOMAIN_ERROR") -> None:
-        super().__init__(message)
-        self.code = code
-
-class NotFoundError(DomainError):
-    def __init__(self, resource: str, resource_id: str) -> None:
-        super().__init__(f"{resource} not found: {resource_id}", "NOT_FOUND")
-
-# Always chain exceptions
-try:
-    result = do_something()
-except SomeError as e:
-    raise DomainError("context: operation failed") from e
-```
+Define domain error types with machine-readable codes and human-readable messages. See language-specific patterns and coder skills (`go/patterns`, `typescript/patterns`, `python/patterns`) for idiomatic error creation examples per language.
 
 ## Propagation Decision Tree
 
@@ -113,14 +43,8 @@ Crossing boundary? (e.g., repository -> service, service -> handler)
   YES |
 
 Is the original error meaningful to the consumer?
-  YES -> Wrap: add context, preserve original
-         Go: fmt.Errorf("svc: op: %w", err)
-         TS: throw new ServiceError("context", { cause: err })
-         Py: raise ServiceError("context") from err
+  YES -> Wrap: add context, preserve original (use language-idiomatic wrapping)
   NO  -> Translate: create new error appropriate for consumer
-         Go: return NewNotFoundError("user", id)
-         TS: throw new NotFoundError("user", id)
-         Py: raise NotFoundError("user", id)
 ```
 
 ## User-Facing Error Guidelines

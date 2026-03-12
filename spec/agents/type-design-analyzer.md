@@ -5,7 +5,7 @@ role: analyzer
 scope: universal
 languages: []
 access: read-only
-uses_skills: []
+uses_skills: [code-quality]
 uses_plugins: []
 delegates_to: []
 ---

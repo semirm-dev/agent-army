@@ -114,12 +114,11 @@ func TestGenerateClaudeMD_StaticPassthrough(t *testing.T) {
 }
 
 func TestGenerateClaudeMD_GlobalDest(t *testing.T) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		t.Skip("cannot determine home directory")
-	}
-
 	dir := t.TempDir()
+
+	// Override HOME so os.UserHomeDir() returns our temp dir
+	t.Setenv("HOME", dir)
+
 	tmplDir := filepath.Join(dir, "spec", "claude")
 	os.MkdirAll(tmplDir, 0755)
 
@@ -127,9 +126,9 @@ func TestGenerateClaudeMD_GlobalDest(t *testing.T) {
 	tmplPath := filepath.Join(tmplDir, "CLAUDE.md")
 	os.WriteFile(tmplPath, []byte(template), 0644)
 
-	destDir := filepath.Join(home, ".claude")
+	destDir := filepath.Join(dir, ".claude")
 
-	err = generateClaudeMD(destDir, tmplPath)
+	err := generateClaudeMD(destDir, tmplPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +137,6 @@ func TestGenerateClaudeMD_GlobalDest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(filepath.Join(destDir, "CLAUDE.md"))
 
 	result := string(content)
 	if !strings.Contains(result, "`~/.claude/agents/`") {

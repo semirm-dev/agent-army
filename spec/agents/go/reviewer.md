@@ -5,7 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [go]
 access: read-only
-uses_skills: [go/reviewer, concurrency, error-handling, api-design, caching-strategy, messaging-patterns]
+uses_skills: [go/reviewer, concurrency, error-handling, caching-strategy, messaging-patterns, ai-assisted-development]
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---

@@ -1,6 +1,6 @@
 ---
 name: code-architecture
-description: Guides structuring new projects and modules using vertical slice architecture, package-by-feature layouts, dependency injection, and interface boundaries across Go, TypeScript, and Python.
+description: Guides structuring new projects and modules using vertical slice architecture, package-by-feature layouts, dependency injection, and interface boundaries. Delegates language-specific examples to language architect skills.
 scope: universal
 languages: []
 uses_skills: [code-quality]
@@ -42,113 +42,13 @@ Is there significant cross-feature logic?
 | Scaling team | Easy (teams own features) | Hard (everyone touches all layers) |
 | Best for | Most projects | Tiny projects, pure CRUD |
 
-## Package-by-Feature Patterns
+## Package-by-Feature Layout
 
-### Go
+Organize code by feature (vertical slice), not by technical layer. Each feature directory contains its handlers, services, repositories, and tests together. See language-specific architect skills (`go/architect`, `typescript/architect`, `python/architect`, `react/architect`) for concrete directory layouts and naming conventions.
 
-```
-internal/
-  auth/
-    handler.go      # HTTP handlers
-    service.go      # Business logic
-    repository.go   # Data access interface
-    postgres.go     # Repository implementation
-    auth_test.go    # Tests
-  order/
-    handler.go
-    service.go
-    repository.go
-    postgres.go
-    order_test.go
-  shared/
-    middleware/      # Cross-cutting HTTP middleware
-    types/          # Shared domain types (IDs, pagination)
-```
+## Dependency Injection
 
-### TypeScript
-
-```
-src/
-  features/
-    auth/
-      auth.controller.ts
-      auth.service.ts
-      auth.repository.ts
-      auth.types.ts
-      auth.test.ts
-    order/
-      order.controller.ts
-      order.service.ts
-      order.repository.ts
-      order.types.ts
-      order.test.ts
-  shared/
-    middleware/
-    types/
-```
-
-### Python
-
-```
-src/
-  auth/
-    __init__.py
-    router.py       # FastAPI/Flask routes
-    service.py      # Business logic
-    repository.py   # Data access
-    models.py       # SQLAlchemy/Pydantic models
-    test_service.py
-  order/
-    __init__.py
-    router.py
-    service.py
-    repository.py
-    models.py
-    test_service.py
-  shared/
-    middleware/
-    types.py
-```
-
-## Dependency Injection Patterns
-
-### Go: Constructor Injection (preferred)
-
-```go
-// Define interface at consumer side
-type UserRepository interface {
-    GetByID(ctx context.Context, id string) (*User, error)
-}
-
-// Inject via constructor
-func NewAuthService(users UserRepository, log *slog.Logger) *AuthService {
-    return &AuthService{users: users, log: log}
-}
-```
-
-### TypeScript: Constructor Injection
-
-```typescript
-interface UserRepository {
-  getByID(id: string): Promise<User | null>;
-}
-
-class AuthService {
-  constructor(
-    private readonly users: UserRepository,
-    private readonly logger: Logger
-  ) {}
-}
-```
-
-### Python: Constructor Injection
-
-```python
-class AuthService:
-    def __init__(self, users: UserRepository, logger: Logger) -> None:
-        self._users = users
-        self._logger = logger
-```
+Prefer constructor injection: define interfaces at the consumer side, inject dependencies via constructor parameters. See language-specific architect and patterns skills for idiomatic DI examples per language.
 
 ## Interface Boundary Guidelines
 

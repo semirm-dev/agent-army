@@ -5,7 +5,7 @@ role: reviewer
 scope: universal
 languages: []
 access: read-only
-uses_skills: [api-design, refactoring-patterns]
+uses_skills: [api-design, refactoring-patterns, ai-assisted-development]
 uses_plugins: [code-review, security-guidance, context7]
 delegates_to: [type-design-analyzer]
 ---

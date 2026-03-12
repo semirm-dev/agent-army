@@ -5,7 +5,7 @@ role: builder
 scope: universal
 languages: []
 access: read-write
-uses_skills: [containerization, observability]
+uses_skills: [containerization]
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---

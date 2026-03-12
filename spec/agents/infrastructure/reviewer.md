@@ -5,7 +5,7 @@ role: reviewer
 scope: universal
 languages: []
 access: read-only
-uses_skills: [containerization, refactoring-patterns]
+uses_skills: [containerization, refactoring-patterns, ai-assisted-development]
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---

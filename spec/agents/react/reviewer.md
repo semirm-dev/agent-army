@@ -5,7 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [react]
 access: read-only
-uses_skills: [react/reviewer, concurrency, error-handling, api-design, caching-strategy]
+uses_skills: [react/reviewer, error-handling, caching-strategy, ai-assisted-development]
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---
@@ -34,7 +34,7 @@ The orchestrator activates you after the React Coder agent produces code. You re
 
 ## Review Standards
 
-React patterns, TypeScript standards, and security patterns are loaded via skills. Concurrency patterns are included when applicable.
+React patterns, TypeScript standards, and security patterns are loaded via skills.
 
 ## Review Checklist
 
@@ -72,13 +72,6 @@ React patterns, TypeScript standards, and security patterns are loaded via skill
 - [ ] Route-level code splitting with `React.lazy()`
 - [ ] Stable, unique keys for list rendering (no array index)
 
-### Concurrency
-- [ ] Race conditions in effects handled (AbortController for fetch, cleanup functions)
-- [ ] Stale closures identified (values captured in callbacks may be outdated)
-- [ ] Concurrent React features used correctly (useTransition, useDeferredValue)
-- [ ] Multiple in-flight requests handled (last-write-wins or request cancellation)
-- [ ] Async state updates don't act on unmounted components
-
 ### Testing Patterns
 - [ ] Tests use `@testing-library/react` (behavior testing, not implementation)
 - [ ] User-centric queries (`getByRole`, `getByLabelText`, not `getByTestId`)
@@ -102,10 +95,7 @@ React patterns, TypeScript standards, and security patterns are loaded via skill
 2. Read every changed file
 3. Read surrounding code for context (imports, callers, hooks, shared components)
 4. For error handling reviews, invoke the `error-handling` skill for taxonomy and propagation patterns
-5. For API endpoint or data-fetching reviews, invoke the `api-design` skill for endpoint design and error format conventions
-6. For caching-related reviews, invoke the `caching-strategy` skill for cache patterns and invalidation
-7. For concurrency concerns (race conditions, stale closures, concurrent features), invoke the `concurrency` skill
-8. Run `tsc --noEmit` and lint tools (`npx eslint`)
+5. Run `tsc --noEmit` and lint tools (`npx eslint`)
 9. Walk through the review checklist
 10. Produce a structured verdict
 

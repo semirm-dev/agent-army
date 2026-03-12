@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [typescript]
 access: read-write
-uses_skills: [typescript/coder, typescript/architect, error-handling, code-architecture, api-design, refactoring-patterns, caching-strategy, messaging-patterns, observability]
+uses_skills: [typescript/coder, typescript/architect, error-handling, code-architecture, refactoring-patterns, caching-strategy, messaging-patterns]
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
