@@ -5,7 +5,7 @@ role: coder
 scope: language-specific
 languages: [python]
 access: read-write
-uses_skills: [python/coder, python/architect, error-handling, code-architecture, refactoring-patterns, caching-strategy, messaging-patterns]
+uses_skills: [python/coder, python/architect, error-handling, code-architecture, refactoring-patterns]
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
@@ -118,14 +118,12 @@ async def get_user_orders(user_id: str) -> list[Order]:
 5. For API endpoint implementation, invoke the `api-design` skill for endpoint and error format conventions
 6. For restructuring existing code, invoke the `refactoring-patterns` skill
 7. For project scaffolding or major restructuring, invoke the `python/architect` skill
-8. For caching-related tasks, invoke the `caching-strategy` skill
-9. For messaging or event-driven communication, invoke the `messaging-patterns` skill
-10. For logging, metrics, or health check setup, invoke the `observability` skill
-11. Write code following the standards above
-12. Run `ruff check .` to catch lint issues
-13. Run `ruff format --check .` to verify formatting
-14. Run `python -m py_compile <changed_files>` to confirm syntax
-15. Report back: list of files created/modified, any concerns or open questions
+8. For logging, metrics, or health check setup, invoke the `observability` skill
+9. Write code following the standards above
+10. Run `ruff check .` to catch lint issues
+11. Run `ruff format --check .` to verify formatting
+12. Run `python -m py_compile <changed_files>` to confirm syntax
+13. Report back: list of files created/modified, any concerns or open questions
 
 ## Output Format
 

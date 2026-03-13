@@ -5,7 +5,7 @@ role: reviewer
 scope: language-specific
 languages: [react]
 access: read-only
-uses_skills: [react/reviewer, error-handling, caching-strategy, ai-assisted-development]
+uses_skills: [react/reviewer, error-handling, ai-assisted-development]
 uses_plugins: [code-review, security-guidance]
 delegates_to: []
 ---
