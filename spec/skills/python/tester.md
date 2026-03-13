@@ -111,8 +111,9 @@ pytest --cov=src --cov-report=html    # visual report
 - Use `test_function_name_scenario` (e.g., `test_create_user_duplicate_email`)
 - Use `class TestCreateUser:` for grouping related tests
 
-## Table-Driven Tests
-- Use `@pytest.mark.parametrize` for data-driven tests:
+## Parametrized Tests
+
+Use `@pytest.mark.parametrize` for data-driven tests (Python's equivalent of table-driven tests):
 
 ```python
 @pytest.mark.parametrize("input_val,expected", [
@@ -125,8 +126,9 @@ def test_square(input_val: int, expected: int) -> None:
 ```
 
 ## Test Isolation
-- Use `yield` fixtures for resource teardown
-- Use `tmp_path` fixture for temporary file system tests
+
+- Use `yield` fixtures for resource teardown (Python-specific)
+- Use `tmp_path` fixture for temporary file system tests (Python-specific)
 - Scope fixtures appropriately (`function`, `module`, `session`)
 
 ## CI Parallelization

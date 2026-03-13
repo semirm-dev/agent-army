@@ -3,7 +3,7 @@ name: go/architect
 description: Designs Go project structure from scratch or restructures existing codebases — covering layout selection, package decomposition, dependency direction rules, interface boundaries, and architecture evolution.
 scope: language-specific
 languages: [go]
-uses_skills: [go/patterns]
+uses_skills: [go/patterns, code-architecture]
 ---
 
 # Go Architect Skill
@@ -53,31 +53,14 @@ internal/
   pkg/          (shared internal utilities)
 ```
 
-## Package Decomposition Workflow
+## Package Decomposition
 
-```
-Does this code represent a distinct domain concept?
-  YES --> new package under internal/
-  NO  --> continue
+Apply the split-vs-keep heuristics from the `code-architecture` skill. Go-specific additions:
 
-Is this code shared by 3+ packages?
-  YES --> extract to internal/pkg/<name>/
-  NO  --> continue
-
-Is this code reusable outside this project?
-  YES --> consider pkg/ (public) or separate module
-  NO  --> continue
-
-Is the current package >500 lines?
-  YES --> Check if it has multiple responsibilities
-         YES --> split
-         NO  --> refactor for clarity
-  NO  --> continue
-
-Does splitting introduce import cycles?
-  YES --> Rethink boundaries — cycles indicate wrong decomposition
-  NO  --> safe to split
-```
+- `internal/` prevents external packages from depending on implementation details
+- Extract to `internal/pkg/<name>/` when shared by 3+ packages
+- Consider `pkg/` (public) or separate module for code reusable outside this project
+- Import cycles indicate wrong decomposition — `go vet` catches these
 
 ## Dependency Direction Rules
 
@@ -98,24 +81,12 @@ Rules:
 
 ## Interface Boundary Design
 
-```
-Does this package depend on an external service (DB, API, queue)?
-  YES --> Define an interface in the consumer package.
-         Implementation lives in an infra/adapter package.
-  NO  --> continue
+Apply the interface boundary guidelines from the `code-architecture` skill. Go-specific additions:
 
-Do two domain packages need to communicate?
-  YES --> Define a shared interface or event. Never import one domain into another.
-  NO  --> continue
-
-Is this for testing?
-  YES --> Interface at the dependency boundary. Fake implementation for tests.
-  NO  --> continue
-
-How many methods on the interface?
-  1-3 --> Good. Keep it.
-  4+  --> Split into focused interfaces (Reader, Writer, Closer pattern)
-```
+- Define interfaces in the consumer package, not the implementor
+- Keep interfaces to 1-3 methods (Go convention). Split wider interfaces (Reader, Writer, Closer pattern)
+- External dependencies (DB, API, queue) live behind interfaces in domain packages
+- For cross-domain communication, use shared interfaces or events — never import one domain into another
 
 ## Wire-Up Pattern
 

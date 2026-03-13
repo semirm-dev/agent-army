@@ -3,7 +3,7 @@ name: typescript/architect
 description: Design TypeScript project structure — backend/frontend/library layout selection, module decomposition, dependency direction rules, type architecture (shared vs domain-scoped), barrel file strategy, and circular import prevention.
 scope: language-specific
 languages: [typescript]
-uses_skills: [typescript/patterns]
+uses_skills: [typescript/patterns, code-architecture]
 ---
 
 # TypeScript Architect Skill
@@ -75,48 +75,23 @@ src/
   types/                   (shared type definitions)
 ```
 
-## Module Decomposition Workflow
+## Module Decomposition
 
-```
-New domain/feature?
-  YES --> New directory under src/
-  NO  --> continue
+Apply the split-vs-keep heuristics from the `code-architecture` skill. TypeScript-specific additions:
 
-Shared utility used by 3+ modules?
-  YES --> src/lib/ or src/utils/
-  NO  --> continue
-
-Shared types used across domains?
-  YES --> src/types/
-  NO  --> continue
-
-Is the current module >300 lines?
-  YES --> Check for multiple responsibilities
-         YES --> split
-         NO  --> refactor for clarity
-  NO  --> continue
-
-Does splitting introduce circular imports?
-  YES --> Move shared types to a types module, use barrel re-exports carefully
-  NO  --> safe to split
-```
+- Module size threshold: >300 lines suggests splitting
+- Shared types used across domains go in `src/types/`
+- Circular imports: move shared types to a types module, use barrel re-exports carefully
 
 ## Dependency Direction Rules
 
-```
-index.ts → domain modules → (database, external services)
-          ↓
-domain/A/ → domain/B/ (AVOID! use shared types or events)
-          ↓
-lib/ ← (shared utilities, imported by domain modules)
+Follow the dependency direction principles from the `code-architecture` skill. TypeScript-specific wiring:
 
-Rules:
 - Entry point wires everything together
 - Domain modules do NOT import each other
 - Cross-domain communication through shared types or event emitter
-- lib/ has zero dependencies on domain modules
+- `lib/` has zero dependencies on domain modules
 - External dependencies (DB clients, HTTP) injected via constructor or factory
-```
 
 ## Barrel File Strategy
 

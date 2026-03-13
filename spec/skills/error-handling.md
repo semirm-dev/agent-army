@@ -52,17 +52,7 @@ Is the original error meaningful to the consumer?
 - **Actionable messages:** Tell the user what they can do to fix it ("Email is required" not "Validation failed")
 - **No stack traces:** Never expose internal error details to end users
 - **Error codes:** Include machine-readable error codes for programmatic handling
-- **Consistency:** Use the standard error response format from api-design rules:
-
-```json
-{
-  "error": {
-    "code": "VALIDATION_FAILED",
-    "message": "Email address is required",
-    "details": [{ "field": "email", "message": "must not be empty" }]
-  }
-}
-```
+- **Consistency:** Use the standard error response envelope defined in the `api-design` skill.
 
 ## Logging / Returning / Alerting Matrix
 

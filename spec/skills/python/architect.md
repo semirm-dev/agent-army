@@ -3,7 +3,7 @@ name: python/architect
 description: Design Python project architecture including layout selection (web API, CLI, library), module decomposition, dependency direction enforcement, sync vs async architecture decisions, and dependency injection patterns.
 scope: language-specific
 languages: [python]
-uses_skills: [python/patterns]
+uses_skills: [python/patterns, code-architecture]
 ---
 
 # Python Architect Skill
@@ -63,44 +63,23 @@ tests/
     test_routes.py
 ```
 
-## Module Decomposition Workflow
+## Module Decomposition
 
-```
-Does this code represent a distinct domain concept?
-  YES --> new package under src/<project>/
-  NO  --> continue
+Apply the split-vs-keep heuristics from the `code-architecture` skill. Python-specific additions:
 
-Is this code shared by 3+ modules?
-  YES --> extract to common/ or lib/
-  NO  --> continue
-
-Is the current module >300 lines?
-  YES --> Check if it has multiple responsibilities
-         YES --> split
-         NO  --> refactor for clarity
-  NO  --> continue
-
-Does splitting introduce circular imports?
-  YES --> Use dependency injection or move shared types to a types module
-  NO  --> safe to split
-```
+- Module size threshold: >300 lines suggests splitting (vs 500 for Go)
+- Circular imports: resolve with dependency injection or move shared types to a `types` module
+- Extract to `common/` or `lib/` when shared by 3+ modules
 
 ## Dependency Direction Rules
 
-```
-main.py → domain packages → (database, external services)
-         ↓
-domain/A/ → domain/B/ (AVOID! use shared types or events)
-         ↓
-common/ ← (shared utilities, imported by domain packages)
+Follow the dependency direction principles from the `code-architecture` skill. Python-specific wiring:
 
-Rules:
-- Entry point (main.py) wires everything together
+- Entry point (`main.py`) wires everything together
 - Domain packages do NOT import each other
 - Cross-domain communication through shared schemas/events or an orchestrator
-- common/ has zero dependencies on domain packages
-- External dependencies (DB sessions, HTTP clients) injected via FastAPI Depends or constructor
-```
+- `common/` has zero dependencies on domain packages
+- External dependencies (DB sessions, HTTP clients) injected via FastAPI `Depends` or constructor
 
 ## Async Architecture Decision
 

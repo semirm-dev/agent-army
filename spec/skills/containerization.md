@@ -153,14 +153,10 @@ Use a lightweight HTTP check against your application's health endpoint. For min
 
 ### Orchestrator Probes
 
-Configure three probe types for container orchestrators:
+Configure three probe types for container orchestrators. For health endpoint implementation details (`/healthz`, `/readyz`), see the `observability` skill.
 
-- **Liveness (`/healthz`):** Is the process alive and not deadlocked? Failure triggers a restart. Keep this check cheap -- do not call external dependencies.
-- **Readiness (`/readyz`):** Can this instance serve traffic? Check database connectivity, cache availability, and other critical dependencies. Failure removes the instance from service endpoints.
-- **Startup probe:** Use for slow-starting applications (JVM warmup, large model loading, migration on boot). The startup probe runs first. Liveness and readiness probes do not start until the startup probe succeeds.
+Container-specific probe configuration:
 
-### Health Endpoint Implementation
-
-- `/healthz` returns 200 if the process is running.
-- `/readyz` returns 200 if all dependencies are connected, 503 otherwise.
-- Include dependency status in the response body for debugging, but do not expose sensitive connection details.
+- **Liveness probe:** Triggers container restart on failure. Keep the check cheap — do not call external dependencies.
+- **Readiness probe:** Removes instance from service endpoints on failure. Check critical dependencies.
+- **Startup probe:** Use for slow-starting applications (JVM warmup, large model loading). Liveness and readiness probes do not start until the startup probe succeeds.

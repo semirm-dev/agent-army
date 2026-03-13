@@ -113,7 +113,8 @@ go tool cover -html=coverage.out        # visual HTML report
 - Use `t.Run()` for subtests within table-driven tests
 
 ## Table-Driven Tests
-- Use `[]struct` with `t.Run()` subtests:
+
+Use Go's idiomatic `[]struct` with `t.Run()` subtests:
 
 ```go
 tests := []struct {
@@ -135,9 +136,9 @@ for _, tt := range tests {
 ```
 
 ## Test Isolation
-- Use `t.Cleanup()` for resource teardown
-- Use `t.TempDir()` for temporary file system tests
-- Wrap database tests in a transaction, rollback after
+
+- Use `t.Cleanup()` for resource teardown (Go-specific)
+- Use `t.TempDir()` for temporary file system tests (Go-specific)
 - Call `t.Parallel()` in subtests when tests are independent. Capture loop variables in table-driven tests (Go < 1.22) to avoid data races.
 
 ## Fuzz Testing
@@ -155,7 +156,8 @@ for _, tt := range tests {
 - Use `testing.Short()` to skip slow integration tests during local development: `if testing.Short() { t.Skip("skipping integration test") }`. Run full suite in CI with `go test ./...` (no `-short` flag).
 - Use `testcontainers-go` to spin up real dependencies (databases, caches, queues) in Docker for integration tests. Prefer real dependencies over mocks for integration-level verification.
 
-## CI Parallelization
+## CI Configuration
+
 - `go test -parallel N` controls per-test parallelism
 - `-count=1` disables test caching
 - Always use `-race` flag: `go test ./... -race`

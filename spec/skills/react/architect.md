@@ -3,7 +3,7 @@ name: react/architect
 description: Plans React project architecture with decision trees for project layout, component hierarchy, state management selection, routing strategy, feature decomposition, and scalable module boundaries.
 scope: language-specific
 languages: [react]
-uses_skills: [react/patterns]
+uses_skills: [react/patterns, code-architecture]
 ---
 
 # React Architect Skill
@@ -150,29 +150,13 @@ Does the app need routing?
 
 ## Feature Decomposition Workflow
 
-```
-New feature request?
-  |
-  +-- Identify data requirements
-  |     What API endpoints? What server state?
-  |     --> Define query hooks (useTanStackQuery wrappers)
-  |
-  +-- Identify UI components
-  |     What does the user see? What interactions?
-  |     --> Sketch component tree (page → sections → primitives)
-  |
-  +-- Identify shared vs feature-specific
-  |     Used by other features?
-  |       YES --> src/components/ or src/hooks/
-  |       NO  --> src/features/<feature>/
-  |
-  +-- Identify state needs
-  |     Apply State Management Selection tree above
-  |
-  +-- Define module boundary
-        What does this feature export?
-        --> Only page component + types (if consumed externally)
-```
+Apply the module boundary checklist from the `code-architecture` skill. React-specific decomposition:
+
+1. **Identify data requirements** — What API endpoints? What server state? → Define query hooks
+2. **Identify UI components** — Sketch component tree (page → sections → primitives)
+3. **Shared vs feature-specific** — Used by other features? → `src/components/` or `src/hooks/`. No → `src/features/<feature>/`
+4. **Identify state needs** — Apply the State Management Selection tree above
+5. **Define module boundary** — Export only page component + types (if consumed externally)
 
 ## Architecture Evolution Checklist
 

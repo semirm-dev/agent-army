@@ -115,7 +115,8 @@ vitest --coverage --reporter=html          # visual report
 - Use clear, behavioral names that describe expected outcomes
 
 ## Table-Driven Tests
-- Use `it.each` for data-driven tests:
+
+Use `it.each` for data-driven tests (TypeScript/vitest/jest pattern):
 
 ```typescript
 it.each([
@@ -128,8 +129,8 @@ it.each([
 ```
 
 ## Test Isolation
-- Use `beforeEach`/`afterEach` for setup/teardown
-- Use temp directories for file system tests
+
+- Use `beforeEach`/`afterEach` for setup/teardown (vitest/jest pattern)
 - Clean up fake timers in `afterEach`
 
 ## CI Parallelization
