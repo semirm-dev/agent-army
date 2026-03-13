@@ -53,11 +53,7 @@ The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` 
 | `make build` | Build the Go CLI binary |
 | `make test` | Run Go tests with race detection |
 | `make manifest` | Scan `spec/` frontmatter and regenerate `manifest.json`. Resolves `uses_rules` and `delegates_to` transitively, including rules inherited from skills |
-| `make edit-deps` | Interactively add or remove dependency entries (`uses_rules`, `uses_skills`, `uses_plugins`, `delegates_to`) on any spec file. Rewrites YAML frontmatter in-place, then auto-regenerates the manifest |
 | `make resolve-deps` | Validate all dependency references across `spec/`. Detect and remove redundant `uses_rules` and `delegates_to` entries covered by transitive dependencies |
-| `make new-rule` | Scaffold a new rule with interactive prompts |
-| `make new-skill` | Scaffold a new skill with interactive prompts |
-| `make new-agent` | Scaffold a new agent with interactive prompts |
 | `make bootstrap` | Generate model-specific rules, skills, and agents (output in `.build/`) |
 | `make sync` | Install all plugins and skills listed in `PLUGINS_AND_SKILLS.md` |
 | `make update-plugins-skills` | Regenerate `PLUGINS_AND_SKILLS.md` from installed system state |

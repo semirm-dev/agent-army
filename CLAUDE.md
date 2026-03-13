@@ -14,9 +14,6 @@ make test               # Run all Go tests with race detection
 make manifest           # Scan spec/ frontmatter, resolve transitive deps, generate manifest.json
 make resolve-deps       # Validate all dependency references, remove redundancies
 make bootstrap          # Generate platform-specific output into .build/
-make new-skill          # Scaffold a new skill
-make new-agent          # Scaffold a new agent
-make edit-deps          # Interactively add/remove dependency entries
 make sync               # Install all plugins and skills from PLUGINS_AND_SKILLS.md
 make update-plugins-skills  # Regenerate PLUGINS_AND_SKILLS.md from system state
 make analyze            # Analyze installed plugins and skills, report duplicates
@@ -40,8 +37,6 @@ Key internal packages:
 - **`graph/`** — Dependency graph traversal for skills/agents
 - **`frontmatter/`** — YAML frontmatter parsing/writing for spec files
 - **`loader/`** — Loads skills, agents from `spec/` directory
-- **`scaffold/`** — Interactive scaffolding for new spec files
-- **`editor/`** — Interactive dependency editor (TUI)
 - **`resolver/`** — Conflict resolution for transitive dependencies
 - **`model/`** — Core data types: Skill, Agent
 - **`plugindoc/`** — Generates PLUGINS_AND_SKILLS.md and terminal analysis reports for installed plugins/skills

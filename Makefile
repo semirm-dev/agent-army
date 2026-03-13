@@ -1,4 +1,4 @@
-.PHONY: help build manifest edit-deps resolve-deps new-skill new-agent bootstrap test sync update-plugins-skills analyze analyze-fix
+.PHONY: help build manifest resolve-deps bootstrap test sync update-plugins-skills analyze analyze-fix
 
 ARMY := army/army
 
@@ -8,17 +8,9 @@ help: ## Show available targets
 	@echo "  manifest       Scan spec/skills/ and spec/agents/ frontmatter and regenerate manifest.json."
 	@echo "                 Resolves delegates_to transitively, including skills inherited from agents."
 	@echo ""
-	@echo "  edit-deps      Interactively add or remove dependency entries (uses_skills,"
-	@echo "                 uses_plugins, delegates_to) on any skill or agent file."
-	@echo "                 Rewrites YAML frontmatter in-place, then auto-regenerates the manifest."
-	@echo ""
 	@echo "  resolve-deps   Validate all dependency references (uses_skills, uses_plugins,"
 	@echo "                 delegates_to) across spec/skills/ and spec/agents/. Detect and remove redundant"
 	@echo "                 delegates_to entries covered by transitive dependencies."
-	@echo ""
-	@echo "  new-skill      Scaffold a new skill with interactive prompts."
-	@echo ""
-	@echo "  new-agent      Scaffold a new agent with interactive prompts."
 	@echo ""
 	@echo "  bootstrap      Generate model-specific skills and agents for Claude Code or Cursor."
 	@echo ""
@@ -41,17 +33,8 @@ build: $(ARMY) ## Build the Go CLI binary
 manifest: | $(ARMY) ## Generate manifest
 	$(ARMY) manifest
 
-edit-deps: | $(ARMY) ## Add or remove dependency entries interactively
-	$(ARMY) edit
-
 resolve-deps: | $(ARMY) ## Validate all dependency references and remove redundancies
 	$(ARMY) resolve
-
-new-skill: | $(ARMY) ## Scaffold a new skill
-	$(ARMY) new skill
-
-new-agent: | $(ARMY) ## Scaffold a new agent
-	$(ARMY) new agent
 
 bootstrap: | $(ARMY) ## Generate model-specific skills and agents
 	$(ARMY) bootstrap
