@@ -775,6 +775,49 @@ func DetectDrift() ([]DriftEntry, error) {
 	return entries, nil
 }
 
+// OrphanEntry represents a skill directory that exists on disk but has no entry in skill-lock.json.
+type OrphanEntry struct {
+	Name string
+}
+
+// DetectOrphans returns skills in ~/.agents/skills/ that have no entry in .skill-lock.json.
+// Plugin-provided skills (those whose name matches a known plugin skill) are excluded.
+func DetectOrphans() ([]OrphanEntry, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, fmt.Errorf("getting home dir: %w", err)
+	}
+
+	skillsDir := filepath.Join(home, ".agents", "skills")
+	entries, err := os.ReadDir(skillsDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("reading skills dir: %w", err)
+	}
+
+	skillLock := loadSkillLock(home)
+	plugins := loadInstalledPlugins(home)
+	pluginSkillNames := buildPluginSkillNames(plugins)
+
+	var orphans []OrphanEntry
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		name := entry.Name()
+		if _, inLock := skillLock.Skills[name]; inLock {
+			continue
+		}
+		if _, isPluginSkill := pluginSkillNames[name]; isPluginSkill {
+			continue
+		}
+		orphans = append(orphans, OrphanEntry{Name: name})
+	}
+	return orphans, nil
+}
+
 // RemoveDriftEntries removes the specified skill entries from ~/.agents/.skill-lock.json.
 func RemoveDriftEntries(entries []DriftEntry) error {
 	home, err := os.UserHomeDir()
@@ -978,6 +1021,20 @@ func Analyze() (string, error) {
 	} else {
 		for _, entry := range driftEntries {
 			b.WriteString("  " + termcolor.Err(fmt.Sprintf("\"%s\" in lock file but missing from filesystem (source: %s)", entry.Name, entry.Source)) + "\n")
+		}
+	}
+
+	b.WriteString("\n")
+
+	// --- Orphaned Skills ---
+	orphanEntries, _ := DetectOrphans()
+
+	b.WriteString(termcolor.Header("Orphaned Skills (on disk, not in lock)", len(orphanEntries)))
+	if len(orphanEntries) == 0 {
+		b.WriteString("  " + termcolor.Success("No orphaned skills found.") + "\n")
+	} else {
+		for _, entry := range orphanEntries {
+			b.WriteString("  " + termcolor.Warn(fmt.Sprintf("\"%s\" exists on disk but missing from .skill-lock.json", entry.Name)) + "\n")
 		}
 	}
 

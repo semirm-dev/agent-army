@@ -289,6 +289,54 @@ func TestRemoveDriftEntries(t *testing.T) {
 	}
 }
 
+func TestDetectOrphans(t *testing.T) {
+	origHome := os.Getenv("HOME")
+	tmpHome := t.TempDir()
+	os.Setenv("HOME", tmpHome)
+	defer os.Setenv("HOME", origHome)
+
+	// Create .agents directory with lock file and skill directories
+	agentsDir := filepath.Join(tmpHome, ".agents")
+	os.MkdirAll(agentsDir, 0755)
+
+	// Lock file has only "locked-skill"
+	lockData := `{"skills":{"locked-skill":{"source":"owner/repo","sourceUrl":"https://github.com/owner/repo"}}}`
+	os.WriteFile(filepath.Join(agentsDir, ".skill-lock.json"), []byte(lockData), 0644)
+
+	// Create directories for both locked-skill and orphan-skill
+	skillsDir := filepath.Join(agentsDir, "skills")
+	os.MkdirAll(filepath.Join(skillsDir, "locked-skill"), 0755)
+	os.MkdirAll(filepath.Join(skillsDir, "orphan-skill"), 0755)
+
+	entries, err := DetectOrphans()
+	if err != nil {
+		t.Fatalf("DetectOrphans() error: %v", err)
+	}
+
+	if len(entries) != 1 {
+		t.Fatalf("expected 1 orphan entry, got %d", len(entries))
+	}
+	if entries[0].Name != "orphan-skill" {
+		t.Errorf("expected orphan entry name 'orphan-skill', got %q", entries[0].Name)
+	}
+}
+
+func TestDetectOrphans_noOrphans(t *testing.T) {
+	origHome := os.Getenv("HOME")
+	tmpHome := t.TempDir()
+	os.Setenv("HOME", tmpHome)
+	defer os.Setenv("HOME", origHome)
+
+	// No skills directory at all
+	entries, err := DetectOrphans()
+	if err != nil {
+		t.Fatalf("DetectOrphans() error: %v", err)
+	}
+	if len(entries) != 0 {
+		t.Errorf("expected 0 orphan entries, got %d", len(entries))
+	}
+}
+
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && containsStr(s, substr)
 }
