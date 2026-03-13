@@ -1,44 +1,37 @@
 # Agent Army
 
-A modular library of coding standards, workflows, and agent prompts for AI-assisted development. Includes a Go CLI (`army`) to manage specs, resolve dependencies, and generate platform-specific output for Claude Code or Cursor.
+A modular library of workflows and agent prompts for AI-assisted development. Includes a Go CLI (`army`) to manage specs, resolve dependencies, and generate platform-specific output for Claude Code or Cursor.
 
 > NOTE: **Caution!!** Always backup your current destination setup because `bootstrap` will always do remove-all-existing -> generate new. Test in a safe place (destination) first.
 
 ## What's Inside
 
-### Rules (`spec/rules/`)
-
-Coding standards and best practices. Markdown files with YAML frontmatter. Scoped as `universal` (all languages) or `language-specific` (e.g., `go/patterns`). Rules define **what** good code looks like — naming, error handling, security, testing, etc.
-
-Examples: `api-design`, `security`, `go/patterns`, `typescript/testing`
-
 ### Skills (`spec/skills/`)
 
-Structured workflows and decision trees. Also markdown with frontmatter. Skills define **how** to accomplish tasks — designing APIs, setting up caching, hardening security. Skills declare `uses_rules` to reference the rules they depend on.
+Structured workflows, decision trees, and coding standards. Markdown files with YAML frontmatter. Skills define **how** to accomplish tasks and **what** good code looks like — designing APIs, setting up caching, hardening security, naming conventions, error handling, testing patterns, etc. Skills can depend on other skills via `uses_skills`.
 
 Examples: `api-designer`, `caching-strategy`, `go/coder`, `react/tester`
 
 ### Agents (`spec/agents/`)
 
-Prompt templates for specialized AI roles. Grouped by language/domain in subdirectories, with cross-cutting agents at the root. Platform-agnostic — no tool names, model references, or IDE-specific paths. Agents declare `uses_skills` (which transitively bring rules) and `uses_plugins` for extensions.
+Prompt templates for specialized AI roles. Grouped by language/domain in subdirectories, with cross-cutting agents at the root. Platform-agnostic — no tool names, model references, or IDE-specific paths. Agents declare `uses_skills` (which transitively bring dependent skills) and `uses_plugins` for extensions.
 
 Examples: `go/coder`, `typescript/reviewer`, `python/tester`, `infrastructure/builder`, `arch-reviewer`
 
 ## How They Relate
 
 ```
-Rules       → foundational standards         (the "what")
-Skills      → task workflows that use rules  (the "how")
-Agents      → specialized roles that invoke skills and follow rules  (the "who")
+Skills      → task workflows and standards    (the "what" and "how")
+Agents      → specialized roles that invoke skills  (the "who")
 ```
 
 ```
-┌─────────┐     uses_rules     ┌─────────┐   uses_skills   ┌─────────┐
-│  Rules  │◄───────────────────│ Skills  │◄────────────────│ Agents  │
-└─────────┘                    └─────────┘                 └─────────┘
-  api-design                     api-designer                go/coder
-  security                       go/coder                    typescript/reviewer
-  go/patterns                    react/tester                python/tester
+┌─────────┐   uses_skills   ┌─────────┐
+│ Skills  │◄────────────────│ Agents  │
+└─────────┘                 └─────────┘
+  api-designer                go/coder
+  go/coder                    typescript/reviewer
+  react/tester                python/tester
 ```
 
 ## CLI (`army`)
@@ -52,12 +45,13 @@ The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` 
 | `make help` | Show all available targets |
 | `make build` | Build the Go CLI binary |
 | `make test` | Run Go tests with race detection |
-| `make manifest` | Scan `spec/` frontmatter and regenerate `manifest.json`. Resolves `uses_rules` and `delegates_to` transitively, including rules inherited from skills |
-| `make resolve-deps` | Validate all dependency references across `spec/`. Detect and remove redundant `uses_rules` and `delegates_to` entries covered by transitive dependencies |
-| `make bootstrap` | Generate model-specific rules, skills, and agents (output in `.build/`) |
+| `make manifest` | Scan `spec/` frontmatter and regenerate `manifest.json`. Resolves `uses_skills` and `delegates_to` transitively |
+| `make resolve-deps` | Validate all dependency references across `spec/`. Detect and remove redundant `uses_skills` and `delegates_to` entries covered by transitive dependencies |
+| `make bootstrap` | Generate model-specific skills and agents (output in `.build/`) |
 | `make sync` | Install all plugins and skills listed in `PLUGINS_AND_SKILLS.md` |
 | `make update-plugins-skills` | Regenerate `PLUGINS_AND_SKILLS.md` from installed system state |
 | `make analyze` | Show installed plugins, skills, and duplicate report (terminal only) |
+| `make analyze-fix` | Analyze and fix skill lock drift (remove stale entries) |
 
 ## Plugin & Skill Management
 
@@ -76,15 +70,15 @@ Three commands manage Claude Code plugins and standalone skills:
 
 ## Manifest (`manifest.json`) - for now unused index file
 
-Auto-generated index of all rules, skills, and agents. Each entry lists:
+Auto-generated index of all skills and agents. Each entry lists:
 
-- **name** — identifier (e.g., `go/patterns`, `api-designer`, `go/coder`)
+- **name** — identifier (e.g., `api-designer`, `go/coder`)
 - **scope** — `universal` or `language-specific`
 - **languages** — applicable languages (for language-specific entries)
-- **uses_rules** — resolved dependencies (transitive — includes indirect dependencies)
+- **uses_skills** — resolved dependencies (transitive — includes indirect dependencies)
 - **path** — file path relative to the repo root
 
-Agent entries additionally include: **role**, **access**, **uses_skills**, **uses_plugins**, **delegates_to**.
+Agent entries additionally include: **role**, **access**, **uses_plugins**, **delegates_to**.
 
 Regenerate with `make manifest`.
 
@@ -95,7 +89,7 @@ Regenerate with `make manifest`.
 `make bootstrap` and pick Claude Code, generates platform-specific output in `.build/claude/` (adjustable):
 
 - `CLAUDE.md` — orchestrator with agent definitions, safety constraints, and plugin references
-- `agents/`, `skills/`, `rules/` — resolved spec files ready for Claude Code consumption
+- `agents/`, `skills/` — resolved spec files ready for Claude Code consumption
 - `settings.json` — Claude Code settings from `spec/claude/settings.json`
 
 ### Cursor
@@ -103,24 +97,9 @@ Regenerate with `make manifest`.
 `make bootstrap` and pick Cursor, generates platform-specific output in `.build/cursor/` (adjustable):
 
 - `AGENTS.md` — orchestrator with agent definitions, safety constraints, and plugin references
-- `agents/`, `skills/`, `rules/` — resolved spec files ready for Cursor consumption
+- `agents/`, `skills/` — resolved spec files ready for Cursor consumption
 
 ## File Format
-
-### Rule
-
-```yaml
----
-name: go/patterns
-description: Go coding conventions, error handling, project structure, and concurrency
-scope: language-specific
-languages: [go]
-uses_rules: [code-quality, security, cross-cutting, observability]
----
-
-# Go Coding Patterns
-...
-```
 
 ### Skill
 
@@ -130,7 +109,7 @@ name: api-designer
 description: API style selection, REST resource design, versioning strategy, ...
 scope: universal
 languages: []
-uses_rules: [api-design, cross-cutting, security]
+uses_skills: [api-design, security]
 ---
 
 # API Designer
@@ -148,15 +127,13 @@ scope: language-specific
 languages: [go]
 access: read-write
 uses_skills: [go/coder]
-uses_rules: []
 uses_plugins: [code-simplifier, context7]
 delegates_to: []
 ---
 ```
 
 ## TODO
-- [ ] Get rid of rules/, focus on skills/ and agents/ only
 - [ ] Adjust skills/ output to be model agnostic (supported by all)
 - [ ] Favor claude's skill creator to create new skills, suggest based on project and tech stack
-- [ ] Simplify claude.md and agents.md (remove references to agents, skills, rules...), be as generic as possible
+- [ ] Simplify claude.md and agents.md (remove references to agents, skills...), be as generic as possible
 - [ ] Cleanup agents/, keep only absolutely necessary ones
