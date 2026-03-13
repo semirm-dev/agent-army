@@ -1,6 +1,6 @@
 # Claude Code — Installed Plugins & Skills
 
-> Generated: 2026-03-11
+> Generated: 2026-03-14
 
 ## Plugins (11)
 
@@ -10,13 +10,13 @@
 | 2 | **claude-md-management** (v1.0.0) | Tools to maintain and improve CLAUDE.md files - audit quality, capture session learnings, and keep project memory current. | `claude-plugins-official` | `/plugin install claude-md-management@claude-plugins-official` |
 | 3 | **code-review** | Automated code review for pull requests using multiple specialized agents with confidence-based scoring | `claude-plugins-official` | `/plugin install code-review@claude-plugins-official` |
 | 4 | **code-simplifier** (v1.0.0) | Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality | `claude-plugins-official` | `/plugin install code-simplifier@claude-plugins-official` |
-| 5 | **coderabbit** (v1.0.0) | AI-powered code review in Claude Code, powered by CodeRabbit | [coderabbitai/claude-plugin](https://github.com/coderabbitai/claude-plugin) via `claude-plugins-official` | `/plugin install coderabbit@claude-plugins-official` |
+| 5 | **coderabbit** (v1.0.0) | Your code review partner. CodeRabbit provides external validation using a specialized AI architecture and 40+ integrated static analyzers—offering a different perspective that catches bugs, security vulnerabilities, logic errors, and edge cases. Context-aware analysis via AST parsing and codegraph relationships. Automatically incorporates CLAUDE.md and project coding guidelines into reviews. Useful after writing or modifying code, before commits, when implementing complex or security-sensitive logic, or when a second opinion would increase confidence in the changes. Returns specific findings with suggested fixes that can be applied immediately. Free to use. | `claude-plugins-official` | `/plugin install coderabbit@claude-plugins-official` |
 | 6 | **context7** | Upstash Context7 MCP server for up-to-date documentation lookup. Pull version-specific documentation and code examples directly from source repositories into your LLM context. | `claude-plugins-official` | `/plugin install context7@claude-plugins-official` |
 | 7 | **frontend-design** | Frontend design skill for UI/UX implementation | `claude-plugins-official` | `/plugin install frontend-design@claude-plugins-official` |
-| 8 | **gopls-lsp** (v1.0.0) |  | `claude-plugins-official` | `/plugin install gopls-lsp@claude-plugins-official` |
+| 8 | **gopls-lsp** (v1.0.0) | Go language server for code intelligence and refactoring | `claude-plugins-official` | `/plugin install gopls-lsp@claude-plugins-official` |
 | 9 | **security-guidance** | Security reminder hook that warns about potential security issues when editing files, including command injection, XSS, and unsafe code patterns | `claude-plugins-official` | `/plugin install security-guidance@claude-plugins-official` |
 | 10 | **skill-creator** | Create new skills, improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, update or optimize an existing skill, run evals to test a skill, or benchmark skill performance with variance analysis. | `claude-plugins-official` | `/plugin install skill-creator@claude-plugins-official` |
-| 11 | **superpowers** (v5.0.1) | Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques | [obra/superpowers](https://github.com/obra/superpowers) via `claude-plugins-official` | `/plugin install superpowers@claude-plugins-official` |
+| 11 | **superpowers** (v5.0.2) | Superpowers teaches Claude brainstorming, subagent driven development with built in code review, systematic debugging, and red/green TDD. Additionally, it teaches Claude how to author and test new skills. | `claude-plugins-official` | `/plugin install superpowers@claude-plugins-official` |
 
 ---
 
