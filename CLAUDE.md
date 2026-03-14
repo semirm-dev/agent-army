@@ -63,8 +63,8 @@ Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 ### Spec Library (`spec/`)
 
 All specs use YAML frontmatter + Markdown content:
-- **`skills/`** (30 files) — Standards + workflow definitions with `uses_skills` dependencies
-- **`agents/`** (21 files) — Role definitions with `uses_skills`, `delegates_to`
+- **`skills/`** (36 files) — Standards + workflow definitions with `uses_skills` dependencies
+- **`agents/`** (23 files) — Role definitions with `uses_skills`, `delegates_to`
 - **`claude/`** — Claude Code platform template (`CLAUDE.md`, `settings.json`)
 - **`cursor/`** — Cursor platform template
 

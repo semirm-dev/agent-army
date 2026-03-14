@@ -10,7 +10,7 @@ A modular library of workflows and agent prompts for AI-assisted development. In
 
 Structured workflows, decision trees, and coding standards. Markdown files with YAML frontmatter. Skills define **how** to accomplish tasks and **what** good code looks like — designing APIs, setting up caching, hardening security, naming conventions, error handling, testing patterns, etc. Skills can depend on other skills via `uses_skills`.
 
-Examples: `api-designer`, `caching-strategy`, `go/coder`, `react/tester`
+Examples: `api-design`, `caching-strategy`, `go/coder`, `react/tester`
 
 ### Agents (`spec/agents/`)
 
@@ -29,7 +29,7 @@ Agents      → specialized roles that invoke skills  (the "who")
 ┌─────────┐   uses_skills   ┌─────────┐
 │ Skills  │◄────────────────│ Agents  │
 └─────────┘                 └─────────┘
-  api-designer                go/coder
+  api-design                  go/coder
   go/coder                    typescript/reviewer
   react/tester                python/tester
 ```
@@ -52,6 +52,9 @@ The Go CLI lives in `army/`. Build it with `make build`, then use it via `make` 
 | `make update-plugins-skills` | Regenerate `PLUGINS_AND_SKILLS.md` from installed system state |
 | `make analyze` | Show installed plugins, skills, and duplicate report (terminal only) |
 | `make analyze-fix` | Analyze and fix skill lock drift (remove stale entries) |
+| `make build-v2` | Build armyv2 CLI binary (`armyv2/armyv2`) |
+| `make test-v2` | Run armyv2 tests with race detection |
+| `make v2 <cmd>` | Run any armyv2 command (e.g., `make v2 setup`) |
 
 ## Plugin & Skill Management
 
@@ -72,7 +75,7 @@ Three commands manage Claude Code plugins and standalone skills:
 
 Auto-generated index of all skills and agents. Each entry lists:
 
-- **name** — identifier (e.g., `api-designer`, `go/coder`)
+- **name** — identifier (e.g., `api-design`, `go/coder`)
 - **scope** — `universal` or `language-specific`
 - **languages** — applicable languages (for language-specific entries)
 - **uses_skills** — resolved dependencies (transitive — includes indirect dependencies)
@@ -132,8 +135,3 @@ delegates_to: []
 ---
 ```
 
-## TODO
-- [ ] Adjust skills/ output to be model agnostic (supported by all)
-- [ ] Favor claude's skill creator to create new skills, suggest based on project and tech stack
-- [ ] Simplify claude.md and agents.md (remove references to agents, skills...), be as generic as possible
-- [ ] Cleanup agents/, keep only absolutely necessary ones
