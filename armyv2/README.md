@@ -16,13 +16,12 @@ make v2 sync           # Install everything from your manifest
 | Command | Description |
 |---------|-------------|
 | `setup` | Interactive TUI wizard — pick destination, detect tech stack, select plugins & skills. Supports inline path editing (`d` key on confirm step) and cursor persistence across steps |
-| `sync` | Reconcile manifest vs installed state — install missing, remove extras. Shows plan and asks for confirmation before executing. Supports interactive destination editing |
-| `add` | Add a plugin or skill (`add plugin context7`, `add skill golang-pro`) |
-| `remove` | Remove a plugin or skill (`remove plugin context7`) |
-| `list` | Show manifest contents with install status indicators |
-| `diff` | Compare manifest vs installed, exit code 1 on drift |
-| `update` | Fetch latest catalog from GitHub |
-| `doctor` | Run health checks — missing items, orphans, lock drift |
+| `sync` | Install missing + remove extras to match manifest. Shows plan and asks for confirmation. Supports interactive destination editing |
+| `add` | Add a plugin or skill to manifest (`add plugin context7`, `add skill golang-pro`) |
+| `remove` | Remove a plugin or skill from manifest (`remove plugin context7`) |
+| `list` | Show manifest items with install status (`✓` ok, `⚠` broken on disk, `✗` missing) |
+| `update` | Fetch latest catalog from GitHub into `~/.armyv2/catalog.json` |
+| `doctor` | Run health checks — missing items, orphans, disk drift (skill dirs + plugin installPaths) |
 
 ### Global Flags
 

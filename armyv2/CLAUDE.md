@@ -60,4 +60,4 @@ Global flags: `--dry-run`, `--manifest <path>`, `--verbose`
 
 ## Testing
 
-55 tests across 5 core packages: `catalog`, `manifest`, `detector`, `diff`, `doctor`. Tests use `t.TempDir()` and don't touch real system state (except `doctor_test.go` which creates temp dirs under `~/.agents/skills/`).
+57 tests across 5 core packages: `catalog`, `manifest`, `detector`, `diff`, `doctor`. Tests use `t.TempDir()` and don't touch real system state (except `doctor_test.go` which creates temp dirs under `~/.agents/skills/`).
