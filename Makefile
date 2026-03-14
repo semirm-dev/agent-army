@@ -10,11 +10,11 @@ help: ## Show available targets
 	@echo ""
 	@echo "  build          Build the army CLI binary."
 	@echo "  test           Run army Go test suite."
-	@echo "  v1 manifest    Scan spec/ frontmatter, resolve transitive deps, generate manifest.json."
+	@echo "  v1 manifest    Scan army/spec/ frontmatter, resolve transitive deps, generate army/manifest.json."
 	@echo "  v1 resolve     Validate all dependency references, detect/remove redundancies."
-	@echo "  v1 bootstrap   Generate model-specific skills and agents for Claude Code or Cursor."
-	@echo "  v1 sync        Install all plugins and skills listed in PLUGINS_AND_SKILLS.md."
-	@echo "  v1 update-plugins-skills  Regenerate PLUGINS_AND_SKILLS.md from system state."
+	@echo "  v1 bootstrap   Generate model-specific output into army/.build/."
+	@echo "  v1 sync        Install all plugins and skills listed in army/PLUGINS_AND_SKILLS.md."
+	@echo "  v1 update-plugins-skills  Regenerate army/PLUGINS_AND_SKILLS.md from system state."
 	@echo "  v1 analyze     Analyze installed plugins and skills, report duplicates."
 	@echo "  v1 analyze --fix  Analyze and fix skill lock drift (remove stale entries)."
 	@echo ""
@@ -45,7 +45,7 @@ test: ## Run Go tests with race detection
 	cd army && go test ./... -race -count=1
 
 v1: | $(ARMY) ## Run any army v1 command (e.g. make v1 sync)
-	$(ARMY) $(filter-out $@,$(MAKECMDGOALS))
+	cd army && ./army $(filter-out $@,$(MAKECMDGOALS))
 
 # --- armyv2 targets ---
 

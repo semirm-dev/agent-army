@@ -12,11 +12,11 @@ Agent Army is a bootstrapping system that generates platform-specific orchestrat
 # army (v1) — spec bootstrapper
 make build              # Build the Go CLI binary (army/army)
 make test               # Run all Go tests with race detection
-make v1 manifest        # Scan spec/ frontmatter, resolve transitive deps, generate manifest.json
+make v1 manifest        # Scan army/spec/ frontmatter, resolve transitive deps, generate army/manifest.json
 make v1 resolve-deps    # Validate all dependency references, remove redundancies
-make v1 bootstrap       # Generate platform-specific output into .build/
-make v1 sync            # Install all plugins and skills from PLUGINS_AND_SKILLS.md
-make v1 update-plugins-skills  # Regenerate PLUGINS_AND_SKILLS.md from system state
+make v1 bootstrap       # Generate platform-specific output into army/.build/
+make v1 sync            # Install all plugins and skills from army/PLUGINS_AND_SKILLS.md
+make v1 update-plugins-skills  # Regenerate army/PLUGINS_AND_SKILLS.md from system state
 make v1 analyze         # Analyze installed plugins and skills, report duplicates
 make v1 analyze --fix   # Analyze and fix skill lock drift (remove stale entries)
 
@@ -48,7 +48,7 @@ Key internal packages:
 - **`manifest/`** — Builds manifest.json with transitive dependency resolution
 - **`graph/`** — Dependency graph traversal for skills/agents
 - **`frontmatter/`** — YAML frontmatter parsing/writing for spec files
-- **`loader/`** — Loads skills, agents from `spec/` directory
+- **`loader/`** — Loads skills, agents from `army/spec/` directory
 - **`resolver/`** — Conflict resolution for transitive dependencies
 - **`model/`** — Core data types: Skill, Agent
 - **`plugindoc/`** — Generates PLUGINS_AND_SKILLS.md and terminal analysis reports for installed plugins/skills
@@ -70,7 +70,7 @@ Commands: `setup`, `sync`, `add`, `remove`, `list`, `update`, `doctor`
 
 Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 
-### Spec Library (`spec/`)
+### Spec Library (`army/spec/`)
 
 All specs use YAML frontmatter + Markdown content:
 - **`skills/`** (36 files) — Standards + workflow definitions with `uses_skills` dependencies
@@ -80,17 +80,17 @@ All specs use YAML frontmatter + Markdown content:
 
 ### Key Files
 
-- **`manifest.json`** — Auto-generated index of all skills and agents with resolved transitive dependencies. Regenerate with `make v1 manifest` after any spec change.
+- **`army/manifest.json`** — Auto-generated index of all skills and agents with resolved transitive dependencies. Regenerate with `make v1 manifest` after any spec change.
 - **`Makefile`** — All build orchestration
-- **`.build/`** — Generated output directory (gitignored)
-- **`PLUGINS_AND_SKILLS.md`** — Auto-generated report of installed Claude Code plugins and skills. Regenerate with `make v1 update-plugins-skills`.
+- **`army/.build/`** — Generated output directory (gitignored)
+- **`army/PLUGINS_AND_SKILLS.md`** — Auto-generated report of installed Claude Code plugins and skills. Regenerate with `make v1 update-plugins-skills`.
 
 ## Development Workflow
 
-1. Edit specs in `spec/` (skills or agents)
+1. Edit specs in `army/spec/` (skills or agents)
 2. Run `make v1 resolve-deps` to validate dependency references
-3. Run `make v1 manifest` to regenerate `manifest.json`
-4. Run `make v1 bootstrap` to produce platform output in `.build/`
+3. Run `make v1 manifest` to regenerate `army/manifest.json`
+4. Run `make v1 bootstrap` to produce platform output in `army/.build/`
 5. Run `make test` to verify nothing broke
 
 ## Conventions

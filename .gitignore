@@ -6,7 +6,7 @@
 # Python
 __pycache__/
 *.pyc
-.build/
+army/.build/
 army/army
 armyv2/armyv2
 .ruff_cache/
