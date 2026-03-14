@@ -2,7 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
+	"github.com/smahovkic/agent-army/armyv2/internal/core/types"
 	"github.com/spf13/cobra"
 )
 
@@ -26,9 +29,9 @@ func newListCmd() *cobra.Command {
 				return fmt.Errorf("reading installed skills: %w", err)
 			}
 
-			pluginSet := make(map[string]bool)
+			pluginMap := make(map[string]types.InstalledPlugin)
 			for _, p := range installedPlugins {
-				pluginSet[p.Name] = true
+				pluginMap[p.Name] = p
 			}
 
 			skillSet := make(map[string]bool)
@@ -41,13 +44,13 @@ func newListCmd() *cobra.Command {
 				return nil
 			}
 
+			home, _ := os.UserHomeDir()
+
 			if len(d.manifest.Plugins) > 0 {
 				fmt.Println("Plugins:")
 				for _, p := range d.manifest.Plugins {
-					status := "\033[32m✓\033[0m"
-					if !pluginSet[p.Name] {
-						status = "\033[31m✗\033[0m"
-					}
+					ip, found := pluginMap[p.Name]
+					status := pluginStatus(found, ip)
 					fmt.Printf("  %s %s (%s, %s)\n", status, p.Name, p.Marketplace, p.Destination)
 				}
 				fmt.Println()
@@ -56,10 +59,7 @@ func newListCmd() *cobra.Command {
 			if len(d.manifest.Skills) > 0 {
 				fmt.Println("Skills:")
 				for _, s := range d.manifest.Skills {
-					status := "\033[32m✓\033[0m"
-					if !skillSet[s.Name] {
-						status = "\033[31m✗\033[0m"
-					}
+					status := skillStatus(skillSet[s.Name], s.Name, home)
 					fmt.Printf("  %s %s (%s, %s)\n", status, s.Name, s.Source, s.Destination)
 				}
 			}
@@ -67,4 +67,27 @@ func newListCmd() *cobra.Command {
 			return nil
 		},
 	}
+}
+
+func pluginStatus(inJSON bool, ip types.InstalledPlugin) string {
+	if !inJSON {
+		return "\033[31m✗\033[0m"
+	}
+	if ip.InstallPath != "" {
+		if _, err := os.Stat(ip.InstallPath); os.IsNotExist(err) {
+			return "\033[33m⚠\033[0m"
+		}
+	}
+	return "\033[32m✓\033[0m"
+}
+
+func skillStatus(inLock bool, name, home string) string {
+	if !inLock {
+		return "\033[31m✗\033[0m"
+	}
+	skillDir := filepath.Join(home, ".agents", "skills", name)
+	if _, err := os.Stat(skillDir); os.IsNotExist(err) {
+		return "\033[33m⚠\033[0m"
+	}
+	return "\033[32m✓\033[0m"
 }
