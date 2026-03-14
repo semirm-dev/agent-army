@@ -19,7 +19,7 @@ func newSetupCmd() *cobra.Command {
 				return err
 			}
 
-			model := tui.NewSetupModel(d.catalog, d.manifest, d.orchestrator)
+			model := tui.NewSetupModel(d.catalog, d.manifest)
 			p := tea.NewProgram(model, tea.WithAltScreen())
 
 			finalModel, err := p.Run()
@@ -33,6 +33,7 @@ func newSetupCmd() *cobra.Command {
 					return fmt.Errorf("saving manifest: %w", err)
 				}
 				fmt.Println("Manifest saved to", d.manifestPath)
+				fmt.Println("Run 'armyv2 sync' to install your selections.")
 			}
 
 			return nil

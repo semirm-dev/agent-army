@@ -8,7 +8,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/smahovkic/agent-army/armyv2/internal/core/catalog"
 	"github.com/smahovkic/agent-army/armyv2/internal/core/detector"
-	"github.com/smahovkic/agent-army/armyv2/internal/core/orchestrator"
 	"github.com/smahovkic/agent-army/armyv2/internal/core/types"
 )
 
@@ -19,7 +18,6 @@ const (
 	stepPlugins
 	stepSkills
 	stepConfirm
-	stepInstalling
 	stepDone
 )
 
@@ -44,13 +42,13 @@ type selectableItem struct {
 
 // SetupModel is the Bubble Tea model for the setup wizard.
 type SetupModel struct {
-	catalog      *catalog.Service
-	orchestrator *orchestrator.Orchestrator
-	manifest     *types.Manifest
+	catalog  *catalog.Service
+	manifest *types.Manifest
 
 	step        int
 	cursor      int
-	destination string // "user" or "project"
+	cursors     map[int]int // saved cursor position per step
+	destination string      // "user" or "project"
 	filter      string
 	filtering   bool
 
@@ -64,20 +62,19 @@ type SetupModel struct {
 
 	// Results
 	resultManifest *types.Manifest
-	installResult  *orchestrator.Result
 	completed      bool
 	quitted        bool
 	err            error
 }
 
 // NewSetupModel creates a new setup wizard model.
-func NewSetupModel(cat *catalog.Service, manifest *types.Manifest, orch *orchestrator.Orchestrator) SetupModel {
+func NewSetupModel(cat *catalog.Service, manifest *types.Manifest) SetupModel {
 	return SetupModel{
-		catalog:      cat,
-		orchestrator: orch,
-		manifest:     manifest,
-		step:         stepDestination,
-		destination:  "user",
+		catalog:     cat,
+		manifest:    manifest,
+		step:        stepDestination,
+		cursors:     make(map[int]int),
+		destination: "user",
 	}
 }
 
@@ -86,10 +83,6 @@ func (m SetupModel) Completed() bool { return m.completed }
 
 // ResultManifest returns the manifest produced by setup.
 func (m SetupModel) ResultManifest() *types.Manifest { return m.resultManifest }
-
-type installDoneMsg struct {
-	result orchestrator.Result
-}
 
 // previousStep returns the step before the current one, accounting for
 // the user vs project flow (user flow skips stepTechStack).
@@ -117,24 +110,18 @@ func (m SetupModel) Init() tea.Cmd {
 
 func (m SetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case installDoneMsg:
-		m.installResult = &msg.result
-		m.step = stepDone
-		m.completed = true
-		return m, nil
-
 	case tea.KeyMsg:
 		// Global keys
 		switch msg.String() {
 		case "ctrl+c", "q":
-			if m.step != stepInstalling {
-				m.quitted = true
-				return m, tea.Quit
-			}
+			m.quitted = true
+			return m, tea.Quit
 		case "left":
-			if !m.filtering && m.step != stepDestination && m.step != stepInstalling && m.step != stepDone {
-				m.step = m.previousStep()
-				m.cursor = 0
+			if !m.filtering && m.step != stepDestination && m.step != stepDone {
+				m.cursors[m.step] = m.cursor
+				prev := m.previousStep()
+				m.step = prev
+				m.cursor = m.cursors[prev]
 				m.filter = ""
 				m.filtering = false
 				return m, nil
@@ -175,6 +162,7 @@ func (m SetupModel) updateDestination(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.cursor++
 		}
 	case "enter", "right":
+		m.cursors[stepDestination] = m.cursor
 		if m.cursor == 0 {
 			m.destination = "user"
 			m.initPluginItems(nil)
@@ -185,7 +173,7 @@ func (m SetupModel) updateDestination(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.initTechItems()
 			m.step = stepTechStack
 		}
-		m.cursor = 0
+		m.cursor = m.cursors[m.step]
 	}
 	return m, nil
 }
@@ -220,6 +208,7 @@ func (m SetupModel) updateMultiSelect(msg tea.KeyMsg, items *[]selectableItem, n
 		}
 	case "enter", "right":
 		// Move to next step
+		m.cursors[m.step] = m.cursor
 		if m.step == stepTechStack {
 			var selectedTech []string
 			for _, item := range *items {
@@ -231,7 +220,7 @@ func (m SetupModel) updateMultiSelect(msg tea.KeyMsg, items *[]selectableItem, n
 			m.initSkillItems(selectedTech)
 		}
 		m.step = nextStep
-		m.cursor = 0
+		m.cursor = m.cursors[nextStep]
 		m.filter = ""
 		m.filtering = false
 	}
@@ -240,14 +229,17 @@ func (m SetupModel) updateMultiSelect(msg tea.KeyMsg, items *[]selectableItem, n
 
 func (m SetupModel) updateConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
-	case "y", "Y", "enter", "right":
+	case "y", "Y", "enter":
 		m.buildResultManifest()
-		m.step = stepInstalling
-		return m, m.runInstall()
+		m.completed = true
+		m.step = stepDone
+		return m, tea.Quit
 	case "n", "N":
 		// Go back to skills instead of quitting
-		m.step = m.previousStep()
-		m.cursor = 0
+		m.cursors[m.step] = m.cursor
+		prev := m.previousStep()
+		m.step = prev
+		m.cursor = m.cursors[prev]
 		return m, nil
 	}
 	return m, nil
@@ -281,7 +273,7 @@ func (m SetupModel) View() string {
 	s.WriteString(titleStyle.Render("armyv2 setup") + "\n\n")
 
 	// Show progress indicator for navigable steps
-	if m.step != stepInstalling && m.step != stepDone {
+	if m.step != stepDone {
 		s.WriteString(m.viewProgress())
 	}
 
@@ -296,8 +288,6 @@ func (m SetupModel) View() string {
 		s.WriteString(m.viewMultiSelect("Select skills to install:", m.skillItems))
 	case stepConfirm:
 		s.WriteString(m.viewConfirm())
-	case stepInstalling:
-		s.WriteString(m.viewInstalling())
 	case stepDone:
 		s.WriteString(m.viewDone())
 	}
@@ -442,31 +432,14 @@ func (m SetupModel) viewConfirm() string {
 		strings.Join(selSkills, ", ")))
 	s.WriteString(fmt.Sprintf("  Destination: %s\n", m.destination))
 
-	s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back"))
+	s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · enter confirm"))
 	return s.String()
-}
-
-func (m SetupModel) viewInstalling() string {
-	return "Installing... please wait.\n"
 }
 
 func (m SetupModel) viewDone() string {
 	var s strings.Builder
-
-	if m.installResult != nil {
-		s.WriteString(successStyle.Render(fmt.Sprintf(
-			"✓ Done: %d succeeded, %d failed\n",
-			m.installResult.Succeeded, m.installResult.Failed)))
-
-		if len(m.installResult.Errors) > 0 {
-			s.WriteString("\nErrors:\n")
-			for _, err := range m.installResult.Errors {
-				s.WriteString(errorStyle.Render("  ✗ "+err.Error()) + "\n")
-			}
-		}
-	}
-
-	s.WriteString("\nPress any key to exit.")
+	s.WriteString(successStyle.Render("✓ Setup complete!") + "\n\n")
+	s.WriteString("  Run 'armyv2 sync' to install your selections.\n")
 	return s.String()
 }
 
@@ -576,16 +549,6 @@ func (m *SetupModel) buildResultManifest() {
 	}
 
 	m.resultManifest = result
-}
-
-func (m SetupModel) runInstall() tea.Cmd {
-	return func() tea.Msg {
-		result := m.orchestrator.InstallItems(
-			m.resultManifest.Plugins,
-			m.resultManifest.Skills,
-		)
-		return installDoneMsg{result: result}
-	}
 }
 
 func (m SetupModel) filteredIndices(items []selectableItem) []int {
