@@ -1,4 +1,4 @@
-.PHONY: help build manifest resolve-deps bootstrap test sync update-plugins-skills analyze analyze-fix
+.PHONY: help build manifest resolve-deps bootstrap test sync update-plugins-skills analyze analyze-fix build-v2 test-v2
 
 ARMY := army/army
 
@@ -53,3 +53,15 @@ analyze: | $(ARMY) ## Analyze installed plugins and skills, report duplicates
 
 analyze-fix: | $(ARMY) ## Analyze and fix skill lock drift
 	$(ARMY) analyze --fix
+
+# --- armyv2 targets ---
+
+ARMYV2 := armyv2/armyv2
+
+$(ARMYV2): $(shell find armyv2 -name '*.go') armyv2/internal/core/catalog/catalog.json
+	cd armyv2 && go build -o armyv2 ./cmd/armyv2
+
+build-v2: $(ARMYV2) ## Build the armyv2 CLI binary
+
+test-v2: ## Run armyv2 tests with race detection
+	cd armyv2 && go test ./... -race -count=1

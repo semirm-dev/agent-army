@@ -8,4 +8,6 @@ __pycache__/
 *.pyc
 .build/
 army/army
+armyv2/armyv2
 .ruff_cache/
+.superpowers/

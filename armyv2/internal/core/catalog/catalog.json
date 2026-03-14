@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "updated_at": "2026-03-14",
+  "plugins": [
+    {
+      "name": "claude-code-setup",
+      "marketplace": "claude-plugins-official",
+      "description": "Analyze codebases and recommend tailored Claude Code automations such as hooks, skills, MCP servers, and subagents.",
+      "tags": ["universal", "automation", "setup"]
+    },
+    {
+      "name": "claude-md-management",
+      "marketplace": "claude-plugins-official",
+      "description": "Tools to maintain and improve CLAUDE.md files - audit quality, capture session learnings, and keep project memory current.",
+      "tags": ["universal", "docs", "memory"]
+    },
+    {
+      "name": "code-review",
+      "marketplace": "claude-plugins-official",
+      "description": "Automated code review for pull requests using multiple specialized agents with confidence-based scoring.",
+      "tags": ["universal", "review", "quality"]
+    },
+    {
+      "name": "code-simplifier",
+      "marketplace": "claude-plugins-official",
+      "description": "Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality.",
+      "tags": ["universal", "refactoring", "quality"]
+    },
+    {
+      "name": "coderabbit",
+      "marketplace": "claude-plugins-official",
+      "description": "AI-powered code review in Claude Code, powered by CodeRabbit.",
+      "tags": ["universal", "review", "quality"]
+    },
+    {
+      "name": "context7",
+      "marketplace": "claude-plugins-official",
+      "description": "Upstash Context7 MCP server for up-to-date documentation lookup. Pull version-specific documentation and code examples directly from source repositories into your LLM context.",
+      "tags": ["universal", "docs", "mcp"]
+    },
+    {
+      "name": "frontend-design",
+      "marketplace": "claude-plugins-official",
+      "description": "Frontend design skill for UI/UX implementation.",
+      "tags": ["frontend", "design", "ui"]
+    },
+    {
+      "name": "gopls-lsp",
+      "marketplace": "claude-plugins-official",
+      "description": "Go language server protocol integration for enhanced Go development support.",
+      "tags": ["go", "lsp", "tooling"]
+    },
+    {
+      "name": "security-guidance",
+      "marketplace": "claude-plugins-official",
+      "description": "Security reminder hook that warns about potential security issues when editing files, including command injection, XSS, and unsafe code patterns.",
+      "tags": ["universal", "security"]
+    },
+    {
+      "name": "skill-creator",
+      "marketplace": "claude-plugins-official",
+      "description": "Create new skills, improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, update or optimize an existing skill, run evals to test a skill, or benchmark skill performance with variance analysis.",
+      "tags": ["universal", "skills", "tooling"]
+    },
+    {
+      "name": "superpowers",
+      "marketplace": "claude-plugins-official",
+      "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques.",
+      "tags": ["universal", "tdd", "debugging", "workflow"]
+    }
+  ],
+  "skills": [
+    {
+      "name": "browser-use",
+      "source": "browser-use/browser-use",
+      "description": "Automates browser interactions for web testing, form filling, screenshots, and data extraction.",
+      "tags": ["browser", "testing", "automation"]
+    },
+    {
+      "name": "api-designer",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when designing REST or GraphQL APIs, creating OpenAPI specifications, or planning API architecture.",
+      "tags": ["api", "rest", "graphql", "design"]
+    },
+    {
+      "name": "architecture-designer",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when designing new high-level system architecture, reviewing existing designs, or making architectural decisions.",
+      "tags": ["architecture", "design", "universal"]
+    },
+    {
+      "name": "cli-developer",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when building CLI tools, implementing argument parsing, or adding interactive prompts.",
+      "tags": ["cli", "tooling"]
+    },
+    {
+      "name": "database-optimizer",
+      "source": "jeffallan/claude-skills",
+      "description": "Optimizes database queries and improves performance across PostgreSQL and MySQL systems.",
+      "tags": ["database", "performance", "sql"]
+    },
+    {
+      "name": "fullstack-guardian",
+      "source": "jeffallan/claude-skills",
+      "description": "Builds security-focused full-stack web applications by implementing integrated frontend and backend components with layered security at every level.",
+      "tags": ["fullstack", "security", "frontend", "backend"]
+    },
+    {
+      "name": "golang-pro",
+      "source": "jeffallan/claude-skills",
+      "description": "Implements concurrent Go patterns using goroutines and channels, designs and builds microservices with gRPC or REST, and enforces idiomatic Go.",
+      "tags": ["go", "grpc", "microservices"]
+    },
+    {
+      "name": "javascript-pro",
+      "source": "jeffallan/claude-skills",
+      "description": "Writes, debugs, and refactors JavaScript code using modern ES2023+ features, async/await patterns, ESM module systems, and Node.js APIs.",
+      "tags": ["javascript", "nodejs"]
+    },
+    {
+      "name": "laravel-specialist",
+      "source": "jeffallan/claude-skills",
+      "description": "Build and configure Laravel 10+ applications, including Eloquent models, Sanctum authentication, Horizon queues, and Livewire components.",
+      "tags": ["laravel", "php", "backend"]
+    },
+    {
+      "name": "nestjs-expert",
+      "source": "jeffallan/claude-skills",
+      "description": "Creates and configures NestJS modules, controllers, services, DTOs, guards, and interceptors for enterprise-grade TypeScript backend applications.",
+      "tags": ["nestjs", "typescript", "backend", "api"]
+    },
+    {
+      "name": "nextjs-developer",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when building Next.js 14+ applications with App Router, server components, or server actions.",
+      "tags": ["nextjs", "react", "frontend", "ssr"]
+    },
+    {
+      "name": "php-pro",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when building PHP applications with modern PHP 8.3+ features, Laravel, or Symfony frameworks.",
+      "tags": ["php", "laravel", "symfony"]
+    },
+    {
+      "name": "postgres-pro",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when optimizing PostgreSQL queries, configuring replication, or implementing advanced database features.",
+      "tags": ["postgres", "database", "sql"]
+    },
+    {
+      "name": "prompt-engineer",
+      "source": "jeffallan/claude-skills",
+      "description": "Writes, refactors, and evaluates prompts for LLMs - generating optimized prompt templates, structured output schemas, and evaluation rubrics.",
+      "tags": ["ai", "prompts", "universal"]
+    },
+    {
+      "name": "react-expert",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when building React 18+ applications, creating components, implementing custom hooks, or debugging rendering issues.",
+      "tags": ["react", "frontend", "javascript"]
+    },
+    {
+      "name": "sql-pro",
+      "source": "jeffallan/claude-skills",
+      "description": "Optimizes SQL queries, designs database schemas, and troubleshoots performance issues across PostgreSQL, MySQL, SQL Server, and Oracle.",
+      "tags": ["sql", "database", "performance"]
+    },
+    {
+      "name": "vue-expert",
+      "source": "jeffallan/claude-skills",
+      "description": "Builds Vue 3 components with Composition API, configures Nuxt 3, sets up Pinia stores, and scaffolds Quasar/Capacitor mobile apps.",
+      "tags": ["vue", "frontend", "javascript"]
+    },
+    {
+      "name": "websocket-engineer",
+      "source": "jeffallan/claude-skills",
+      "description": "Use when building real-time communication systems with WebSockets or Socket.IO.",
+      "tags": ["websocket", "realtime", "backend"]
+    },
+    {
+      "name": "database-schema-designer",
+      "source": "softaworks/agent-toolkit",
+      "description": "Design robust, scalable database schemas for SQL and NoSQL databases with normalization guidelines, indexing strategies, and migration patterns.",
+      "tags": ["database", "schema", "design"]
+    },
+    {
+      "name": "find-skills",
+      "source": "vercel-labs/skills",
+      "description": "Helps users discover and install agent skills when they ask questions about extending capabilities.",
+      "tags": ["universal", "skills", "discovery"]
+    }
+  ],
+  "tech_profiles": {
+    "go": {
+      "detect": ["go.mod", "go.sum"],
+      "plugins": ["gopls-lsp"],
+      "skills": ["golang-pro"]
+    },
+    "react": {
+      "detect": ["package.json:react", "*.tsx", "*.jsx"],
+      "plugins": ["frontend-design"],
+      "skills": ["react-expert", "javascript-pro"]
+    },
+    "python": {
+      "detect": ["requirements.txt", "pyproject.toml", "setup.py", "*.py"],
+      "plugins": [],
+      "skills": []
+    },
+    "typescript": {
+      "detect": ["tsconfig.json", "*.ts"],
+      "plugins": [],
+      "skills": ["javascript-pro"]
+    },
+    "php": {
+      "detect": ["composer.json", "*.php"],
+      "plugins": [],
+      "skills": ["php-pro"]
+    },
+    "laravel": {
+      "detect": ["artisan", "composer.json:laravel"],
+      "plugins": [],
+      "skills": ["laravel-specialist", "php-pro"]
+    },
+    "vue": {
+      "detect": ["package.json:vue", "*.vue"],
+      "plugins": ["frontend-design"],
+      "skills": ["vue-expert", "javascript-pro"]
+    },
+    "nextjs": {
+      "detect": ["package.json:next", "next.config.*"],
+      "plugins": ["frontend-design"],
+      "skills": ["nextjs-developer", "react-expert", "javascript-pro"]
+    },
+    "nestjs": {
+      "detect": ["package.json:@nestjs/core"],
+      "plugins": [],
+      "skills": ["nestjs-expert"]
+    },
+    "postgres": {
+      "detect": ["*.sql", "docker-compose.*:postgres"],
+      "plugins": [],
+      "skills": ["postgres-pro", "database-optimizer", "database-schema-designer"]
+    },
+    "websocket": {
+      "detect": ["package.json:socket.io", "package.json:ws"],
+      "plugins": [],
+      "skills": ["websocket-engineer"]
+    }
+  }
+}

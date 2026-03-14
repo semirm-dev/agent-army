@@ -18,6 +18,8 @@ make sync               # Install all plugins and skills from PLUGINS_AND_SKILLS
 make update-plugins-skills  # Regenerate PLUGINS_AND_SKILLS.md from system state
 make analyze            # Analyze installed plugins and skills, report duplicates
 make analyze-fix        # Analyze and fix skill lock drift (remove stale entries)
+make build-v2           # Build armyv2 CLI binary (armyv2/armyv2)
+make test-v2            # Run armyv2 tests with race detection
 ```
 
 Run a single test package:
@@ -44,6 +46,19 @@ Key internal packages:
 - **`termcolor/`** — ANSI color helpers for formatted CLI output
 
 Dependencies: `cobra` (CLI framework), `gopkg.in/yaml.v3` (YAML parsing)
+
+### Go CLI (`armyv2/`)
+
+Entry point: `armyv2/cmd/armyv2/main.go` → `cli.NewRootCmd()`
+
+Ports & Adapters architecture:
+- **`internal/core/`** — Pure domain logic: catalog, manifest, detector, orchestrator, diff, doctor, types
+- **`internal/port/`** — Presentation: TUI (Bubble Tea) + CLI (Cobra)
+- **`internal/adapter/`** — System integration: plugin installer, skill installer, system reader, command runner
+
+Commands: `setup`, `sync`, `add`, `remove`, `list`, `diff`, `update`, `doctor`
+
+Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 
 ### Spec Library (`spec/`)
 
