@@ -469,10 +469,10 @@ func (m SetupModel) viewConfirm() string {
 		}
 	}
 
-	s.WriteString(fmt.Sprintf("  %s to install: %s\n",
+	s.WriteString(fmt.Sprintf("  %s selected: %s\n",
 		selectedStyle.Render(fmt.Sprintf("%d plugin(s)", len(selPlugins))),
 		strings.Join(selPlugins, ", ")))
-	s.WriteString(fmt.Sprintf("  %s to install: %s\n",
+	s.WriteString(fmt.Sprintf("  %s selected: %s\n",
 		selectedStyle.Render(fmt.Sprintf("%d skill(s)", len(selSkills))),
 		strings.Join(selSkills, ", ")))
 	s.WriteString(fmt.Sprintf("  Destination: %s (%s)\n", m.destination, tildefy(m.manifestPath)))
