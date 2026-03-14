@@ -37,6 +37,7 @@ var (
 type selectableItem struct {
 	name        string
 	description string
+	source      string
 	selected    bool
 	recommended bool
 }
@@ -431,12 +432,17 @@ func (m SetupModel) viewMultiSelect(title string, items []selectableItem) string
 			star = " " + starStyle.Render("★")
 		}
 
+		source := ""
+		if item.source != "" {
+			source = " " + dimStyle.Render("("+item.source+")")
+		}
+
 		desc := ""
 		if item.description != "" {
 			desc = " " + dimStyle.Render("— "+item.description)
 		}
 
-		s.WriteString(cursor + check + item.name + star + desc + "\n")
+		s.WriteString(cursor + check + item.name + star + source + desc + "\n")
 	}
 
 	if len(filtered) < len(items) {
@@ -544,6 +550,7 @@ func (m *SetupModel) initPluginItems(selectedTech []string) {
 		m.pluginItems = append(m.pluginItems, selectableItem{
 			name:        p.Name,
 			description: p.Description,
+			source:      p.Marketplace,
 			selected:    recSet[p.Name],
 			recommended: recSet[p.Name],
 		})
@@ -571,6 +578,7 @@ func (m *SetupModel) initSkillItems(selectedTech []string) {
 		m.skillItems = append(m.skillItems, selectableItem{
 			name:        s.Name,
 			description: s.Description,
+			source:      s.Source,
 			selected:    recSet[s.Name],
 			recommended: recSet[s.Name],
 		})
@@ -620,6 +628,7 @@ func (m SetupModel) filteredIndices(items []selectableItem) []int {
 	lower := strings.ToLower(m.filter)
 	for i, item := range items {
 		if strings.Contains(strings.ToLower(item.name), lower) ||
+			strings.Contains(strings.ToLower(item.source), lower) ||
 			strings.Contains(strings.ToLower(item.description), lower) {
 			indices = append(indices, i)
 		}
