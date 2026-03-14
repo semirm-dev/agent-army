@@ -91,6 +91,26 @@ type installDoneMsg struct {
 	result orchestrator.Result
 }
 
+// previousStep returns the step before the current one, accounting for
+// the user vs project flow (user flow skips stepTechStack).
+func (m SetupModel) previousStep() int {
+	switch m.step {
+	case stepTechStack:
+		return stepDestination
+	case stepPlugins:
+		if m.destination == "project" {
+			return stepTechStack
+		}
+		return stepDestination
+	case stepSkills:
+		return stepPlugins
+	case stepConfirm:
+		return stepSkills
+	default:
+		return m.step
+	}
+}
+
 func (m SetupModel) Init() tea.Cmd {
 	return nil
 }
@@ -110,6 +130,14 @@ func (m SetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.step != stepInstalling {
 				m.quitted = true
 				return m, tea.Quit
+			}
+		case "left":
+			if !m.filtering && m.step != stepDestination && m.step != stepInstalling && m.step != stepDone {
+				m.step = m.previousStep()
+				m.cursor = 0
+				m.filter = ""
+				m.filtering = false
+				return m, nil
 			}
 		}
 
@@ -146,7 +174,7 @@ func (m SetupModel) updateDestination(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if m.cursor < 1 {
 			m.cursor++
 		}
-	case "enter":
+	case "enter", "right":
 		if m.cursor == 0 {
 			m.destination = "user"
 			m.initPluginItems(nil)
@@ -190,7 +218,7 @@ func (m SetupModel) updateMultiSelect(msg tea.KeyMsg, items *[]selectableItem, n
 		for i := range *items {
 			(*items)[i].selected = false
 		}
-	case "enter":
+	case "enter", "right":
 		// Move to next step
 		if m.step == stepTechStack {
 			var selectedTech []string
@@ -212,13 +240,15 @@ func (m SetupModel) updateMultiSelect(msg tea.KeyMsg, items *[]selectableItem, n
 
 func (m SetupModel) updateConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
-	case "y", "Y", "enter":
+	case "y", "Y", "enter", "right":
 		m.buildResultManifest()
 		m.step = stepInstalling
 		return m, m.runInstall()
 	case "n", "N":
-		m.quitted = true
-		return m, tea.Quit
+		// Go back to skills instead of quitting
+		m.step = m.previousStep()
+		m.cursor = 0
+		return m, nil
 	}
 	return m, nil
 }
@@ -250,6 +280,11 @@ func (m SetupModel) View() string {
 
 	s.WriteString(titleStyle.Render("armyv2 setup") + "\n\n")
 
+	// Show progress indicator for navigable steps
+	if m.step != stepInstalling && m.step != stepDone {
+		s.WriteString(m.viewProgress())
+	}
+
 	switch m.step {
 	case stepDestination:
 		s.WriteString(m.viewDestination())
@@ -270,6 +305,54 @@ func (m SetupModel) View() string {
 	return s.String()
 }
 
+func (m SetupModel) viewProgress() string {
+	type stepInfo struct {
+		step  int
+		label string
+	}
+
+	var steps []stepInfo
+	if m.destination == "project" {
+		steps = []stepInfo{
+			{stepDestination, "Destination"},
+			{stepTechStack, "Tech Stack"},
+			{stepPlugins, "Plugins"},
+			{stepSkills, "Skills"},
+			{stepConfirm, "Confirm"},
+		}
+	} else {
+		steps = []stepInfo{
+			{stepDestination, "Destination"},
+			{stepPlugins, "Plugins"},
+			{stepSkills, "Skills"},
+			{stepConfirm, "Confirm"},
+		}
+	}
+
+	currentIdx := 0
+	for i, s := range steps {
+		if s.step == m.step {
+			currentIdx = i
+			break
+		}
+	}
+
+	var dots strings.Builder
+	for i := range steps {
+		if i > 0 {
+			dots.WriteString(" ")
+		}
+		if i <= currentIdx {
+			dots.WriteString("●")
+		} else {
+			dots.WriteString("○")
+		}
+	}
+
+	return dimStyle.Render(fmt.Sprintf("%s  Step %d of %d: %s",
+		dots.String(), currentIdx+1, len(steps), steps[currentIdx].label)) + "\n\n"
+}
+
 func (m SetupModel) viewDestination() string {
 	var s strings.Builder
 	s.WriteString("Where are you setting up Claude Code?\n\n")
@@ -287,7 +370,7 @@ func (m SetupModel) viewDestination() string {
 		s.WriteString(cursor + opt + "\n")
 	}
 
-	s.WriteString("\n" + helpStyle.Render("↑/↓ navigate · enter select"))
+	s.WriteString("\n" + helpStyle.Render("↑/↓ navigate · →/enter select"))
 	return s.String()
 }
 
@@ -331,7 +414,7 @@ func (m SetupModel) viewMultiSelect(title string, items []selectableItem) string
 		s.WriteString(dimStyle.Render(fmt.Sprintf("\n  ... %d hidden by filter", len(items)-len(filtered))))
 	}
 
-	s.WriteString("\n" + helpStyle.Render("↑/↓ navigate · space toggle · a all · n none · / filter · enter confirm"))
+	s.WriteString("\n" + helpStyle.Render("↑/↓ navigate · space toggle · a all · n none · / filter · ← back · →/enter confirm"))
 	return s.String()
 }
 
@@ -359,7 +442,7 @@ func (m SetupModel) viewConfirm() string {
 		strings.Join(selSkills, ", ")))
 	s.WriteString(fmt.Sprintf("  Destination: %s\n", m.destination))
 
-	s.WriteString("\n  Proceed with installation? [Y/n] ")
+	s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back"))
 	return s.String()
 }
 
@@ -390,6 +473,10 @@ func (m SetupModel) viewDone() string {
 // --- Initialization helpers ---
 
 func (m *SetupModel) initTechItems() {
+	if len(m.techItems) > 0 {
+		return // Already initialized, preserve user selections
+	}
+
 	profiles := m.catalog.AllTechProfiles()
 	m.detectedTech = detector.Detect(".", profiles)
 
@@ -408,16 +495,23 @@ func (m *SetupModel) initTechItems() {
 }
 
 func (m *SetupModel) initPluginItems(selectedTech []string) {
-	allPlugins := m.catalog.AllPlugins()
 	profiles := m.catalog.AllTechProfiles()
-
 	recPlugins, _ := detector.RecommendedItems(selectedTech, profiles)
 	recSet := make(map[string]bool)
 	for _, p := range recPlugins {
 		recSet[p] = true
 	}
 
-	for _, p := range allPlugins {
+	if len(m.pluginItems) > 0 {
+		// Already populated — update recommendation flags only, preserve selections
+		for i := range m.pluginItems {
+			m.pluginItems[i].recommended = recSet[m.pluginItems[i].name]
+		}
+		return
+	}
+
+	// First population
+	for _, p := range m.catalog.AllPlugins() {
 		m.pluginItems = append(m.pluginItems, selectableItem{
 			name:        p.Name,
 			description: p.Description,
@@ -428,16 +522,23 @@ func (m *SetupModel) initPluginItems(selectedTech []string) {
 }
 
 func (m *SetupModel) initSkillItems(selectedTech []string) {
-	allSkills := m.catalog.AllSkills()
 	profiles := m.catalog.AllTechProfiles()
-
 	_, recSkills := detector.RecommendedItems(selectedTech, profiles)
 	recSet := make(map[string]bool)
 	for _, s := range recSkills {
 		recSet[s] = true
 	}
 
-	for _, s := range allSkills {
+	if len(m.skillItems) > 0 {
+		// Already populated — update recommendation flags only, preserve selections
+		for i := range m.skillItems {
+			m.skillItems[i].recommended = recSet[m.skillItems[i].name]
+		}
+		return
+	}
+
+	// First population
+	for _, s := range m.catalog.AllSkills() {
 		m.skillItems = append(m.skillItems, selectableItem{
 			name:        s.Name,
 			description: s.Description,
