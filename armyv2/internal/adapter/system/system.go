@@ -94,6 +94,7 @@ func (r *Reader) InstalledPlugins() ([]types.InstalledPlugin, error) {
 			Marketplace: marketplace,
 			Version:     inst.Version,
 			Scope:       inst.Scope,
+			InstallPath: inst.InstallPath,
 		})
 	}
 

@@ -61,6 +61,7 @@ type InstalledPlugin struct {
 	Marketplace string
 	Version     string
 	Scope       string
+	InstallPath string
 }
 
 // InstalledSkill represents a skill found on the system.

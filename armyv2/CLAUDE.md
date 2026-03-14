@@ -33,7 +33,7 @@ Entry point: `cmd/armyv2/main.go` → `cli.NewRootCmd()`
 
 ## Commands
 
-`setup`, `sync`, `add`, `remove`, `list`, `diff`, `update`, `doctor`
+`setup`, `sync`, `add`, `remove`, `list`, `update`, `doctor`
 
 Global flags: `--dry-run`, `--manifest <path>`, `--verbose`
 

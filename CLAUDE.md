@@ -26,7 +26,6 @@ make test-v2            # Run armyv2 tests with race detection
 make v2 setup           # Interactive setup wizard for plugins and skills
 make v2 sync            # Apply manifest — install missing, remove extras (with confirmation)
 make v2 list            # Show manifest contents with install status
-make v2 diff            # Compare manifest vs installed state
 make v2 doctor          # Run health checks on plugins and skills
 make v2 update          # Fetch latest catalog from GitHub
 make v2 add             # Add a plugin or skill (e.g. make v2 add plugin context7)
@@ -67,7 +66,7 @@ Ports & Adapters architecture:
 - **`internal/port/`** — Presentation: TUI (Bubble Tea) + CLI (Cobra)
 - **`internal/adapter/`** — System integration: plugin installer, skill installer, system reader, command runner
 
-Commands: `setup`, `sync`, `add`, `remove`, `list`, `diff`, `update`, `doctor`
+Commands: `setup`, `sync`, `add`, `remove`, `list`, `update`, `doctor`
 
 Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 

@@ -24,8 +24,9 @@ func TestCheck_NoIssues(t *testing.T) {
 	skills := []types.InstalledSkill{{Name: "s1"}}
 
 	issues := Check(manifest, plugins, skills)
-	if len(issues) != 0 {
-		t.Errorf("expected no issues, got %d: %v", len(issues), issues)
+	errors := filterBySeverity(issues, "error")
+	if len(errors) != 0 {
+		t.Errorf("expected no errors, got %d: %v", len(errors), errors)
 	}
 }
 
@@ -137,6 +138,111 @@ func TestCheck_SkillDiskDrift_Exists(t *testing.T) {
 	}
 }
 
+func TestCheck_SkillOrphanDir(t *testing.T) {
+	home, _ := os.UserHomeDir()
+	orphanName := "orphan-dir-test-xyz-99999"
+	orphanDir := filepath.Join(home, ".agents", "skills", orphanName)
+	os.MkdirAll(orphanDir, 0o755)
+	defer os.RemoveAll(orphanDir)
+
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{},
+		Skills:  []types.ManifestSkill{},
+	}
+
+	// No installed skills — the directory should be flagged as orphan.
+	issues := Check(manifest, nil, nil)
+
+	found := findIssue(issues, "drift", orphanName)
+	if found == nil {
+		t.Error("expected drift warning for orphan skill directory")
+	}
+	if found != nil && found.Severity != "warning" {
+		t.Errorf("orphan dir severity: got %q, want warning", found.Severity)
+	}
+}
+
+func TestCheck_SkillOrphanDir_NoOrphans(t *testing.T) {
+	home, _ := os.UserHomeDir()
+	skillName := "tracked-skill-test-xyz-99999"
+	skillDir := filepath.Join(home, ".agents", "skills", skillName)
+	os.MkdirAll(skillDir, 0o755)
+	defer os.RemoveAll(skillDir)
+
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{},
+		Skills:  []types.ManifestSkill{},
+	}
+	// Skill is in the installed list — should not be flagged.
+	skills := []types.InstalledSkill{{Name: skillName}}
+
+	issues := Check(manifest, nil, skills)
+
+	found := findIssue(issues, "drift", skillName)
+	if found != nil {
+		t.Error("should not report drift when skill dir is tracked in lock file")
+	}
+}
+
+func TestCheck_PluginDiskDrift(t *testing.T) {
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{},
+		Skills:  []types.ManifestSkill{},
+	}
+	plugins := []types.InstalledPlugin{{
+		Name:        "ghost-plugin",
+		InstallPath: "/tmp/nonexistent-plugin-path-xyz-99999",
+	}}
+
+	issues := Check(manifest, plugins, nil)
+
+	found := findIssue(issues, "drift", "ghost-plugin")
+	if found == nil {
+		t.Error("expected drift warning for plugin with missing installPath")
+	}
+	if found != nil && found.Severity != "warning" {
+		t.Errorf("plugin drift severity: got %q, want warning", found.Severity)
+	}
+}
+
+func TestCheck_PluginDiskDrift_Exists(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{},
+		Skills:  []types.ManifestSkill{},
+	}
+	plugins := []types.InstalledPlugin{{
+		Name:        "real-plugin",
+		InstallPath: tmpDir,
+	}}
+
+	issues := Check(manifest, plugins, nil)
+
+	found := findIssue(issues, "drift", "real-plugin")
+	if found != nil {
+		t.Error("should not report drift when plugin installPath exists")
+	}
+}
+
+func TestCheck_PluginDiskDrift_EmptyPath(t *testing.T) {
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{},
+		Skills:  []types.ManifestSkill{},
+	}
+	plugins := []types.InstalledPlugin{{
+		Name:        "no-path-plugin",
+		InstallPath: "",
+	}}
+
+	issues := Check(manifest, plugins, nil)
+
+	found := findIssue(issues, "drift", "no-path-plugin")
+	if found != nil {
+		t.Error("should not report drift when plugin has no installPath")
+	}
+}
+
 func TestCheck_MultipleIssues(t *testing.T) {
 	manifest := &types.Manifest{
 		Plugins: []types.ManifestPlugin{{Name: "wanted-p"}},
@@ -174,9 +280,21 @@ func TestCheck_EmptyEverything(t *testing.T) {
 	}
 
 	issues := Check(manifest, nil, nil)
-	if len(issues) != 0 {
-		t.Errorf("expected no issues for empty state, got %d", len(issues))
+	errors := filterBySeverity(issues, "error")
+	if len(errors) != 0 {
+		t.Errorf("expected no errors for empty state, got %d", len(errors))
 	}
+}
+
+// filterBySeverity returns issues matching the given severity.
+func filterBySeverity(issues []types.DoctorIssue, severity string) []types.DoctorIssue {
+	var filtered []types.DoctorIssue
+	for _, issue := range issues {
+		if issue.Severity == severity {
+			filtered = append(filtered, issue)
+		}
+	}
+	return filtered
 }
 
 // findIssue returns the first issue matching the given category and item, or nil.
