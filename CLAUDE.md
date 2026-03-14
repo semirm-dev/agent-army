@@ -9,17 +9,28 @@ Agent Army is a bootstrapping system that generates platform-specific orchestrat
 ## Build & Test Commands
 
 ```bash
+# army (v1) — spec bootstrapper
 make build              # Build the Go CLI binary (army/army)
 make test               # Run all Go tests with race detection
-make manifest           # Scan spec/ frontmatter, resolve transitive deps, generate manifest.json
-make resolve-deps       # Validate all dependency references, remove redundancies
-make bootstrap          # Generate platform-specific output into .build/
-make sync               # Install all plugins and skills from PLUGINS_AND_SKILLS.md
-make update-plugins-skills  # Regenerate PLUGINS_AND_SKILLS.md from system state
-make analyze            # Analyze installed plugins and skills, report duplicates
-make analyze-fix        # Analyze and fix skill lock drift (remove stale entries)
+make v1 manifest        # Scan spec/ frontmatter, resolve transitive deps, generate manifest.json
+make v1 resolve-deps    # Validate all dependency references, remove redundancies
+make v1 bootstrap       # Generate platform-specific output into .build/
+make v1 sync            # Install all plugins and skills from PLUGINS_AND_SKILLS.md
+make v1 update-plugins-skills  # Regenerate PLUGINS_AND_SKILLS.md from system state
+make v1 analyze         # Analyze installed plugins and skills, report duplicates
+make v1 analyze --fix   # Analyze and fix skill lock drift (remove stale entries)
+
+# armyv2 — plugin & skill manager
 make build-v2           # Build armyv2 CLI binary (armyv2/armyv2)
 make test-v2            # Run armyv2 tests with race detection
+make v2 setup           # Interactive setup wizard for plugins and skills
+make v2 sync            # Apply manifest — install missing, remove extras (with confirmation)
+make v2 list            # Show manifest contents with install status
+make v2 diff            # Compare manifest vs installed state
+make v2 doctor          # Run health checks on plugins and skills
+make v2 update          # Fetch latest catalog from GitHub
+make v2 add             # Add a plugin or skill (e.g. make v2 add plugin context7)
+make v2 remove          # Remove a plugin or skill (e.g. make v2 remove skill golang-pro)
 ```
 
 Run a single test package:
@@ -70,17 +81,17 @@ All specs use YAML frontmatter + Markdown content:
 
 ### Key Files
 
-- **`manifest.json`** — Auto-generated index of all skills and agents with resolved transitive dependencies. Regenerate with `make manifest` after any spec change.
+- **`manifest.json`** — Auto-generated index of all skills and agents with resolved transitive dependencies. Regenerate with `make v1 manifest` after any spec change.
 - **`Makefile`** — All build orchestration
 - **`.build/`** — Generated output directory (gitignored)
-- **`PLUGINS_AND_SKILLS.md`** — Auto-generated report of installed Claude Code plugins and skills. Regenerate with `make update-plugins-skills`.
+- **`PLUGINS_AND_SKILLS.md`** — Auto-generated report of installed Claude Code plugins and skills. Regenerate with `make v1 update-plugins-skills`.
 
 ## Development Workflow
 
 1. Edit specs in `spec/` (skills or agents)
-2. Run `make resolve-deps` to validate dependency references
-3. Run `make manifest` to regenerate `manifest.json`
-4. Run `make bootstrap` to produce platform output in `.build/`
+2. Run `make v1 resolve-deps` to validate dependency references
+3. Run `make v1 manifest` to regenerate `manifest.json`
+4. Run `make v1 bootstrap` to produce platform output in `.build/`
 5. Run `make test` to verify nothing broke
 
 ## Conventions

@@ -37,6 +37,17 @@ Entry point: `cmd/armyv2/main.go` → `cli.NewRootCmd()`
 
 Global flags: `--dry-run`, `--manifest <path>`, `--verbose`
 
+### sync flags
+
+- `--destination <user|project>` — Override destination for all actions
+- `--yes` / `-y` — Skip confirmation prompt
+- Reads from `/dev/tty` for interactive confirmation (works through `make`)
+
+### setup TUI
+
+- Saves/restores cursor positions when navigating between steps
+- Confirm step supports inline manifest path editing via `d` key
+
 ## Conventions
 
 - Core packages must not import adapter or port packages

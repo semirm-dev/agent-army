@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -45,12 +46,15 @@ type SetupModel struct {
 	catalog  *catalog.Service
 	manifest *types.Manifest
 
-	step        int
-	cursor      int
-	cursors     map[int]int // saved cursor position per step
-	destination string      // "user" or "project"
-	filter      string
-	filtering   bool
+	step         int
+	cursor       int
+	cursors      map[int]int // saved cursor position per step
+	destination  string      // "user" or "project"
+	manifestPath string      // output path for manifest
+	filter       string
+	filtering    bool
+	editingPath  bool   // true when editing manifest path on confirm step
+	pathInput    string // buffer for path editing
 
 	// Step data
 	techItems   []selectableItem
@@ -68,13 +72,14 @@ type SetupModel struct {
 }
 
 // NewSetupModel creates a new setup wizard model.
-func NewSetupModel(cat *catalog.Service, manifest *types.Manifest) SetupModel {
+func NewSetupModel(cat *catalog.Service, manifest *types.Manifest, manifestPath string) SetupModel {
 	return SetupModel{
-		catalog:     cat,
-		manifest:    manifest,
-		step:        stepDestination,
-		cursors:     make(map[int]int),
-		destination: "user",
+		catalog:      cat,
+		manifest:     manifest,
+		manifestPath: manifestPath,
+		step:         stepDestination,
+		cursors:      make(map[int]int),
+		destination:  "user",
 	}
 }
 
@@ -83,6 +88,9 @@ func (m SetupModel) Completed() bool { return m.completed }
 
 // ResultManifest returns the manifest produced by setup.
 func (m SetupModel) ResultManifest() *types.Manifest { return m.resultManifest }
+
+// ManifestPath returns the (possibly modified) manifest output path.
+func (m SetupModel) ManifestPath() string { return m.manifestPath }
 
 // previousStep returns the step before the current one, accounting for
 // the user vs project flow (user flow skips stepTechStack).
@@ -113,11 +121,16 @@ func (m SetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		// Global keys
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			m.quitted = true
 			return m, tea.Quit
+		case "q":
+			if !m.filtering && !m.editingPath {
+				m.quitted = true
+				return m, tea.Quit
+			}
 		case "left":
-			if !m.filtering && m.step != stepDestination && m.step != stepDone {
+			if !m.filtering && !m.editingPath && m.step != stepDestination && m.step != stepDone {
 				m.cursors[m.step] = m.cursor
 				prev := m.previousStep()
 				m.step = prev
@@ -228,6 +241,9 @@ func (m SetupModel) updateMultiSelect(msg tea.KeyMsg, items *[]selectableItem, n
 }
 
 func (m SetupModel) updateConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	if m.editingPath {
+		return m.handlePathInput(msg)
+	}
 	switch msg.String() {
 	case "y", "Y", "enter":
 		m.buildResultManifest()
@@ -241,6 +257,29 @@ func (m SetupModel) updateConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.step = prev
 		m.cursor = m.cursors[prev]
 		return m, nil
+	case "d":
+		m.editingPath = true
+		m.pathInput = m.manifestPath
+		return m, nil
+	}
+	return m, nil
+}
+
+func (m SetupModel) handlePathInput(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "enter":
+		m.manifestPath = m.pathInput
+		m.editingPath = false
+	case "esc":
+		m.editingPath = false
+	case "backspace":
+		if len(m.pathInput) > 0 {
+			m.pathInput = m.pathInput[:len(m.pathInput)-1]
+		}
+	default:
+		if len(msg.String()) == 1 {
+			m.pathInput += msg.String()
+		}
 	}
 	return m, nil
 }
@@ -430,10 +469,27 @@ func (m SetupModel) viewConfirm() string {
 	s.WriteString(fmt.Sprintf("  %s to install: %s\n",
 		selectedStyle.Render(fmt.Sprintf("%d skill(s)", len(selSkills))),
 		strings.Join(selSkills, ", ")))
-	s.WriteString(fmt.Sprintf("  Destination: %s\n", m.destination))
+	s.WriteString(fmt.Sprintf("  Destination: %s (%s)\n", m.destination, tildefy(m.manifestPath)))
 
-	s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · enter confirm"))
+	if m.editingPath {
+		s.WriteString("\n  " + dimStyle.Render("Path: ") + m.pathInput + "█\n")
+		s.WriteString("\n  " + helpStyle.Render("enter save · esc cancel"))
+	} else {
+		s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · d edit path · enter confirm"))
+	}
 	return s.String()
+}
+
+// tildefy replaces the home directory prefix with ~ for display.
+func tildefy(path string) string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return path
+	}
+	if strings.HasPrefix(path, home) {
+		return "~" + path[len(home):]
+	}
+	return path
 }
 
 func (m SetupModel) viewDone() string {

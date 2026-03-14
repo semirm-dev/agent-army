@@ -15,8 +15,8 @@ make v2 sync           # Install everything from your manifest
 
 | Command | Description |
 |---------|-------------|
-| `setup` | Interactive TUI wizard — pick destination, detect tech stack, select plugins & skills |
-| `sync` | Reconcile manifest vs installed state — install missing, remove extras |
+| `setup` | Interactive TUI wizard — pick destination, detect tech stack, select plugins & skills. Supports inline path editing (`d` key on confirm step) and cursor persistence across steps |
+| `sync` | Reconcile manifest vs installed state — install missing, remove extras. Shows plan and asks for confirmation before executing. Supports interactive destination editing |
 | `add` | Add a plugin or skill (`add plugin context7`, `add skill golang-pro`) |
 | `remove` | Remove a plugin or skill (`remove plugin context7`) |
 | `list` | Show manifest contents with install status indicators |
@@ -31,6 +31,13 @@ make v2 sync           # Install everything from your manifest
 | `--dry-run` | Print commands without executing |
 | `--manifest <path>` | Override manifest path (default: `~/.armyv2/manifest.json`) |
 | `--verbose` | Verbose output |
+
+### Sync Flags
+
+| Flag | Description |
+|------|-------------|
+| `--destination <user\|project>` | Override destination for all actions |
+| `--yes` / `-y` | Skip confirmation prompt |
 
 ### Using via Make
 
@@ -47,6 +54,7 @@ For commands with flags, use the binary directly:
 ```bash
 ./armyv2/armyv2 add plugin context7 --no-install
 ./armyv2/armyv2 sync --dry-run
+./armyv2/armyv2 sync --destination user --yes
 ./armyv2/armyv2 remove skill golang-pro --manifest-only
 ```
 
