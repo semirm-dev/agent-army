@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/smahovkic/agent-army/army/internal/core/config"
 	"github.com/smahovkic/agent-army/army/internal/core/manifest"
@@ -31,6 +32,12 @@ func newDetectCmd() *cobra.Command {
 	}
 }
 
+type tableRow struct {
+	label string
+	value string
+	sub   string // optional second line (e.g. provenance)
+}
+
 func runDetect() error {
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -42,38 +49,32 @@ func runDetect() error {
 		return fmt.Errorf("getting home directory: %w", err)
 	}
 
-	fmt.Printf("\n%s📂 Config Resolution%s %s(cwd: %s)%s\n\n", bold, reset, dim, cwd, reset)
-
 	// Config
 	configPath, err := config.Path()
 	if err != nil {
 		return fmt.Errorf("resolving config path: %w", err)
 	}
+	configValue := dim + "none" + reset + "  " + yellow + "(using defaults)" + reset
 	if fileExists(configPath) {
-		printRow("⚙", cyan, "Config", configPath)
-	} else {
-		printRow("⚙", cyan, "Config", dim+"none"+reset+" "+yellow+"(using defaults)"+reset)
+		configValue = configPath
 	}
 
 	// Catalog
 	overlayPath := filepath.Join(home, ".army", "catalog.json")
+	catalogValue := "embedded"
 	if fileExists(overlayPath) {
-		printRow("⚙", cyan, "Catalog", "embedded + "+overlayPath)
-	} else {
-		printRow("⚙", cyan, "Catalog", "embedded")
+		catalogValue = "embedded + " + overlayPath
 	}
 
-	// Manifest resolution with provenance
+	// Manifest
 	manifestPath, provenance := resolveManifestWithProvenance(configPath, cwd)
 	if manifestPath == "" {
 		return fmt.Errorf("could not determine manifest path")
 	}
+	manifestValue := dim + "none" + reset + "  " + yellow + "(" + manifestPath + " does not exist)" + reset
 	if fileExists(manifestPath) {
-		printRow("📄", "", "Manifest", manifestPath)
-	} else {
-		printRow("📄", "", "Manifest", dim+"none"+reset+" "+yellow+"("+manifestPath+" does not exist)"+reset)
+		manifestValue = manifestPath
 	}
-	fmt.Printf("               %s↳ %s%s\n", dim, provenance, reset)
 
 	// Load manifest for summary
 	m, err := manifest.Load(manifestPath)
@@ -84,19 +85,77 @@ func runDetect() error {
 	// Installed state files
 	pluginsDB := filepath.Join(home, ".claude", "plugins", "installed_plugins.json")
 	skillsDB := filepath.Join(home, ".agents", ".skill-lock.json")
+	pluginsValue := dim + "none" + reset
 	if fileExists(pluginsDB) {
-		printRow("🔌", "", "Plugins DB", pluginsDB)
-	} else {
-		printRow("🔌", "", "Plugins DB", dim+"none"+reset)
+		pluginsValue = pluginsDB
 	}
+	skillsValue := dim + "none" + reset
 	if fileExists(skillsDB) {
-		printRow("🧩", "", "Skills DB", skillsDB)
-	} else {
-		printRow("🧩", "", "Skills DB", dim+"none"+reset)
+		skillsValue = skillsDB
 	}
 
-	// Summary
-	fmt.Printf("\n  %s📋 Manifest:%s %d plugins, %d skills\n\n", bold, reset, len(m.Plugins), len(m.Skills))
+	rows := []tableRow{
+		{"Config", configValue, ""},
+		{"Catalog", catalogValue, ""},
+		{"Manifest", manifestValue, provenance},
+		{"Plugins DB", pluginsValue, ""},
+		{"Skills DB", skillsValue, ""},
+	}
+
+	labelWidth := 12
+	maxValLen := 0
+	for _, r := range rows {
+		vl := visibleLen(r.value)
+		if vl > maxValLen {
+			maxValLen = vl
+		}
+		if r.sub != "" {
+			sl := visibleLen(r.sub) + 2 // "↳ " prefix
+			if sl > maxValLen {
+				maxValLen = sl
+			}
+		}
+	}
+	colW := labelWidth + 2 // label + ": "
+	valW := maxValLen
+	innerWidth := colW + valW + 3 // "│ " + " " + " │"
+
+	// Header
+	fmt.Println()
+	fmt.Printf("  📂 %sConfig Resolution%s  %s(cwd: %s)%s\n", bold, reset, dim, cwd, reset)
+	fmt.Println()
+
+	// Top border
+	fmt.Printf("  ┌─%s─┬─%s─┐\n", strings.Repeat("─", colW), strings.Repeat("─", valW))
+
+	for i, r := range rows {
+		// Data row
+		valPad := valW - visibleLen(r.value)
+		fmt.Printf("  │ %s%-*s%s │ %s%s │\n",
+			cyan, colW, r.label+":", reset,
+			r.value, strings.Repeat(" ", valPad))
+
+		// Sub-line (provenance)
+		if r.sub != "" {
+			subText := dim + "↳ " + r.sub + reset
+			subPad := valW - visibleLen("↳ "+r.sub)
+			fmt.Printf("  │ %-*s │ %s%s │\n",
+				colW, "",
+				subText, strings.Repeat(" ", subPad))
+		}
+
+		// Separator or bottom
+		if i < len(rows)-1 {
+			fmt.Printf("  ├─%s─┼─%s─┤\n", strings.Repeat("─", colW), strings.Repeat("─", valW))
+		}
+	}
+
+	// Bottom border
+	fmt.Printf("  └─%s─┴─%s─┘\n", strings.Repeat("─", colW), strings.Repeat("─", valW))
+
+	// Summary below
+	_ = innerWidth
+	fmt.Printf("\n  %s Manifest:%s %d plugins, %d skills\n\n", bold, reset, len(m.Plugins), len(m.Skills))
 
 	return nil
 }
@@ -120,15 +179,27 @@ func resolveManifestWithProvenance(configPath, cwd string) (string, string) {
 	return defaultPath, "via default (~/.army/manifest.json)"
 }
 
-func printRow(icon, iconColor, label, value string) {
-	if iconColor != "" {
-		fmt.Printf("  %s%s%s  %-12s %s\n", iconColor, icon, reset, label+":", value)
-	} else {
-		fmt.Printf("  %s  %-12s %s\n", icon, label+":", value)
-	}
-}
-
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+// visibleLen returns the display width of a string, stripping ANSI escape codes.
+func visibleLen(s string) int {
+	n := 0
+	inEsc := false
+	for _, r := range s {
+		if r == '\033' {
+			inEsc = true
+			continue
+		}
+		if inEsc {
+			if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
+				inEsc = false
+			}
+			continue
+		}
+		n++
+	}
+	return n
 }
