@@ -6,6 +6,8 @@ import (
 
 	"github.com/smahovkic/agent-army/army/internal/core/config"
 	"github.com/smahovkic/agent-army/army/internal/core/doctor"
+	"github.com/smahovkic/agent-army/army/internal/core/manifest"
+	"github.com/smahovkic/agent-army/army/internal/core/types"
 	"github.com/spf13/cobra"
 )
 
@@ -35,6 +37,18 @@ func newDoctorCmd() *cobra.Command {
 			}
 
 			issues := doctor.Check(d.manifest, installedPlugins, installedSkills)
+
+			// Project-level manifests should not report orphans — they only
+			// describe what this project needs, not the full system state.
+			if !manifest.IsDefault(d.manifestPath) {
+				filtered := make([]types.DoctorIssue, 0, len(issues))
+				for _, i := range issues {
+					if i.Category != "orphan" {
+						filtered = append(filtered, i)
+					}
+				}
+				issues = filtered
+			}
 
 			if len(issues) == 0 {
 				fmt.Println("\033[32m✓\033[0m No issues found.")

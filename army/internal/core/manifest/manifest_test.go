@@ -226,6 +226,31 @@ func TestHasPlugin(t *testing.T) {
 	}
 }
 
+func TestIsDefault(t *testing.T) {
+	def, err := DefaultPath()
+	if err != nil {
+		t.Fatalf("DefaultPath() error: %v", err)
+	}
+
+	tests := []struct {
+		name string
+		path string
+		want bool
+	}{
+		{"default path", def, true},
+		{"project path", "/some/project/.army/manifest.json", false},
+		{"unclean default", def + "/.", true},
+		{"empty path", "", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsDefault(tt.path); got != tt.want {
+				t.Errorf("IsDefault(%q) = %v, want %v", tt.path, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestHasSkill(t *testing.T) {
 	m := emptyManifest()
 	AddSkill(m, types.ManifestSkill{Name: "present"})

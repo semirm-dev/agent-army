@@ -19,6 +19,15 @@ func DefaultPath() (string, error) {
 	return filepath.Join(home, ".army", "manifest.json"), nil
 }
 
+// IsDefault reports whether the given path is the default user-level manifest path.
+func IsDefault(path string) bool {
+	def, err := DefaultPath()
+	if err != nil {
+		return false
+	}
+	return filepath.Clean(path) == filepath.Clean(def)
+}
+
 // Load reads a manifest from the given path. If the file does not exist,
 // it returns an empty manifest with version 1.
 func Load(path string) (*types.Manifest, error) {

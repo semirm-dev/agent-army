@@ -46,6 +46,10 @@ Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 
 Global flags: `--dry-run`, `--manifest <path>`, `--verbose`
 
+### Orphan handling
+
+Orphans (installed items not in manifest) are only relevant for user-level manifests (`~/.army/manifest.json`). When using a project-level manifest, `sync` skips removal actions and `doctor` skips orphan warnings — a project manifest describes what one project needs, not the full system state.
+
 ### sync flags
 
 - `--destination <user|project>` — Override destination for all actions

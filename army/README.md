@@ -18,12 +18,12 @@ army sync                # Install everything from your manifest
 | Command | Description |
 |---------|-------------|
 | `setup` | Interactive TUI wizard — pick destination, detect tech stack, select plugins & skills. Destination sets default manifest path (user: `~/.army/manifest.json`, project: `<cwd>/.army/manifest.json`). Path editing via `d` key on confirm step (project-level only) |
-| `sync` | Install missing + remove extras to match manifest. Shows plan and asks for confirmation. Supports interactive destination editing |
+| `sync` | Install missing + remove extras to match manifest. Shows plan and asks for confirmation. Supports interactive destination editing. **Project-level manifests skip orphan removal** — only installs missing items |
 | `add` | Add a plugin or skill to manifest (`add plugin context7`, `add skill golang-pro`) |
 | `remove` | Remove a plugin or skill from manifest (`remove plugin context7`) |
 | `list` | Show manifest items with install status (`✓` ok, `⚠` broken on disk, `✗` missing) |
 | `update` | Fetch latest catalog from GitHub into `~/.army/catalog.json` |
-| `doctor` | Run health checks — missing items, orphans, disk drift (skill dirs + plugin installPaths) |
+| `doctor` | Run health checks — missing items, orphans, disk drift (skill dirs + plugin installPaths). **Project-level manifests skip orphan warnings** |
 
 ### Global Flags
 
@@ -58,7 +58,7 @@ army sync                # Install everything from your manifest
 2. **Manifest** — Tracks your selected plugins and skills. Default paths: `~/.army/manifest.json` (user-level) or `<cwd>/.army/manifest.json` (project-level).
 3. **Config** — `~/.army/config.json` maps directories to manifest paths. Auto-populated when you run `army setup` with project-level destination or use `--manifest`. Commands auto-resolve the correct manifest by walking up from cwd.
 4. **Tech detection** — Scans project directory for markers (go.mod, package.json deps, tsconfig.json, etc.) and recommends relevant plugins/skills.
-5. **Sync** — Compares manifest against installed state, installs missing items, optionally removes extras.
+5. **Sync** — Compares manifest against installed state, installs missing items, removes extras (user-level manifests only — project-level manifests skip orphan removal since they describe a subset of the system).
 
 ## Architecture
 

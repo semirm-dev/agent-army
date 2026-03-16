@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/smahovkic/agent-army/army/internal/core/manifest"
 	"github.com/smahovkic/agent-army/army/internal/core/types"
 	"github.com/spf13/cobra"
 )
@@ -32,7 +33,19 @@ func newSyncCmd() *cobra.Command {
 				return fmt.Errorf("planning actions: %w", err)
 			}
 
-			if len(actions) == 0 {
+			// Project-level manifests should not remove orphans — they only
+		// describe what this project needs, not the full system state.
+		if !manifest.IsDefault(d.manifestPath) {
+			filtered := actions[:0]
+			for _, a := range actions {
+				if a.Type != "remove" {
+					filtered = append(filtered, a)
+				}
+			}
+			actions = filtered
+		}
+
+		if len(actions) == 0 {
 				fmt.Println("Everything is in sync.")
 				return nil
 			}
