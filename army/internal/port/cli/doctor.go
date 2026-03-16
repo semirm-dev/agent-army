@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/smahovkic/agent-army/army/internal/core/config"
 	"github.com/smahovkic/agent-army/army/internal/core/doctor"
 	"github.com/spf13/cobra"
 )
@@ -17,6 +18,11 @@ func newDoctorCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			cwd, _ := os.Getwd()
+			configPath, _ := config.Path()
+			manifestPath, provenance := resolveManifestWithProvenance(configPath, cwd)
+			fmt.Printf("Manifest: %s %s(%s)%s\n", manifestPath, dim, provenance, reset)
 
 			installedPlugins, err := d.system.InstalledPlugins()
 			if err != nil {
