@@ -31,6 +31,18 @@ make v2 sync           # Install everything from your manifest
 | `--manifest <path>` | Override manifest path (default: `~/.armyv2/manifest.json`) |
 | `--verbose` | Verbose output |
 
+### Add Flags
+
+| Flag | Description |
+|------|-------------|
+| `--no-install` | Add to manifest without installing |
+
+### Remove Flags
+
+| Flag | Description |
+|------|-------------|
+| `--manifest-only` | Remove from manifest without uninstalling |
+
 ### Sync Flags
 
 | Flag | Description |
