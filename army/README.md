@@ -65,10 +65,10 @@ make army doctor
 For commands with flags, use the binary directly:
 
 ```bash
-./army/army add plugin context7 --no-install
-./army/army sync --dry-run
-./army/army sync --destination user --yes
-./army/army remove skill golang-pro --manifest-only
+./.build/army add plugin context7 --no-install
+./.build/army sync --dry-run
+./.build/army sync --destination user --yes
+./.build/army remove skill golang-pro --manifest-only
 ```
 
 ## How It Works
