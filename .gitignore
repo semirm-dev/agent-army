@@ -6,6 +6,6 @@
 # Python
 __pycache__/
 *.pyc
-army/army
 .ruff_cache/
 .superpowers/
+.build/

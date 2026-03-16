@@ -1,6 +1,6 @@
 .PHONY: help build test army
 
-ARMY := army/army
+ARMY := .build/army
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -18,13 +18,14 @@ help: ## Show available targets
 	@echo "  army remove    Remove a plugin or skill from manifest (e.g. make army remove skill golang-pro)."
 	@echo ""
 	@echo "  For commands with flags, use the binary directly:"
-	@echo "    ./army/army add plugin context7 --no-install"
-	@echo "    ./army/army sync --dry-run"
+	@echo "    ./$(ARMY) add plugin context7 --no-install"
+	@echo "    ./$(ARMY) sync --dry-run"
 
 # --- army targets ---
 
 $(ARMY): $(shell find army -name '*.go') army/internal/core/catalog/catalog.json
-	cd army && go build -o army ./cmd/army
+	@mkdir -p .build
+	cd army && go build -o ../$(ARMY) ./cmd/army
 
 build: $(ARMY) ## Build the army CLI binary
 
