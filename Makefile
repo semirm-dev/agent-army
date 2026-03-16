@@ -1,4 +1,4 @@
-.PHONY: help build test army export
+.PHONY: help build test army export detect
 
 ARMY := .build/army
 DEST := $(CURDIR)/.build
@@ -15,6 +15,7 @@ help: ## Show available targets
 	@echo "  army sync      Install missing + remove extras to match manifest (with confirmation)."
 	@echo "  army list      Show manifest items with install status (✓ ok, ⚠ broken, ✗ missing)."
 	@echo "  army doctor    Run health checks — missing, orphan, and disk drift detection."
+	@echo "  army detect    Show loaded config files for current directory."
 	@echo "  army update    Fetch latest catalog from GitHub into ~/.army/catalog.json."
 	@echo "  army add       Add a plugin or skill to manifest (e.g. make army add plugin context7)."
 	@echo "  army remove    Remove a plugin or skill from manifest (e.g. make army remove skill golang-pro)."
@@ -36,6 +37,9 @@ test: ## Run army tests with race detection
 
 army: | $(ARMY) ## Run any army command (e.g. make army setup)
 	$(ARMY) $(filter-out $@,$(MAKECMDGOALS))
+
+detect: $(ARMY) ## Show loaded config for current directory
+	$(ARMY) detect
 
 export: $(ARMY) ## Add army to PATH in shell profile
 	@RAW="$(DEST)"; \
