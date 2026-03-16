@@ -75,6 +75,7 @@ For commands with flags, use the binary directly:
 
 1. **Catalog** — Bundled JSON with all known plugins, skills, and tech profiles. Updated via `army update`.
 2. **Manifest** — Personal file at `~/.army/manifest.json` tracking your selected plugins and skills.
+   > **Note:** If you change the manifest path during setup (via `d` key), all subsequent commands must use `--manifest <path>` to target it. There is no auto-detection — the default always resolves to `~/.army/manifest.json`.
 3. **Tech detection** — Scans project directory for markers (go.mod, package.json deps, tsconfig.json, etc.) and recommends relevant plugins/skills.
 4. **Sync** — Compares manifest against installed state, installs missing items, optionally removes extras.
 

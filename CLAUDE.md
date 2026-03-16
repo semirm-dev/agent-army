@@ -33,6 +33,7 @@ Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 - **Bundled catalog**: `army/internal/core/catalog/catalog.json` (embedded via `go:embed`)
 - **Updated catalog**: `~/.army/catalog.json` (fetched by `update` command, merged over bundled)
 - **Manifest**: `~/.army/manifest.json` (user's plugin/skill selections)
+  - **Note:** If the manifest path is changed during setup (via `d` key), all subsequent commands (`sync`, `add`, `remove`, `list`) must use `--manifest <path>` to target it. There is no auto-detection — the default always resolves to `~/.army/manifest.json`.
 - **Installed plugins**: `~/.claude/plugins/installed_plugins.json`
 - **Installed skills**: `~/.agents/.skill-lock.json`
 - **Skill directories**: `~/.agents/skills/<name>/`
