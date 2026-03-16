@@ -4,23 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Agent Army is a bootstrapping system that generates platform-specific orchestration files (CLAUDE.md, Cursor AGENTS.md) from a unified spec library. It organizes AI development guidance into two layers: **Skills** (standards + workflows) → **Agents** (specialized roles), with transitive dependency resolution.
+Agent Army (armyv2) is an interactive CLI for managing Claude Code plugins and skills. It provides a TUI wizard for selecting plugins/skills, syncs installations to match a manifest, and runs health checks to detect drift.
 
 ## Build & Test Commands
 
 ```bash
-# army (v1) — spec bootstrapper
-make build              # Build the Go CLI binary (army/army)
-make test               # Run all Go tests with race detection
-make v1 manifest        # Scan army/spec/ frontmatter, resolve transitive deps, generate army/manifest.json
-make v1 resolve-deps    # Validate all dependency references, remove redundancies
-make v1 bootstrap       # Generate platform-specific output into army/.build/
-make v1 sync            # Install all plugins and skills from army/PLUGINS_AND_SKILLS.md
-make v1 update-plugins-skills  # Regenerate army/PLUGINS_AND_SKILLS.md from system state
-make v1 analyze         # Analyze installed plugins and skills, report duplicates
-make v1 analyze --fix   # Analyze and fix skill lock drift (remove stale entries)
-
-# armyv2 — plugin & skill manager
 make build-v2           # Build armyv2 CLI binary (armyv2/armyv2)
 make test-v2            # Run armyv2 tests with race detection
 make v2 setup           # Interactive TUI wizard — select plugins/skills, save manifest
@@ -34,28 +22,10 @@ make v2 remove          # Remove a plugin or skill from manifest (e.g. make v2 r
 
 Run a single test package:
 ```bash
-cd army && go test ./internal/graph/... -race -count=1
+cd armyv2 && go test ./internal/core/detector/... -race -count=1
 ```
 
 ## Architecture
-
-### Go CLI (`army/`)
-
-Entry point: `army/cmd/army/main.go` → `cli.NewRootCmd()`
-
-Key internal packages:
-- **`bootstrap/`** — Generates CLAUDE.md and Cursor AGENTS.md from spec templates + manifest
-- **`manifest/`** — Builds manifest.json with transitive dependency resolution
-- **`graph/`** — Dependency graph traversal for skills/agents
-- **`frontmatter/`** — YAML frontmatter parsing/writing for spec files
-- **`loader/`** — Loads skills, agents from `army/spec/` directory
-- **`resolver/`** — Conflict resolution for transitive dependencies
-- **`model/`** — Core data types: Skill, Agent
-- **`plugindoc/`** — Generates PLUGINS_AND_SKILLS.md and terminal analysis reports for installed plugins/skills
-- **`pluginsync/`** — Reads PLUGINS_AND_SKILLS.md and executes plugin/skill install + redundant skill cleanup
-- **`termcolor/`** — ANSI color helpers for formatted CLI output
-
-Dependencies: `cobra` (CLI framework), `gopkg.in/yaml.v3` (YAML parsing)
 
 ### Go CLI (`armyv2/`)
 
@@ -70,31 +40,21 @@ Commands: `setup`, `sync`, `add`, `remove`, `list`, `update`, `doctor`
 
 Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 
-### Spec Library (`army/spec/`)
-
-All specs use YAML frontmatter + Markdown content:
-- **`skills/`** (36 files) — Standards + workflow definitions with `uses_skills` dependencies
-- **`agents/`** (23 files) — Role definitions with `uses_skills`, `delegates_to`
-- **`claude/`** — Claude Code platform template (`CLAUDE.md`, `settings.json`)
-- **`cursor/`** — Cursor platform template
-
 ### Key Files
 
-- **`army/manifest.json`** — Auto-generated index of all skills and agents with resolved transitive dependencies. Regenerate with `make v1 manifest` after any spec change.
 - **`Makefile`** — All build orchestration
-- **`army/.build/`** — Generated output directory (gitignored)
-- **`army/PLUGINS_AND_SKILLS.md`** — Auto-generated report of installed Claude Code plugins and skills. Regenerate with `make v1 update-plugins-skills`.
+- **`armyv2/internal/core/catalog/catalog.json`** — Bundled catalog (embedded via `go:embed`)
+- **`~/.armyv2/catalog.json`** — Updated catalog (fetched by `update` command)
+- **`~/.armyv2/manifest.json`** — User's plugin/skill selections
 
 ## Development Workflow
 
-1. Edit specs in `army/spec/` (skills or agents)
-2. Run `make v1 resolve-deps` to validate dependency references
-3. Run `make v1 manifest` to regenerate `army/manifest.json`
-4. Run `make v1 bootstrap` to produce platform output in `army/.build/`
-5. Run `make test` to verify nothing broke
+1. Make changes in `armyv2/`
+2. Run `make build-v2` to build the binary
+3. Run `make test-v2` to verify nothing broke
 
 ## Conventions
 
 - Go CLI uses standard `internal/` package layout — no exported API
-- Spec frontmatter keys vary by type: skills have `uses_skills` and workflow context; agents add `role`/`access`/`delegates_to`/`uses_skills`/`uses_plugins`
+- Core packages must not import adapter or port packages
 - Commit messages follow Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`

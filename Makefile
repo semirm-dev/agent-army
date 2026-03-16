@@ -1,22 +1,9 @@
-.PHONY: help build build-v2 test test-v2 v1 v2
+.PHONY: help build-v2 test-v2 v2
 
-ARMY := army/army
 ARMYV2 := armyv2/armyv2
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
-	@echo ""
-	@echo "  === army (spec bootstrapper) ==="
-	@echo ""
-	@echo "  build          Build the army CLI binary."
-	@echo "  test           Run army Go test suite."
-	@echo "  v1 manifest    Scan army/spec/ frontmatter, resolve transitive deps, generate army/manifest.json."
-	@echo "  v1 resolve     Validate all dependency references, detect/remove redundancies."
-	@echo "  v1 bootstrap   Generate model-specific output into army/.build/."
-	@echo "  v1 sync        Install all plugins and skills listed in army/PLUGINS_AND_SKILLS.md."
-	@echo "  v1 update-plugins-skills  Regenerate army/PLUGINS_AND_SKILLS.md from system state."
-	@echo "  v1 analyze     Analyze installed plugins and skills, report duplicates."
-	@echo "  v1 analyze --fix  Analyze and fix skill lock drift (remove stale entries)."
 	@echo ""
 	@echo "  === armyv2 (plugin & skill manager) ==="
 	@echo ""
@@ -34,19 +21,6 @@ help: ## Show available targets
 	@echo "    ./armyv2/armyv2 add plugin context7 --no-install"
 	@echo "    ./armyv2/armyv2 sync --dry-run"
 
-# --- army targets ---
-
-$(ARMY): $(shell find army -name '*.go')
-	cd army && go build -o army ./cmd/army
-
-build: $(ARMY) ## Build the Go CLI binary
-
-test: ## Run Go tests with race detection
-	cd army && go test ./... -race -count=1
-
-v1: | $(ARMY) ## Run any army v1 command (e.g. make v1 sync)
-	cd army && ./army $(filter-out $@,$(MAKECMDGOALS))
-
 # --- armyv2 targets ---
 
 $(ARMYV2): $(shell find armyv2 -name '*.go') armyv2/internal/core/catalog/catalog.json
@@ -60,6 +34,6 @@ test-v2: ## Run armyv2 tests with race detection
 v2: | $(ARMYV2) ## Run any armyv2 command (e.g. make v2 setup)
 	$(ARMYV2) $(filter-out $@,$(MAKECMDGOALS))
 
-# Catch-all to swallow extra args passed to 'make v1/v2 ...'
+# Catch-all to swallow extra args passed to 'make v2 ...'
 %:
 	@:

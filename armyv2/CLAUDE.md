@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Interactive CLI for managing Claude Code plugins and skills. Lives in `armyv2/` within the agent-army repo. Separate Go module from `army/`.
+Interactive CLI for managing Claude Code plugins and skills. Lives in `armyv2/` within the agent-army repo.
 
 ## Build & Test
 
