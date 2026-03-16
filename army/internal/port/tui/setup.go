@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -179,11 +180,17 @@ func (m SetupModel) updateDestination(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.cursors[stepDestination] = m.cursor
 		if m.cursor == 0 {
 			m.destination = "user"
+			if home, err := os.UserHomeDir(); err == nil {
+				m.manifestPath = filepath.Join(home, ".army", "manifest.json")
+			}
 			m.initPluginItems(nil)
 			m.initSkillItems(nil)
 			m.step = stepPlugins
 		} else {
 			m.destination = "project"
+			if cwd, err := os.Getwd(); err == nil {
+				m.manifestPath = filepath.Join(cwd, ".army", "manifest.json")
+			}
 			m.initTechItems()
 			m.step = stepTechStack
 		}
@@ -259,8 +266,10 @@ func (m SetupModel) updateConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.cursor = m.cursors[prev]
 		return m, nil
 	case "d":
-		m.editingPath = true
-		m.pathInput = m.manifestPath
+		if m.destination == "project" {
+			m.editingPath = true
+			m.pathInput = m.manifestPath
+		}
 		return m, nil
 	}
 	return m, nil
@@ -481,7 +490,11 @@ func (m SetupModel) viewConfirm() string {
 		s.WriteString("\n  " + dimStyle.Render("Path: ") + m.pathInput + "█\n")
 		s.WriteString("\n  " + helpStyle.Render("enter save · esc cancel"))
 	} else {
-		s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · d edit path · enter confirm"))
+		if m.destination == "project" {
+			s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · d edit path · enter confirm"))
+		} else {
+			s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · enter confirm"))
+		}
 	}
 	return s.String()
 }

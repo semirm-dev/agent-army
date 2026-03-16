@@ -9,6 +9,7 @@ import (
 	"github.com/smahovkic/agent-army/army/internal/adapter/skill"
 	"github.com/smahovkic/agent-army/army/internal/adapter/system"
 	"github.com/smahovkic/agent-army/army/internal/core/catalog"
+	"github.com/smahovkic/agent-army/army/internal/core/config"
 	"github.com/smahovkic/agent-army/army/internal/core/manifest"
 	"github.com/smahovkic/agent-army/army/internal/core/orchestrator"
 	"github.com/smahovkic/agent-army/army/internal/core/types"
@@ -32,10 +33,28 @@ func resolveDeps() (*deps, error) {
 
 	manifestPath := globalFlags.ManifestPath
 	if manifestPath == "" {
-		manifestPath, err = manifest.DefaultPath()
-		if err != nil {
-			return nil, fmt.Errorf("determining manifest path: %w", err)
+		// Try directory-based config resolution.
+		cfg, cfgErr := config.Load()
+		if cfgErr == nil {
+			cwd, cwdErr := os.Getwd()
+			if cwdErr == nil {
+				if resolved := config.Resolve(cfg, cwd); resolved != "" {
+					manifestPath = resolved
+				}
+			}
 		}
+		// Fall back to default.
+		if manifestPath == "" {
+			manifestPath, err = manifest.DefaultPath()
+			if err != nil {
+				return nil, fmt.Errorf("determining manifest path: %w", err)
+			}
+		}
+	}
+
+	// Auto-register if --manifest was explicitly provided.
+	if globalFlags.ManifestPath != "" {
+		registerManifestMapping(manifestPath)
 	}
 
 	m, err := manifest.Load(manifestPath)
