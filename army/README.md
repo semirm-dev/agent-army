@@ -8,9 +8,9 @@ Interactive CLI for setting up and managing Claude Code plugins and skills. Main
 make build               # Build the binary
 make export              # Add army to PATH (uses .build/army by default)
 make export DEST=~/bin   # Copy binary to custom dir + add to PATH
-make army setup          # Launch interactive setup wizard
-make army list           # See what's in your manifest
-make army sync           # Install everything from your manifest
+army setup               # Launch interactive setup wizard
+army list                # See what's in your manifest
+army sync                # Install everything from your manifest
 ```
 
 ## Commands
@@ -51,25 +51,6 @@ make army sync           # Install everything from your manifest
 |------|-------------|
 | `--destination <user\|project>` | Override destination for all actions |
 | `--yes` / `-y` | Skip confirmation prompt |
-
-### Using via Make
-
-Simple commands work through make:
-
-```bash
-make army setup
-make army list
-make army doctor
-```
-
-For commands with flags, use the binary directly:
-
-```bash
-./.build/army add plugin context7 --no-install
-./.build/army sync --dry-run
-./.build/army sync --destination user --yes
-./.build/army remove skill golang-pro --manifest-only
-```
 
 ## How It Works
 

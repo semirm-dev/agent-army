@@ -50,7 +50,7 @@ Global flags: `--dry-run`, `--manifest <path>`, `--verbose`
 
 - `--destination <user|project>` — Override destination for all actions
 - `--yes` / `-y` — Skip confirmation prompt
-- Reads from `/dev/tty` for interactive confirmation (works through `make`)
+- Reads from `/dev/tty` for interactive confirmation
 
 ### setup TUI
 
