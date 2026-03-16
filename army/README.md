@@ -5,7 +5,9 @@ Interactive CLI for setting up and managing Claude Code plugins and skills. Main
 ## Quick Start
 
 ```bash
-make build          # Build the binary
+make build               # Build the binary
+make export              # Add army to PATH (uses .build/army by default)
+make export DEST=~/bin   # Copy binary to custom dir + add to PATH
 make army setup          # Launch interactive setup wizard
 make army list           # See what's in your manifest
 make army sync           # Install everything from your manifest

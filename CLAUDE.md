@@ -10,6 +10,8 @@ Agent Army (army) is an interactive CLI for managing Claude Code plugins and ski
 
 ```bash
 make build                                             # Build binary (army/army)
+make export                                            # Add army to PATH (default: .build/army)
+make export DEST=~/bin                                 # Copy binary to custom dir + add to PATH
 make test                                              # All tests with race detection
 cd army && go test ./internal/core/detector/... -race   # Single package
 ```
