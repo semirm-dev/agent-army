@@ -3,7 +3,6 @@ package orchestrator
 import (
 	"fmt"
 	"io"
-	"sync"
 
 	"github.com/smahovkic/agent-army/army/internal/core/diff"
 	"github.com/smahovkic/agent-army/army/internal/core/types"
@@ -108,8 +107,8 @@ func (o *Orchestrator) PlanActions(manifest *types.Manifest) ([]types.Action, er
 	return actions, nil
 }
 
-// Execute runs the given actions. Plugins are installed in parallel,
-// skills sequentially. Continues on failure and reports all errors at the end.
+// Execute runs the given actions sequentially to avoid races on the external
+// state files managed by the claude CLI. Continues on failure and reports all errors.
 func (o *Orchestrator) Execute(actions []types.Action) Result {
 	var pluginActions, skillActions []types.Action
 	for _, a := range actions {
@@ -123,12 +122,14 @@ func (o *Orchestrator) Execute(actions []types.Action) Result {
 
 	result := Result{}
 
-	// Execute plugin actions in parallel
-	if len(pluginActions) > 0 {
-		r := o.executePluginsParallel(pluginActions)
-		result.Succeeded += r.Succeeded
-		result.Failed += r.Failed
-		result.Errors = append(result.Errors, r.Errors...)
+	// Execute plugin actions sequentially to avoid races on installed_plugins.json
+	for _, a := range pluginActions {
+		if err := o.executeAction(a); err != nil {
+			result.Failed++
+			result.Errors = append(result.Errors, err)
+		} else {
+			result.Succeeded++
+		}
 	}
 
 	// Execute skill actions sequentially
@@ -169,31 +170,6 @@ func (o *Orchestrator) InstallItems(plugins []types.ManifestPlugin, skills []typ
 	}
 
 	return o.Execute(actions)
-}
-
-func (o *Orchestrator) executePluginsParallel(actions []types.Action) Result {
-	var mu sync.Mutex
-	result := Result{}
-	var wg sync.WaitGroup
-
-	for _, a := range actions {
-		wg.Add(1)
-		go func(action types.Action) {
-			defer wg.Done()
-			err := o.executeAction(action)
-			mu.Lock()
-			defer mu.Unlock()
-			if err != nil {
-				result.Failed++
-				result.Errors = append(result.Errors, err)
-			} else {
-				result.Succeeded++
-			}
-		}(a)
-	}
-
-	wg.Wait()
-	return result
 }
 
 func (o *Orchestrator) executeAction(a types.Action) error {
