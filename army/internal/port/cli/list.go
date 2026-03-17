@@ -47,7 +47,13 @@ func newListCmd() *cobra.Command {
 			home, _ := os.UserHomeDir()
 
 			if len(d.manifest.Plugins) > 0 {
-				fmt.Println("Plugins:")
+				installedCount := 0
+				for _, p := range d.manifest.Plugins {
+					if _, found := pluginMap[p.Name]; found {
+						installedCount++
+					}
+				}
+				fmt.Printf("%sPlugins (%d/%d):%s\n", bold, installedCount, len(d.manifest.Plugins), reset)
 				for _, p := range d.manifest.Plugins {
 					ip, found := pluginMap[p.Name]
 					status := pluginStatus(found, ip)
@@ -57,7 +63,13 @@ func newListCmd() *cobra.Command {
 			}
 
 			if len(d.manifest.Skills) > 0 {
-				fmt.Println("Skills:")
+				installedCount := 0
+				for _, s := range d.manifest.Skills {
+					if skillSet[s.Name] {
+						installedCount++
+					}
+				}
+				fmt.Printf("%sSkills (%d/%d):%s\n", bold, installedCount, len(d.manifest.Skills), reset)
 				for _, s := range d.manifest.Skills {
 					status := skillStatus(skillSet[s.Name], s.Name, home)
 					fmt.Printf("  %s %s (%s, %s)\n", status, s.Name, s.Source, s.Destination)
@@ -71,23 +83,23 @@ func newListCmd() *cobra.Command {
 
 func pluginStatus(inJSON bool, ip types.InstalledPlugin) string {
 	if !inJSON {
-		return "\033[31m✗\033[0m"
+		return red + "✗" + reset
 	}
 	if ip.InstallPath != "" {
 		if _, err := os.Stat(ip.InstallPath); os.IsNotExist(err) {
-			return "\033[33m⚠\033[0m"
+			return yellow + "⚠" + reset
 		}
 	}
-	return "\033[32m✓\033[0m"
+	return green + "✓" + reset
 }
 
 func skillStatus(inLock bool, name, home string) string {
 	if !inLock {
-		return "\033[31m✗\033[0m"
+		return red + "✗" + reset
 	}
 	skillDir := filepath.Join(home, ".agents", "skills", name)
 	if _, err := os.Stat(skillDir); os.IsNotExist(err) {
-		return "\033[33m⚠\033[0m"
+		return yellow + "⚠" + reset
 	}
-	return "\033[32m✓\033[0m"
+	return green + "✓" + reset
 }
