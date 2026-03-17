@@ -15,22 +15,10 @@
       "tags": ["universal", "docs", "memory"]
     },
     {
-      "name": "code-review",
-      "marketplace": "claude-plugins-official",
-      "description": "Automated code review for pull requests using multiple specialized agents with confidence-based scoring.",
-      "tags": ["universal", "review", "quality"]
-    },
-    {
       "name": "code-simplifier",
       "marketplace": "claude-plugins-official",
       "description": "Agent that simplifies and refines code for clarity, consistency, and maintainability while preserving functionality.",
       "tags": ["universal", "refactoring", "quality"]
-    },
-    {
-      "name": "coderabbit",
-      "marketplace": "claude-plugins-official",
-      "description": "AI-powered code review in Claude Code, powered by CodeRabbit.",
-      "tags": ["universal", "review", "quality"]
     },
     {
       "name": "context7",
