@@ -22,7 +22,7 @@ army sync                # Install everything from your manifest
 | `add` | Add a plugin or skill to manifest (`add plugin context7`, `add skill golang-pro`) |
 | `remove` | Remove a plugin or skill from manifest (`remove plugin context7`) |
 | `list` | Show manifest items with install status (`✓` ok, `⚠` broken on disk, `✗` missing) |
-| `update` | Fetch latest catalog from GitHub into `~/.army/catalog.json` |
+| `fetch-catalog` | Fetch latest catalog from GitHub into `~/.army/catalog.json` |
 | `doctor` | Run health checks — missing items, orphans, disk drift (skill dirs + plugin installPaths). **Project-level manifests skip orphan warnings** |
 
 ### Global Flags
@@ -53,7 +53,7 @@ army sync                # Install everything from your manifest
 
 ## How It Works
 
-1. **Catalog** — Bundled JSON with all known plugins, skills, and tech profiles. Updated via `army update`.
+1. **Catalog** — Bundled JSON with all known plugins, skills, and tech profiles. Updated via `army fetch-catalog`.
 2. **Manifest** — Tracks your selected plugins and skills. Paths: `~/.army/manifest.json` (user-level) or `<cwd>/.army/manifest.json` (project-level). Resolution walks up from cwd looking for `.army/manifest.json` (like `.git` discovery), falls back to `~/.army/manifest.json`.
 3. **Tech detection** — Scans project directory for markers (go.mod, package.json deps, tsconfig.json, etc.) and recommends relevant plugins/skills.
 4. **Sync** — Compares manifest against installed state, installs missing items, removes extras (user-level manifests only — project-level manifests skip orphan removal since they describe a subset of the system).

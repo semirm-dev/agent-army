@@ -29,7 +29,7 @@ func NewRootCmd() *cobra.Command {
 		newAddCmd(),
 		newRemoveCmd(),
 		newListCmd(),
-		newUpdateCmd(),
+		newFetchCatalogCmd(),
 		newDoctorCmd(),
 		newDetectCmd(),
 	)

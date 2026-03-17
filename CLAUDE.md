@@ -31,7 +31,7 @@ Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 ## Key Data Paths
 
 - **Bundled catalog**: `army/internal/core/catalog/catalog.json` (embedded via `go:embed`)
-- **Updated catalog**: `~/.army/catalog.json` (fetched by `update` command, merged over bundled)
+- **Updated catalog**: `~/.army/catalog.json` (fetched by `fetch-catalog` command, merged over bundled)
 - **Manifest**: `~/.army/manifest.json` (user-level) or `<cwd>/.army/manifest.json` (project-level)
   - **Resolution**: walks up from cwd looking for `.army/manifest.json` (like `.git` discovery), falls back to `~/.army/manifest.json`
 - **Installed plugins**: `~/.claude/plugins/installed_plugins.json`
@@ -40,7 +40,7 @@ Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 
 ## Commands
 
-`setup`, `sync`, `add`, `remove`, `list`, `update`, `doctor`
+`setup`, `sync`, `add`, `remove`, `list`, `fetch-catalog`, `doctor`
 
 Global flags: `--dry-run`, `--verbose`
 

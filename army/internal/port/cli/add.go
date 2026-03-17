@@ -35,7 +35,7 @@ func newAddPluginCmd() *cobra.Command {
 
 			cp, found := d.catalog.FindPlugin(name)
 			if !found {
-				return fmt.Errorf("plugin %q not found in catalog. Run 'army update' to refresh", name)
+				return fmt.Errorf("plugin %q not found in catalog. Run 'army fetch-catalog' to refresh", name)
 			}
 
 			dest := "user"
@@ -94,7 +94,7 @@ func newAddSkillCmd() *cobra.Command {
 
 			cs, found := d.catalog.FindSkill(name)
 			if !found {
-				return fmt.Errorf("skill %q not found in catalog. Run 'army update' to refresh", name)
+				return fmt.Errorf("skill %q not found in catalog. Run 'army fetch-catalog' to refresh", name)
 			}
 
 			dest := "user"

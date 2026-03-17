@@ -13,11 +13,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const catalogURL = "https://raw.githubusercontent.com/smahovkic/agent-army/main/army/internal/core/catalog/catalog.json"
+const catalogURL = "https://raw.githubusercontent.com/semirm-dev/agent-army/main/army/internal/core/catalog/catalog.json"
 
-func newUpdateCmd() *cobra.Command {
+func newFetchCatalogCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "update",
+		Use:   "fetch-catalog",
 		Short: "Fetch latest catalog from GitHub",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Fetching latest catalog...")
@@ -63,7 +63,7 @@ func newUpdateCmd() *cobra.Command {
 				return fmt.Errorf("writing catalog: %w", err)
 			}
 
-			fmt.Printf("Catalog updated: %s\n", path)
+			fmt.Printf("Catalog saved: %s\n", path)
 			return nil
 		},
 	}
