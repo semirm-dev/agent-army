@@ -22,9 +22,9 @@ func New(r runner.Runner) *Adapter {
 	return &Adapter{runner: r}
 }
 
-// Install runs: npx @anthropic-ai/claude-code-skills add <name> -s <source> -y
+// Install runs: npx skills add <source> -s <name> -g -y
 func (a *Adapter) Install(name, source string) error {
-	_, err := a.runner.Run("npx", "@anthropic-ai/claude-code-skills", "add", name, "-s", source, "-y")
+	_, err := a.runner.Run("npx", "skills", "add", source, "-s", name, "-g", "-y")
 	if err != nil {
 		return fmt.Errorf("installing skill %s from %s: %w", name, source, err)
 	}
