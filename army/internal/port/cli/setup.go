@@ -33,7 +33,6 @@ func newSetupCmd() *cobra.Command {
 				if err := manifest.Save(savePath, m.ResultManifest()); err != nil {
 					return fmt.Errorf("saving manifest: %w", err)
 				}
-				registerManifestMapping(savePath)
 				fmt.Println("Manifest saved to", savePath)
 				fmt.Println("Run 'army sync' to install your selections.")
 			}

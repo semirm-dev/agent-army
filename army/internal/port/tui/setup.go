@@ -55,8 +55,6 @@ type SetupModel struct {
 	manifestPath string      // output path for manifest
 	filter       string
 	filtering    bool
-	editingPath  bool   // true when editing manifest path on confirm step
-	pathInput    string // buffer for path editing
 
 	// Step data
 	techItems   []selectableItem
@@ -127,12 +125,12 @@ func (m SetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitted = true
 			return m, tea.Quit
 		case "q":
-			if !m.filtering && !m.editingPath {
+			if !m.filtering {
 				m.quitted = true
 				return m, tea.Quit
 			}
 		case "left":
-			if !m.filtering && !m.editingPath && m.step != stepDestination && m.step != stepDone {
+			if !m.filtering && m.step != stepDestination && m.step != stepDone {
 				m.cursors[m.step] = m.cursor
 				prev := m.previousStep()
 				m.step = prev
@@ -249,9 +247,6 @@ func (m SetupModel) updateMultiSelect(msg tea.KeyMsg, items *[]selectableItem, n
 }
 
 func (m SetupModel) updateConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	if m.editingPath {
-		return m.handlePathInput(msg)
-	}
 	switch msg.String() {
 	case "y", "Y", "enter":
 		m.buildResultManifest()
@@ -259,37 +254,11 @@ func (m SetupModel) updateConfirm(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.step = stepDone
 		return m, tea.Quit
 	case "n", "N":
-		// Go back to skills instead of quitting
 		m.cursors[m.step] = m.cursor
 		prev := m.previousStep()
 		m.step = prev
 		m.cursor = m.cursors[prev]
 		return m, nil
-	case "d":
-		if m.destination == "project" {
-			m.editingPath = true
-			m.pathInput = m.manifestPath
-		}
-		return m, nil
-	}
-	return m, nil
-}
-
-func (m SetupModel) handlePathInput(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	switch msg.String() {
-	case "enter":
-		m.manifestPath = m.pathInput
-		m.editingPath = false
-	case "esc":
-		m.editingPath = false
-	case "backspace":
-		if len(m.pathInput) > 0 {
-			m.pathInput = m.pathInput[:len(m.pathInput)-1]
-		}
-	default:
-		if len(msg.String()) == 1 {
-			m.pathInput += msg.String()
-		}
 	}
 	return m, nil
 }
@@ -486,16 +455,7 @@ func (m SetupModel) viewConfirm() string {
 		strings.Join(selSkills, ", ")))
 	s.WriteString(fmt.Sprintf("  Destination: %s (%s)\n", m.destination, tildefy(m.manifestPath)))
 
-	if m.editingPath {
-		s.WriteString("\n  " + dimStyle.Render("Path: ") + m.pathInput + "█\n")
-		s.WriteString("\n  " + helpStyle.Render("enter save · esc cancel"))
-	} else {
-		if m.destination == "project" {
-			s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · d edit path · enter confirm"))
-		} else {
-			s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · enter confirm"))
-		}
-	}
+	s.WriteString("\n  " + helpStyle.Render("Proceed? [Y/n] · ← back · enter confirm"))
 	return s.String()
 }
 

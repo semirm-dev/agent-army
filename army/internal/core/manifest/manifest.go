@@ -28,6 +28,24 @@ func IsDefault(path string) bool {
 	return filepath.Clean(path) == filepath.Clean(def)
 }
 
+// ResolveFromDir walks up from dir looking for .army/manifest.json.
+// Returns the first match found, or falls back to DefaultPath().
+func ResolveFromDir(dir string) (string, error) {
+	dir = filepath.Clean(dir)
+	for {
+		candidate := filepath.Join(dir, ".army", "manifest.json")
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+	return DefaultPath()
+}
+
 // Load reads a manifest from the given path. If the file does not exist,
 // it returns an empty manifest with version 1.
 func Load(path string) (*types.Manifest, error) {

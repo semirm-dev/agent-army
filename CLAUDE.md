@@ -22,7 +22,7 @@ Entry point: `army/cmd/army/main.go` → `cli.NewRootCmd()`
 
 Ports & Adapters. Three layers, strict dependency direction: adapters → core ← ports.
 
-- **`internal/core/`** — Pure domain logic, no I/O, no external deps beyond stdlib. Packages: `types`, `catalog`, `config`, `manifest`, `detector`, `orchestrator`, `diff`, `doctor`.
+- **`internal/core/`** — Pure domain logic, no I/O, no external deps beyond stdlib. Packages: `types`, `catalog`, `manifest`, `detector`, `orchestrator`, `diff`, `doctor`.
 - **`internal/port/`** — User-facing. CLI (Cobra) and TUI (Bubble Tea).
 - **`internal/adapter/`** — External integration. Plugin installer (`claude plugin install`), skill installer (`npx skills add`), system reader (parses `installed_plugins.json` and `.skill-lock.json`), command runner (real + dry-run).
 
@@ -32,10 +32,8 @@ Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 
 - **Bundled catalog**: `army/internal/core/catalog/catalog.json` (embedded via `go:embed`)
 - **Updated catalog**: `~/.army/catalog.json` (fetched by `update` command, merged over bundled)
-- **Config**: `~/.army/config.json` (directory→manifest mappings, auto-managed)
-- **Manifest**: `~/.army/manifest.json` (user-level default) or `<cwd>/.army/manifest.json` (project-level default)
-  - **Resolution order** (no `--manifest` flag): config.json dir_map lookup (walks cwd up parents) → `~/.army/manifest.json` fallback
-  - **Auto-registration**: `army setup` with project-level destination and `--manifest` flag usage automatically register cwd→manifest mappings in config.json
+- **Manifest**: `~/.army/manifest.json` (user-level) or `<cwd>/.army/manifest.json` (project-level)
+  - **Resolution**: walks up from cwd looking for `.army/manifest.json` (like `.git` discovery), falls back to `~/.army/manifest.json`
 - **Installed plugins**: `~/.claude/plugins/installed_plugins.json`
 - **Installed skills**: `~/.agents/.skill-lock.json`
 - **Skill directories**: `~/.agents/skills/<name>/`
@@ -44,7 +42,7 @@ Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
 
 `setup`, `sync`, `add`, `remove`, `list`, `update`, `doctor`
 
-Global flags: `--dry-run`, `--manifest <path>`, `--verbose`
+Global flags: `--dry-run`, `--verbose`
 
 ### Orphan handling
 
@@ -59,8 +57,7 @@ Orphans (installed items not in manifest) are only relevant for user-level manif
 ### setup TUI
 
 - Saves/restores cursor positions when navigating between steps
-- Destination choice sets default manifest path: user → `~/.army/manifest.json`, project → `<cwd>/.army/manifest.json`
-- Confirm step supports inline manifest path editing via `d` key (project-level only; user-level path is fixed)
+- Destination choice sets manifest path: user → `~/.army/manifest.json`, project → `<cwd>/.army/manifest.json` (fixed, not editable)
 
 ## Conventions
 
@@ -76,7 +73,7 @@ Orphans (installed items not in manifest) are only relevant for user-level manif
 
 ## Testing
 
-72 tests across 6 core packages: `catalog`, `config`, `manifest`, `detector`, `diff`, `doctor`. Tests use `t.TempDir()` and don't touch real system state (except `doctor_test.go` which creates temp dirs under `~/.agents/skills/`).
+Tests across 5 core packages: `catalog`, `manifest`, `detector`, `diff`, `doctor`. Tests use `t.TempDir()` and don't touch real system state (except `doctor_test.go` which creates temp dirs under `~/.agents/skills/`).
 
 ## Development Workflow
 

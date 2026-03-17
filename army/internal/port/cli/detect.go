@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/smahovkic/agent-army/army/internal/core/config"
 	"github.com/smahovkic/agent-army/army/internal/core/manifest"
 	"github.com/spf13/cobra"
 )
@@ -49,16 +48,6 @@ func runDetect() error {
 		return fmt.Errorf("getting home directory: %w", err)
 	}
 
-	// Config
-	configPath, err := config.Path()
-	if err != nil {
-		return fmt.Errorf("resolving config path: %w", err)
-	}
-	configValue := dim + "none" + reset + "  " + yellow + "(using defaults)" + reset
-	if fileExists(configPath) {
-		configValue = configPath
-	}
-
 	// Catalog
 	overlayPath := filepath.Join(home, ".army", "catalog.json")
 	catalogValue := "embedded"
@@ -67,7 +56,7 @@ func runDetect() error {
 	}
 
 	// Manifest
-	manifestPath, provenance := resolveManifestWithProvenance(configPath, cwd)
+	manifestPath, provenance := resolveManifestWithProvenance(cwd)
 	if manifestPath == "" {
 		return fmt.Errorf("could not determine manifest path")
 	}
@@ -95,7 +84,6 @@ func runDetect() error {
 	}
 
 	rows := []tableRow{
-		{"Config", configValue, ""},
 		{"Catalog", catalogValue, ""},
 		{"Manifest", manifestValue, provenance},
 		{"Plugins DB", pluginsValue, ""},
@@ -160,23 +148,15 @@ func runDetect() error {
 	return nil
 }
 
-func resolveManifestWithProvenance(configPath, cwd string) (string, string) {
-	if globalFlags.ManifestPath != "" {
-		return globalFlags.ManifestPath, "via --manifest flag"
-	}
-
-	cfg, err := config.Load()
-	if err == nil {
-		if resolved := config.Resolve(cfg, cwd); resolved != "" {
-			return resolved, "via config.json dir_map"
-		}
-	}
-
-	defaultPath, err := manifest.DefaultPath()
+func resolveManifestWithProvenance(cwd string) (string, string) {
+	manifestPath, err := manifest.ResolveFromDir(cwd)
 	if err != nil {
 		return "", ""
 	}
-	return defaultPath, "via default (~/.army/manifest.json)"
+	if manifest.IsDefault(manifestPath) {
+		return manifestPath, "via default (~/.army/manifest.json)"
+	}
+	return manifestPath, "via project .army/manifest.json"
 }
 
 func fileExists(path string) bool {

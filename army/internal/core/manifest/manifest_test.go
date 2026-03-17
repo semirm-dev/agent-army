@@ -271,3 +271,70 @@ func TestHasSkill(t *testing.T) {
 		})
 	}
 }
+
+func TestResolveFromDir_FindsManifestInParent(t *testing.T) {
+	// Create: root/.army/manifest.json
+	// Call ResolveFromDir from root/a/b/c — should walk up and find it.
+	root := t.TempDir()
+	armyDir := filepath.Join(root, ".army")
+	if err := os.MkdirAll(armyDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll: %v", err)
+	}
+	manifestPath := filepath.Join(armyDir, "manifest.json")
+	if err := os.WriteFile(manifestPath, []byte(`{"version":1}`), 0o644); err != nil {
+		t.Fatalf("WriteFile: %v", err)
+	}
+
+	subdir := filepath.Join(root, "a", "b", "c")
+	if err := os.MkdirAll(subdir, 0o755); err != nil {
+		t.Fatalf("MkdirAll: %v", err)
+	}
+
+	got, err := ResolveFromDir(subdir)
+	if err != nil {
+		t.Fatalf("ResolveFromDir: %v", err)
+	}
+	if got != manifestPath {
+		t.Errorf("got %q, want %q", got, manifestPath)
+	}
+}
+
+func TestResolveFromDir_FindsManifestInExactDir(t *testing.T) {
+	// Call ResolveFromDir from the exact directory containing .army/manifest.json.
+	root := t.TempDir()
+	armyDir := filepath.Join(root, ".army")
+	if err := os.MkdirAll(armyDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll: %v", err)
+	}
+	manifestPath := filepath.Join(armyDir, "manifest.json")
+	if err := os.WriteFile(manifestPath, []byte(`{"version":1}`), 0o644); err != nil {
+		t.Fatalf("WriteFile: %v", err)
+	}
+
+	got, err := ResolveFromDir(root)
+	if err != nil {
+		t.Fatalf("ResolveFromDir: %v", err)
+	}
+	if got != manifestPath {
+		t.Errorf("got %q, want %q", got, manifestPath)
+	}
+}
+
+func TestResolveFromDir_FallsBackToDefault(t *testing.T) {
+	// Use an empty temp dir with no .army/manifest.json anywhere up the tree.
+	// ResolveFromDir should fall back to DefaultPath().
+	dir := t.TempDir()
+
+	got, err := ResolveFromDir(dir)
+	if err != nil {
+		t.Fatalf("ResolveFromDir: %v", err)
+	}
+
+	want, err := DefaultPath()
+	if err != nil {
+		t.Fatalf("DefaultPath: %v", err)
+	}
+	if got != want {
+		t.Errorf("got %q, want default %q", got, want)
+	}
+}

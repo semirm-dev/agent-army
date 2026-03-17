@@ -6,9 +6,8 @@ import (
 
 // GlobalFlags holds flags shared across all commands.
 type GlobalFlags struct {
-	DryRun       bool
-	ManifestPath string
-	Verbose      bool
+	DryRun  bool
+	Verbose bool
 }
 
 var globalFlags GlobalFlags
@@ -22,7 +21,6 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	cmd.PersistentFlags().BoolVar(&globalFlags.DryRun, "dry-run", false, "Print commands without executing")
-	cmd.PersistentFlags().StringVar(&globalFlags.ManifestPath, "manifest", "", "Override manifest path (default: ~/.army/manifest.json)")
 	cmd.PersistentFlags().BoolVar(&globalFlags.Verbose, "verbose", false, "Verbose output")
 
 	cmd.AddCommand(
