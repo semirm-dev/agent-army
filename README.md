@@ -17,7 +17,7 @@ army sync                # Install everything from your manifest
 
 | Command | Description |
 |---------|-------------|
-| `setup` | Interactive TUI wizard — pick destination, detect tech stack, select plugins & skills. Destination sets default manifest path (user: `~/.army/manifest.json`, project: `<cwd>/.army/manifest.json`). Path editing via `d` key on confirm step (project-level only) |
+| `setup` | Interactive TUI wizard — pick destination, detect tech stack, select plugins & skills. Fixed manifest paths: user → `~/.army/manifest.json`, project → `<cwd>/.army/manifest.json` |
 | `sync` | Install missing + remove extras to match manifest. Shows plan and asks for confirmation. Supports interactive destination editing. **Project-level manifests skip orphan removal** — only installs missing items |
 | `add` | Add a plugin or skill to manifest (`add plugin context7`, `add skill golang-pro`) |
 | `remove` | Remove a plugin or skill from manifest (`remove plugin context7`) |
@@ -30,7 +30,6 @@ army sync                # Install everything from your manifest
 | Flag | Description |
 |------|-------------|
 | `--dry-run` | Print commands without executing |
-| `--manifest <path>` | Override manifest path (default: auto-resolved from `~/.army/config.json` by cwd, then `~/.army/manifest.json`) |
 | `--verbose` | Verbose output |
 
 ### Add Flags
@@ -55,27 +54,25 @@ army sync                # Install everything from your manifest
 ## How It Works
 
 1. **Catalog** — Bundled JSON with all known plugins, skills, and tech profiles. Updated via `army update`.
-2. **Manifest** — Tracks your selected plugins and skills. Default paths: `~/.army/manifest.json` (user-level) or `<cwd>/.army/manifest.json` (project-level).
-3. **Config** — `~/.army/config.json` maps directories to manifest paths. Auto-populated when you run `army setup` with project-level destination or use `--manifest`. Commands auto-resolve the correct manifest by walking up from cwd.
-4. **Tech detection** — Scans project directory for markers (go.mod, package.json deps, tsconfig.json, etc.) and recommends relevant plugins/skills.
-5. **Sync** — Compares manifest against installed state, installs missing items, removes extras (user-level manifests only — project-level manifests skip orphan removal since they describe a subset of the system).
+2. **Manifest** — Tracks your selected plugins and skills. Paths: `~/.army/manifest.json` (user-level) or `<cwd>/.army/manifest.json` (project-level). Resolution walks up from cwd looking for `.army/manifest.json` (like `.git` discovery), falls back to `~/.army/manifest.json`.
+3. **Tech detection** — Scans project directory for markers (go.mod, package.json deps, tsconfig.json, etc.) and recommends relevant plugins/skills.
+4. **Sync** — Compares manifest against installed state, installs missing items, removes extras (user-level manifests only — project-level manifests skip orphan removal since they describe a subset of the system).
 
 ## Architecture
 
 Ports & Adapters (hexagonal):
 
 ```
-internal/
+army/internal/
 ├── core/              # Pure domain logic (no I/O)
 │   ├── types/         # Shared data structures
 │   ├── catalog/       # Catalog loading, merging, embedded JSON
-│   ├── config/        # Config file (dir→manifest mappings) with atomic writes
-│   ├── manifest/      # Manifest CRUD with atomic writes
+│   ├── manifest/      # Manifest CRUD with atomic writes, walk-up resolution
 │   ├── detector/      # Tech stack detection from project files
 │   ├── orchestrator/  # Action planning and execution coordination
 │   ├── diff/          # Manifest vs installed comparison
 │   └── doctor/        # Health checks
-├── port/              # User-facing interfaces
+├── port/              # User-facing
 │   ├── cli/           # Cobra commands
 │   └── tui/           # Bubble Tea setup wizard
 └── adapter/           # External system integration
