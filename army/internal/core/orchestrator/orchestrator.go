@@ -3,6 +3,7 @@ package orchestrator
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/smahovkic/agent-army/army/internal/core/diff"
 	"github.com/smahovkic/agent-army/army/internal/core/types"
@@ -96,6 +97,87 @@ func (o *Orchestrator) PlanActions(manifest *types.Manifest) ([]types.Action, er
 	}
 
 	for _, s := range d.ExtraSkills {
+		actions = append(actions, types.Action{
+			Type:     "remove",
+			ItemType: "skill",
+			Name:     s.Name,
+			Source:   s.Source,
+		})
+	}
+
+	return actions, nil
+}
+
+// PlanClear produces remove actions for all manifest items that are currently installed.
+func (o *Orchestrator) PlanClear(manifest *types.Manifest) ([]types.Action, error) {
+	installedPlugins, err := o.system.InstalledPlugins()
+	if err != nil {
+		return nil, fmt.Errorf("reading installed plugins: %w", err)
+	}
+	installedSkills, err := o.system.InstalledSkills()
+	if err != nil {
+		return nil, fmt.Errorf("reading installed skills: %w", err)
+	}
+
+	pluginSet := make(map[string]bool, len(installedPlugins))
+	for _, p := range installedPlugins {
+		pluginSet[strings.ToLower(p.Name)] = true
+	}
+	skillSet := make(map[string]bool, len(installedSkills))
+	for _, s := range installedSkills {
+		skillSet[strings.ToLower(s.Name)] = true
+	}
+
+	var actions []types.Action
+
+	for _, mp := range manifest.Plugins {
+		if pluginSet[strings.ToLower(mp.Name)] {
+			actions = append(actions, types.Action{
+				Type:     "remove",
+				ItemType: "plugin",
+				Name:     mp.Name,
+				Source:   mp.Marketplace,
+			})
+		}
+	}
+
+	for _, ms := range manifest.Skills {
+		if skillSet[strings.ToLower(ms.Name)] {
+			actions = append(actions, types.Action{
+				Type:     "remove",
+				ItemType: "skill",
+				Name:     ms.Name,
+				Source:   ms.Source,
+			})
+		}
+	}
+
+	return actions, nil
+}
+
+// PlanFullClear produces remove actions for every installed plugin and skill.
+func (o *Orchestrator) PlanFullClear() ([]types.Action, error) {
+	installedPlugins, err := o.system.InstalledPlugins()
+	if err != nil {
+		return nil, fmt.Errorf("reading installed plugins: %w", err)
+	}
+	installedSkills, err := o.system.InstalledSkills()
+	if err != nil {
+		return nil, fmt.Errorf("reading installed skills: %w", err)
+	}
+
+	var actions []types.Action
+
+	for _, p := range installedPlugins {
+		actions = append(actions, types.Action{
+			Type:     "remove",
+			ItemType: "plugin",
+			Name:     p.Name,
+			Source:   p.Marketplace,
+		})
+	}
+
+	for _, s := range installedSkills {
 		actions = append(actions, types.Action{
 			Type:     "remove",
 			ItemType: "skill",

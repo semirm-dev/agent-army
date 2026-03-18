@@ -202,6 +202,145 @@ func TestExecute_Empty(t *testing.T) {
 	}
 }
 
+func TestPlanClear_RemovesInstalledManifestItems(t *testing.T) {
+	sys := &mockSystemReader{
+		plugins: []types.InstalledPlugin{
+			{Name: "p1", Marketplace: "m"},
+			{Name: "p2", Marketplace: "m"},
+			{Name: "orphan", Marketplace: "m"},
+		},
+		skills: []types.InstalledSkill{
+			{Name: "s1", Source: "src"},
+			{Name: "orphan-s", Source: "src"},
+		},
+	}
+	orch := New(&mockPluginInstaller{}, &mockSkillInstaller{}, sys, &bytes.Buffer{})
+
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{
+			{Name: "p1", Marketplace: "m"},
+			{Name: "p2", Marketplace: "m"},
+			{Name: "not-installed", Marketplace: "m"},
+		},
+		Skills: []types.ManifestSkill{
+			{Name: "s1", Source: "src"},
+		},
+	}
+
+	actions, err := orch.PlanClear(manifest)
+	if err != nil {
+		t.Fatalf("PlanClear: %v", err)
+	}
+
+	// Should only get remove actions for p1, p2, s1 (installed + in manifest)
+	// "not-installed" is skipped (not on system), "orphan"/"orphan-s" are skipped (not in manifest)
+	if len(actions) != 3 {
+		t.Fatalf("actions count: got %d, want 3", len(actions))
+	}
+	for _, a := range actions {
+		if a.Type != "remove" {
+			t.Errorf("expected remove action, got %q", a.Type)
+		}
+	}
+}
+
+func TestPlanClear_EmptyManifest(t *testing.T) {
+	sys := &mockSystemReader{
+		plugins: []types.InstalledPlugin{{Name: "p1", Marketplace: "m"}},
+		skills:  []types.InstalledSkill{{Name: "s1", Source: "src"}},
+	}
+	orch := New(&mockPluginInstaller{}, &mockSkillInstaller{}, sys, &bytes.Buffer{})
+
+	actions, err := orch.PlanClear(&types.Manifest{})
+	if err != nil {
+		t.Fatalf("PlanClear: %v", err)
+	}
+	if len(actions) != 0 {
+		t.Errorf("actions count: got %d, want 0", len(actions))
+	}
+}
+
+func TestPlanClear_NothingInstalled(t *testing.T) {
+	sys := &mockSystemReader{}
+	orch := New(&mockPluginInstaller{}, &mockSkillInstaller{}, sys, &bytes.Buffer{})
+
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{{Name: "p1", Marketplace: "m"}},
+		Skills:  []types.ManifestSkill{{Name: "s1", Source: "src"}},
+	}
+
+	actions, err := orch.PlanClear(manifest)
+	if err != nil {
+		t.Fatalf("PlanClear: %v", err)
+	}
+	if len(actions) != 0 {
+		t.Errorf("actions count: got %d, want 0", len(actions))
+	}
+}
+
+func TestPlanClear_CaseInsensitive(t *testing.T) {
+	sys := &mockSystemReader{
+		plugins: []types.InstalledPlugin{{Name: "myplugin", Marketplace: "m"}},
+		skills:  []types.InstalledSkill{{Name: "MySkill", Source: "src"}},
+	}
+	orch := New(&mockPluginInstaller{}, &mockSkillInstaller{}, sys, &bytes.Buffer{})
+
+	manifest := &types.Manifest{
+		Plugins: []types.ManifestPlugin{{Name: "MyPlugin", Marketplace: "m"}},
+		Skills:  []types.ManifestSkill{{Name: "myskill", Source: "src"}},
+	}
+
+	actions, err := orch.PlanClear(manifest)
+	if err != nil {
+		t.Fatalf("PlanClear: %v", err)
+	}
+	if len(actions) != 2 {
+		t.Errorf("actions count: got %d, want 2", len(actions))
+	}
+}
+
+func TestPlanFullClear_RemovesEverything(t *testing.T) {
+	sys := &mockSystemReader{
+		plugins: []types.InstalledPlugin{
+			{Name: "p1", Marketplace: "m1"},
+			{Name: "p2", Marketplace: "m2"},
+		},
+		skills: []types.InstalledSkill{
+			{Name: "s1", Source: "src1"},
+			{Name: "s2", Source: "src2"},
+			{Name: "s3", Source: "src3"},
+		},
+	}
+	orch := New(&mockPluginInstaller{}, &mockSkillInstaller{}, sys, &bytes.Buffer{})
+
+	actions, err := orch.PlanFullClear()
+	if err != nil {
+		t.Fatalf("PlanFullClear: %v", err)
+	}
+
+	if len(actions) != 5 {
+		t.Fatalf("actions count: got %d, want 5", len(actions))
+	}
+	for _, a := range actions {
+		if a.Type != "remove" {
+			t.Errorf("expected remove action, got %q", a.Type)
+		}
+	}
+}
+
+func TestPlanFullClear_NothingInstalled(t *testing.T) {
+	sys := &mockSystemReader{}
+	orch := New(&mockPluginInstaller{}, &mockSkillInstaller{}, sys, &bytes.Buffer{})
+
+	actions, err := orch.PlanFullClear()
+	if err != nil {
+		t.Fatalf("PlanFullClear: %v", err)
+	}
+	if len(actions) != 0 {
+		t.Errorf("actions count: got %d, want 0", len(actions))
+	}
+}
+
 func TestPlanActions_OrphansDetected(t *testing.T) {
 	pi := &mockPluginInstaller{}
 	si := &mockSkillInstaller{}
