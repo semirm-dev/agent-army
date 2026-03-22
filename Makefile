@@ -2,6 +2,8 @@
 
 ARMY := .build/army
 DEST := $(CURDIR)/.build
+VERSION := $(shell cat VERSION)
+LDFLAGS := -ldflags "-X github.com/smahovkic/agent-army/army/internal/port/cli.Version=$(VERSION)"
 
 help: ## Show available targets
 	@echo "Usage: make <target>"
@@ -12,7 +14,7 @@ help: ## Show available targets
 
 $(ARMY): $(shell find army -name '*.go') army/internal/core/catalog/catalog.json
 	@mkdir -p .build
-	cd army && go build -o ../$(ARMY) ./cmd/army
+	cd army && go build $(LDFLAGS) -o ../$(ARMY) ./cmd/army
 
 build: $(ARMY) ## Build the army CLI binary
 

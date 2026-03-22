@@ -33,6 +33,7 @@ func NewRootCmd() *cobra.Command {
 		newFetchCatalogCmd(),
 		newDoctorCmd(),
 		newDetectCmd(),
+		newVersionCmd(),
 	)
 
 	return cmd
