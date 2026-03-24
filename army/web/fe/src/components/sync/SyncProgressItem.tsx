@@ -1,5 +1,4 @@
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface SyncProgressItemProps {
   type: string;
@@ -17,35 +16,17 @@ export function SyncProgressItem({
   error,
 }: SyncProgressItemProps) {
   return (
-    <div className="flex items-center gap-3 py-2 px-3 rounded-md border">
-      <div className="shrink-0">
-        {status === 'running' && (
-          <Loader2 className="size-4 animate-spin text-blue-500" />
-        )}
-        {status === 'success' && (
-          <CheckCircle2 className="size-4 text-green-500" />
-        )}
-        {status === 'failed' && (
-          <XCircle className="size-4 text-red-500" />
-        )}
-        {status === 'pending' && (
-          <div className="size-4 rounded-full border-2 border-muted-foreground/30" />
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{name}</span>
-          <Badge variant="outline" className="text-[10px]">
-            {type}
-          </Badge>
-          <Badge variant="secondary" className="text-[10px]">
-            {itemType}
-          </Badge>
-        </div>
-        {error && (
-          <p className="text-xs text-red-500 mt-1">{error}</p>
-        )}
-      </div>
+    <div className={cn('flex items-center gap-2 py-0.5 font-mono text-xs', status === 'pending' && 'opacity-30')}>
+      <span className="w-4 text-center">
+        {status === 'success' && <span className="text-green-400">&#10003;</span>}
+        {status === 'failed' && <span className="text-red-400">&#10007;</span>}
+        {status === 'running' && <span className="text-yellow-400 animate-pulse">&#9611;</span>}
+        {status === 'pending' && <span className="text-muted-foreground">&#9675;</span>}
+      </span>
+      <span className="text-muted-foreground">{type}</span>
+      <span className="text-muted-foreground/60">{itemType}</span>
+      <span className="text-foreground">{name}</span>
+      {error && <span className="text-red-400 ml-2">&mdash; {error}</span>}
     </div>
   );
 }

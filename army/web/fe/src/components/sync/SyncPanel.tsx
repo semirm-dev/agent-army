@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
-import { Play, CheckCircle2 } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SyncProgressItem } from './SyncProgressItem';
 import type { SyncEvent, SyncAction } from '@/lib/types';
 
@@ -50,18 +49,23 @@ export function SyncPanel({ events, isRunning, onSync, destination }: SyncPanelP
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <Button onClick={() => onSync(destination)} disabled={isRunning} size="lg">
+        <Button
+          onClick={() => onSync(destination)}
+          disabled={isRunning}
+          size="lg"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+        >
           <Play className="size-4" />
           {isRunning ? 'Syncing...' : 'Sync Now'}
         </Button>
       </div>
 
       {actionStatuses.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Progress</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
+        <div className="bg-card border border-border rounded-lg font-mono">
+          <div className="px-4 py-2.5 border-b border-border">
+            <span className="text-xs text-muted-foreground/60">$ army sync --json --yes</span>
+          </div>
+          <div className="p-4 space-y-0.5">
             {actionStatuses.map((as) => (
               <SyncProgressItem
                 key={as.action.name}
@@ -72,28 +76,25 @@ export function SyncPanel({ events, isRunning, onSync, destination }: SyncPanelP
                 error={as.error}
               />
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {completeEvent && completeEvent.event === 'complete' && (
-        <Card>
-          <CardContent className="flex items-center gap-3 pt-6">
-            <CheckCircle2 className="size-5 text-green-500" />
-            <span className="text-sm">
-              Sync complete: {completeEvent.succeeded} succeeded
-              {completeEvent.failed > 0 && `, ${completeEvent.failed} failed`}
-            </span>
-          </CardContent>
-        </Card>
+        <div className="bg-card border border-border rounded-lg px-4 py-3 font-mono text-xs">
+          <span className="text-green-400">✓</span>
+          <span className="text-muted-foreground ml-2">
+            Sync complete: {completeEvent.succeeded} succeeded
+            {completeEvent.failed > 0 && `, ${completeEvent.failed} failed`}
+          </span>
+        </div>
       )}
 
       {errorEvent && errorEvent.event === 'error' && (
-        <Card className="border-red-200">
-          <CardContent className="pt-6">
-            <p className="text-sm text-red-500">{errorEvent.message}</p>
-          </CardContent>
-        </Card>
+        <div className="bg-card border border-red-500/30 rounded-lg px-4 py-3 font-mono text-xs">
+          <span className="text-red-400">✗</span>
+          <span className="text-red-400 ml-2">{errorEvent.message}</span>
+        </div>
       )}
     </div>
   );

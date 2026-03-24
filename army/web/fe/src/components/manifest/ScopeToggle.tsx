@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface ScopeToggleProps {
@@ -8,29 +7,29 @@ interface ScopeToggleProps {
 
 export function ScopeToggle({ scope, onChange }: ScopeToggleProps) {
   return (
-    <div className="inline-flex rounded-lg border p-0.5">
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="inline-flex rounded-lg border border-border bg-card overflow-hidden">
+      <button
         className={cn(
-          'rounded-md px-3',
-          scope === 'user' && 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+          'px-3 py-1.5 text-xs font-medium transition-colors',
+          scope === 'user'
+            ? 'bg-primary/15 text-primary'
+            : 'text-muted-foreground hover:text-foreground'
         )}
         onClick={() => onChange('user')}
       >
         User
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
+      </button>
+      <button
         className={cn(
-          'rounded-md px-3',
-          scope === 'project' && 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+          'px-3 py-1.5 text-xs font-medium transition-colors border-l border-border',
+          scope === 'project'
+            ? 'bg-primary/15 text-primary'
+            : 'text-muted-foreground hover:text-foreground'
         )}
         onClick={() => onChange('project')}
       >
         Project
-      </Button>
+      </button>
     </div>
   );
 }

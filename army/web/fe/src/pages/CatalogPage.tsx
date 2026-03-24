@@ -1,8 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { CatalogSearch } from '@/components/catalog/CatalogSearch';
 import { CatalogList } from '@/components/catalog/CatalogList';
 import { getCatalog } from '@/api/catalog';
@@ -12,6 +10,7 @@ import { cn } from '@/lib/utils';
 export function CatalogPage() {
   const [search, setSearch] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'plugins' | 'skills'>('plugins');
 
   const catalogQuery = useQuery({
     queryKey: ['catalog'],
@@ -78,7 +77,7 @@ export function CatalogPage() {
   return (
     <div className="space-y-4 max-w-5xl">
       <div>
-        <h2 className="text-2xl font-bold">Catalog</h2>
+        <h2 className="text-xl font-semibold">Catalog</h2>
         <p className="text-sm text-muted-foreground">
           Browse available plugins and skills
         </p>
@@ -89,46 +88,67 @@ export function CatalogPage() {
       {allTags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {allTags.map((tag) => (
-            <Badge
+            <button
               key={tag}
-              variant={selectedTags.includes(tag) ? 'default' : 'outline'}
-              className={cn('cursor-pointer text-xs', selectedTags.includes(tag) && 'bg-primary')}
+              className={cn(
+                'px-2.5 py-1 rounded-md text-xs border transition-colors cursor-pointer',
+                selectedTags.includes(tag)
+                  ? 'bg-primary/15 text-primary border-primary/30'
+                  : 'bg-muted border-border text-muted-foreground'
+              )}
               onClick={() => toggleTag(tag)}
             >
               {tag}
-            </Badge>
+            </button>
           ))}
         </div>
       )}
 
-      <Tabs defaultValue="plugins">
-        <TabsList>
-          <TabsTrigger value="plugins">
+      <div>
+        <div className="flex gap-4 border-b border-border">
+          <button
+            className={cn(
+              'pb-2 text-sm font-medium transition-colors',
+              activeTab === 'plugins'
+                ? 'border-b-2 border-primary text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+            onClick={() => setActiveTab('plugins')}
+          >
             Plugins ({catalog.plugins.length})
-          </TabsTrigger>
-          <TabsTrigger value="skills">
+          </button>
+          <button
+            className={cn(
+              'pb-2 text-sm font-medium transition-colors',
+              activeTab === 'skills'
+                ? 'border-b-2 border-primary text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+            onClick={() => setActiveTab('skills')}
+          >
             Skills ({catalog.skills.length})
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="plugins" className="mt-4">
-          <CatalogList
-            items={catalog.plugins}
-            type="plugin"
-            search={search}
-            selectedTags={selectedTags}
-            manifestNames={manifestNames}
-          />
-        </TabsContent>
-        <TabsContent value="skills" className="mt-4">
-          <CatalogList
-            items={catalog.skills}
-            type="skill"
-            search={search}
-            selectedTags={selectedTags}
-            manifestNames={manifestNames}
-          />
-        </TabsContent>
-      </Tabs>
+          </button>
+        </div>
+        <div className="mt-4">
+          {activeTab === 'plugins' ? (
+            <CatalogList
+              items={catalog.plugins}
+              type="plugin"
+              search={search}
+              selectedTags={selectedTags}
+              manifestNames={manifestNames}
+            />
+          ) : (
+            <CatalogList
+              items={catalog.skills}
+              type="skill"
+              search={search}
+              selectedTags={selectedTags}
+              manifestNames={manifestNames}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

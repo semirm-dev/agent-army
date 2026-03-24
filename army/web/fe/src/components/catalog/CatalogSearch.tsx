@@ -14,7 +14,7 @@ export function CatalogSearch({ value, onChange }: CatalogSearchProps) {
         placeholder="Search plugins and skills..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="pl-9"
+        className="pl-9 bg-card"
       />
     </div>
   );

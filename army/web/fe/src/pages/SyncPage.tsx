@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Separator } from '@/components/ui/separator';
 import { SyncPanel } from '@/components/sync/SyncPanel';
 import { useSyncStream } from '@/hooks/use-sync-stream';
 
@@ -10,7 +9,7 @@ export function SyncPage() {
   return (
     <div className="space-y-4 max-w-3xl">
       <div>
-        <h2 className="text-2xl font-bold">Sync</h2>
+        <h2 className="text-xl font-semibold">Sync</h2>
         <p className="text-sm text-muted-foreground">
           Synchronize installed state with your manifest
         </p>
@@ -19,7 +18,7 @@ export function SyncPage() {
       <div className="flex items-center gap-2">
         <label className="text-sm text-muted-foreground">Destination:</label>
         <select
-          className="text-sm border rounded-md px-2 py-1 bg-background"
+          className="bg-card border border-border rounded-md px-2.5 py-1.5 text-xs text-muted-foreground"
           value={destination || ''}
           onChange={(e) => setDestination(e.target.value || undefined)}
         >
@@ -28,8 +27,6 @@ export function SyncPage() {
           <option value="project">Project</option>
         </select>
       </div>
-
-      <Separator />
 
       <SyncPanel
         events={events}

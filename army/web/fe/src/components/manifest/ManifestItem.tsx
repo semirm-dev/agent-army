@@ -1,6 +1,4 @@
-import { Trash2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ManifestItemProps {
@@ -14,9 +12,9 @@ interface ManifestItemProps {
 }
 
 const statusConfig = {
-  ok: { color: 'bg-green-500', label: 'Installed' },
-  missing: { color: 'bg-red-500', label: 'Missing' },
-  drift: { color: 'bg-yellow-500', label: 'Drift' },
+  ok: { color: 'bg-green-500', label: '' },
+  missing: { color: 'bg-red-500', label: 'missing' },
+  drift: { color: 'bg-yellow-500', label: 'drift' },
 } as const;
 
 export function ManifestItem({
@@ -27,41 +25,34 @@ export function ManifestItem({
   onRemove,
   isRemoving,
 }: ManifestItemProps) {
-  const statusInfo = statusConfig[status];
+  const cfg = statusConfig[status];
 
   return (
-    <div className="flex items-center justify-between py-3 px-4 rounded-lg border">
-      <div className="flex items-center gap-3 min-w-0">
-        <div
-          className={cn('size-2.5 rounded-full shrink-0', statusInfo.color)}
-          title={statusInfo.label}
-        />
-        <div className="min-w-0">
-          <p className="font-medium text-sm">{name}</p>
-          <p className="text-xs text-muted-foreground truncate" title={source}>
-            {source}
-          </p>
-        </div>
+    <div className="flex items-center justify-between py-2 px-3 rounded-md border border-border bg-card hover:border-primary/20 transition-colors">
+      <div className="flex items-center gap-2.5 min-w-0">
+        <span className={cn('size-1.5 rounded-full shrink-0', cfg.color)} />
+        <span className="font-mono text-[13px] font-medium truncate">{name}</span>
+        <span className="font-mono text-[10px] text-muted-foreground/40 truncate hidden sm:inline">{source}</span>
+        {cfg.label && (
+          <span className={cn(
+            'text-[10px] font-mono',
+            status === 'missing' ? 'text-red-400' : 'text-yellow-400'
+          )}>
+            {cfg.label}
+          </span>
+        )}
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <Badge variant="outline" className="text-[10px]">
+        <span className="px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-muted-foreground">
           {destination}
-        </Badge>
-        <Badge
-          variant={status === 'ok' ? 'secondary' : status === 'missing' ? 'destructive' : 'outline'}
-          className="text-[10px]"
-        >
-          {statusInfo.label}
-        </Badge>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8 text-muted-foreground hover:text-destructive"
+        </span>
+        <button
+          className="size-6 rounded flex items-center justify-center text-muted-foreground/40 hover:text-red-400 hover:bg-red-400/10 transition-colors disabled:opacity-50"
           onClick={onRemove}
           disabled={isRemoving}
         >
-          <Trash2 className="size-4" />
-        </Button>
+          <X className="size-3" />
+        </button>
       </div>
     </div>
   );

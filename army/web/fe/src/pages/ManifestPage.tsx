@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { ScopeToggle } from '@/components/manifest/ScopeToggle';
 import { ManifestList } from '@/components/manifest/ManifestList';
 import { getManifest } from '@/api/manifest';
@@ -18,7 +17,7 @@ export function ManifestPage() {
     <div className="space-y-4 max-w-3xl">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Manifest</h2>
+          <h2 className="text-xl font-semibold">Manifest</h2>
           <p className="text-sm text-muted-foreground">
             Manage your selected plugins and skills
           </p>
@@ -27,12 +26,10 @@ export function ManifestPage() {
       </div>
 
       {manifestQuery.data && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground font-mono">
           {manifestQuery.data.manifest_path}
         </p>
       )}
-
-      <Separator />
 
       {manifestQuery.isLoading ? (
         <div className="flex items-center justify-center h-64">

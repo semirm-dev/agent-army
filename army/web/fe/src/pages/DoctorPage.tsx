@@ -14,7 +14,7 @@ export function DoctorPage() {
     <div className="space-y-4 max-w-3xl">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Doctor</h2>
+          <h2 className="text-xl font-semibold">Doctor</h2>
           <p className="text-sm text-muted-foreground">
             Health check for your plugins and skills
           </p>
@@ -22,6 +22,7 @@ export function DoctorPage() {
         <Button
           variant="outline"
           size="sm"
+          className="text-xs"
           onClick={() => doctorQuery.refetch()}
           disabled={doctorQuery.isFetching}
         >

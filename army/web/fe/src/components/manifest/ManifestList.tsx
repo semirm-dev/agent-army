@@ -32,10 +32,10 @@ export function ManifestList({ plugins, skills }: ManifestListProps) {
     <div className="space-y-6">
       {plugins.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">
-            Plugins ({pluginCount}/{plugins.length} installed)
+          <h3 className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase mb-3">
+            Plugins <span className="text-primary">{pluginCount}/{plugins.length}</span>
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {plugins.map((plugin) => (
               <ManifestItem
                 key={plugin.name}
@@ -57,10 +57,10 @@ export function ManifestList({ plugins, skills }: ManifestListProps) {
 
       {skills.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">
-            Skills ({skillCount}/{skills.length} installed)
+          <h3 className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase mb-3">
+            Skills <span className="text-primary">{skillCount}/{skills.length}</span>
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {skills.map((skill) => (
               <ManifestItem
                 key={skill.name}
