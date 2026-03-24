@@ -14,6 +14,11 @@ import (
 	"github.com/smahovkic/agent-army/army/internal/core/types"
 )
 
+// commandRunner is satisfied by runner.RealRunner and runner.DryRunner.
+type commandRunner interface {
+	Run(cmd string, args ...string) (string, error)
+}
+
 // deps bundles all resolved dependencies for commands.
 type deps struct {
 	catalog      *catalog.Service
@@ -21,7 +26,6 @@ type deps struct {
 	manifestPath string
 	orchestrator *orchestrator.Orchestrator
 	system       *system.Reader
-	runner       runner.Runner
 }
 
 func resolveDeps() (*deps, error) {
@@ -44,7 +48,7 @@ func resolveDeps() (*deps, error) {
 		return nil, fmt.Errorf("loading manifest: %w", err)
 	}
 
-	var r runner.Runner
+	var r commandRunner
 	if globalFlags.DryRun {
 		r = runner.NewDry()
 	} else {
@@ -62,6 +66,5 @@ func resolveDeps() (*deps, error) {
 		manifestPath: manifestPath,
 		orchestrator: orch,
 		system:       sysReader,
-		runner:       r,
 	}, nil
 }

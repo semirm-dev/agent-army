@@ -5,20 +5,23 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/smahovkic/agent-army/army/internal/adapter/runner"
 )
+
+// CommandRunner executes shell commands.
+type CommandRunner interface {
+	Run(cmd string, args ...string) (stdout string, err error)
+}
 
 // userHomeDir is a package-level var so tests can override it.
 var userHomeDir = os.UserHomeDir
 
 // Adapter handles skill install/remove operations.
 type Adapter struct {
-	runner runner.Runner
+	runner CommandRunner
 }
 
 // New creates a skill Adapter with the given command runner.
-func New(r runner.Runner) *Adapter {
+func New(r CommandRunner) *Adapter {
 	return &Adapter{runner: r}
 }
 

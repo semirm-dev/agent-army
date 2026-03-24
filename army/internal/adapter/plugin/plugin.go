@@ -1,18 +1,19 @@
 package plugin
 
-import (
-	"fmt"
+import "fmt"
 
-	"github.com/smahovkic/agent-army/army/internal/adapter/runner"
-)
+// CommandRunner executes shell commands.
+type CommandRunner interface {
+	Run(cmd string, args ...string) (stdout string, err error)
+}
 
 // Adapter handles plugin install/remove operations via the claude CLI.
 type Adapter struct {
-	runner runner.Runner
+	runner CommandRunner
 }
 
 // New creates a plugin Adapter with the given command runner.
-func New(r runner.Runner) *Adapter {
+func New(r CommandRunner) *Adapter {
 	return &Adapter{runner: r}
 }
 
