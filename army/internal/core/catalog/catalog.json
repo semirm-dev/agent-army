@@ -149,6 +149,12 @@
       "tags": ["react", "frontend", "javascript"]
     },
     {
+      "name": "shadcn-ui",
+      "source": "shadcn/ui",
+      "description": "Accessible, customizable React UI components built on Radix UI and Tailwind CSS. Use when building polished interfaces with shadcn/ui.",
+      "tags": ["react", "ui", "components", "frontend"]
+    },
+    {
       "name": "sql-pro",
       "source": "jeffallan/claude-skills",
       "description": "Optimizes SQL queries, designs database schemas, and troubleshoots performance issues across PostgreSQL, MySQL, SQL Server, and Oracle.",
@@ -188,7 +194,7 @@
     "react": {
       "detect": ["package.json:react", "*.tsx", "*.jsx"],
       "plugins": ["frontend-design"],
-      "skills": ["react-expert", "javascript-pro"]
+      "skills": ["react-expert", "shadcn-ui", "javascript-pro"]
     },
     "python": {
       "detect": ["requirements.txt", "pyproject.toml", "setup.py", "*.py"],
@@ -218,7 +224,7 @@
     "nextjs": {
       "detect": ["package.json:next", "next.config.*"],
       "plugins": ["frontend-design"],
-      "skills": ["nextjs-developer", "react-expert", "javascript-pro"]
+      "skills": ["nextjs-developer", "react-expert", "shadcn-ui", "javascript-pro"]
     },
     "nestjs": {
       "detect": ["package.json:@nestjs/core"],
