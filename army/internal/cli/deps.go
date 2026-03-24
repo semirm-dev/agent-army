@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/smahovkic/agent-army/army/internal/adapter/plugin"
-	"github.com/smahovkic/agent-army/army/internal/adapter/runner"
-	"github.com/smahovkic/agent-army/army/internal/adapter/skill"
-	"github.com/smahovkic/agent-army/army/internal/adapter/system"
+	"github.com/smahovkic/agent-army/army/internal/installer"
+	"github.com/smahovkic/agent-army/army/internal/runner"
+	"github.com/smahovkic/agent-army/army/internal/state"
 	"github.com/smahovkic/agent-army/army/internal/core/catalog"
 	"github.com/smahovkic/agent-army/army/internal/core/manifest"
 	"github.com/smahovkic/agent-army/army/internal/core/orchestrator"
@@ -25,7 +24,7 @@ type deps struct {
 	manifest     *types.Manifest
 	manifestPath string
 	orchestrator *orchestrator.Orchestrator
-	system       *system.Reader
+	state        *state.Reader
 }
 
 func resolveDeps() (*deps, error) {
@@ -55,16 +54,16 @@ func resolveDeps() (*deps, error) {
 		r = runner.NewReal(nil)
 	}
 
-	pluginAdapter := plugin.New(r)
-	skillAdapter := skill.New(r)
-	sysReader := system.New()
-	orch := orchestrator.New(pluginAdapter, skillAdapter, sysReader, os.Stdout)
+	pi := installer.NewPlugin(r)
+	si := installer.NewSkill(r)
+	sr := state.New()
+	orch := orchestrator.New(pi, si, sr, os.Stdout)
 
 	return &deps{
 		catalog:      cat,
 		manifest:     m,
 		manifestPath: manifestPath,
 		orchestrator: orch,
-		system:       sysReader,
+		state:        sr,
 	}, nil
 }

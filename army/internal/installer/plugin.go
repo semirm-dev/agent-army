@@ -1,4 +1,4 @@
-package plugin
+package installer
 
 import "fmt"
 
@@ -7,18 +7,18 @@ type CommandRunner interface {
 	Run(cmd string, args ...string) (stdout string, err error)
 }
 
-// Adapter handles plugin install/remove operations via the claude CLI.
-type Adapter struct {
+// Plugin handles plugin install/remove operations via the claude CLI.
+type Plugin struct {
 	runner CommandRunner
 }
 
-// New creates a plugin Adapter with the given command runner.
-func New(r CommandRunner) *Adapter {
-	return &Adapter{runner: r}
+// NewPlugin creates a Plugin with the given command runner.
+func NewPlugin(r CommandRunner) *Plugin {
+	return &Plugin{runner: r}
 }
 
 // Install runs: claude plugin install <name>
-func (a *Adapter) Install(name string) error {
+func (a *Plugin) Install(name string) error {
 	_, err := a.runner.Run("claude", "plugin", "install", name)
 	if err != nil {
 		return fmt.Errorf("installing plugin %s: %w", name, err)
@@ -27,7 +27,7 @@ func (a *Adapter) Install(name string) error {
 }
 
 // Remove runs: claude plugin remove <name>
-func (a *Adapter) Remove(name string) error {
+func (a *Plugin) Remove(name string) error {
 	_, err := a.runner.Run("claude", "plugin", "remove", name)
 	if err != nil {
 		return fmt.Errorf("removing plugin %s: %w", name, err)

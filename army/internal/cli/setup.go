@@ -5,7 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/smahovkic/agent-army/army/internal/core/manifest"
-	"github.com/smahovkic/agent-army/army/internal/port/tui"
+	"github.com/smahovkic/agent-army/army/internal/tui"
 	"github.com/spf13/cobra"
 )
 

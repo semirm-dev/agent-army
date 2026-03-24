@@ -3,7 +3,7 @@
 ARMY := .build/army
 DEST := $(CURDIR)/.build
 VERSION := $(shell cat VERSION)
-LDFLAGS := -ldflags "-X github.com/smahovkic/agent-army/army/internal/port/cli.Version=$(VERSION)"
+LDFLAGS := -ldflags "-X github.com/smahovkic/agent-army/army/internal/cli.Version=$(VERSION)"
 
 help: ## Show available targets
 	@echo "Usage: make <target>"

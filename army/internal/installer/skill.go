@@ -1,4 +1,4 @@
-package skill
+package installer
 
 import (
 	"encoding/json"
@@ -7,26 +7,21 @@ import (
 	"path/filepath"
 )
 
-// CommandRunner executes shell commands.
-type CommandRunner interface {
-	Run(cmd string, args ...string) (stdout string, err error)
-}
-
 // userHomeDir is a package-level var so tests can override it.
 var userHomeDir = os.UserHomeDir
 
-// Adapter handles skill install/remove operations.
-type Adapter struct {
+// Skill handles skill install/remove operations.
+type Skill struct {
 	runner CommandRunner
 }
 
-// New creates a skill Adapter with the given command runner.
-func New(r CommandRunner) *Adapter {
-	return &Adapter{runner: r}
+// NewSkill creates a Skill with the given command runner.
+func NewSkill(r CommandRunner) *Skill {
+	return &Skill{runner: r}
 }
 
 // Install runs: npx skills add <source> -s <name> -g -y
-func (a *Adapter) Install(name, source string) error {
+func (a *Skill) Install(name, source string) error {
 	_, err := a.runner.Run("npx", "skills", "add", source, "-s", name, "-g", "-y")
 	if err != nil {
 		return fmt.Errorf("installing skill %s from %s: %w", name, source, err)
@@ -41,7 +36,7 @@ func (a *Adapter) Install(name, source string) error {
 //  1. Delete ~/.agents/skills/<name>/ directory
 //  2. Delete ~/.claude/skills/<name>/ symlink (if it exists)
 //  3. Remove entry from ~/.agents/.skill-lock.json
-func (a *Adapter) Remove(name string) error {
+func (a *Skill) Remove(name string) error {
 	home, err := userHomeDir()
 	if err != nil {
 		return fmt.Errorf("getting home dir: %w", err)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/smahovkic/agent-army/army/internal/port/cli"
+	"github.com/smahovkic/agent-army/army/internal/cli"
 )
 
 func main() {

@@ -19,12 +19,12 @@ func newListCmd() *cobra.Command {
 				return err
 			}
 
-			installedPlugins, err := d.system.InstalledPlugins()
+			installedPlugins, err := d.state.InstalledPlugins()
 			if err != nil {
 				return fmt.Errorf("reading installed plugins: %w", err)
 			}
 
-			installedSkills, err := d.system.InstalledSkills()
+			installedSkills, err := d.state.InstalledSkills()
 			if err != nil {
 				return fmt.Errorf("reading installed skills: %w", err)
 			}

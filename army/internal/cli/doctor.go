@@ -24,12 +24,12 @@ func newDoctorCmd() *cobra.Command {
 			manifestPath, provenance := resolveManifestWithProvenance(cwd)
 			fmt.Printf("Manifest: %s %s(%s)%s\n", manifestPath, dim, provenance, reset)
 
-			installedPlugins, err := d.system.InstalledPlugins()
+			installedPlugins, err := d.state.InstalledPlugins()
 			if err != nil {
 				return fmt.Errorf("reading installed plugins: %w", err)
 			}
 
-			installedSkills, err := d.system.InstalledSkills()
+			installedSkills, err := d.state.InstalledSkills()
 			if err != nil {
 				return fmt.Errorf("reading installed skills: %w", err)
 			}
