@@ -23,7 +23,7 @@ Entry point: `army/cmd/army/main.go` → `cli.NewRootCmd()`
 Layered structure with strict dependency direction: outer packages → core.
 
 - **`internal/core/`** — Pure domain logic, no I/O, no external deps beyond stdlib. Packages: `types`, `catalog`, `manifest`, `detector`, `orchestrator`, `diff`, `doctor`.
-- **`internal/cli/`** — CLI commands (Cobra). **`internal/tui/`** — Setup wizard (Bubble Tea).
+- **`cli/`** — CLI commands (Cobra), at module root since it's the app's entry surface. **`internal/tui/`** — Setup wizard (Bubble Tea), internal to cli.
 - **`internal/installer/`** — Plugin and skill install/remove operations (`claude plugin install`, `npx skills add`). **`internal/runner/`** — Command execution (`RealRunner` + `DryRunner`). **`internal/state/`** — Reads installed state from filesystem (`installed_plugins.json`, `.skill-lock.json`).
 
 Dependencies: `cobra`, `bubbletea`, `bubbles`, `lipgloss`
@@ -72,6 +72,7 @@ Orphans (installed items not in manifest) are only relevant for user-level manif
 - All name comparisons are case-insensitive (`strings.EqualFold`)
 - Commit messages follow Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 - **Versioning**: Always bump `VERSION` file (semver) with every code change. Patch (`0.1.2` → `0.1.3`) for `fix:`, `refactor:`, `test:`, `chore:`, `docs:`. Minor (`0.1.2` → `0.2.0`) for `feat:`. Major (`0.1.2` → `1.0.0`) for breaking changes.
+- **README**: Update `README.md` when changes affect commands, flags, architecture, or usage (new/removed commands, renamed packages, changed build steps).
 
 ## Testing
 

@@ -18,12 +18,15 @@ army sync                # Install everything from your manifest
 | Command | Description |
 |---------|-------------|
 | `setup` | Interactive TUI wizard — pick destination, detect tech stack, select plugins & skills. Fixed manifest paths: user → `~/.army/manifest.json`, project → `<cwd>/.army/manifest.json` |
-| `sync` | Install missing + remove extras to match manifest. Shows plan and asks for confirmation. Supports interactive destination editing. **Project-level manifests skip orphan removal** — only installs missing items |
+| `sync` | Install missing + remove extras to match manifest. Shows plan and asks for confirmation. **Project-level manifests skip orphan removal** — only installs missing items |
 | `add` | Add a plugin or skill to manifest (`add plugin context7`, `add skill golang-pro`) |
 | `remove` | Remove a plugin or skill from manifest (`remove plugin context7`) |
+| `clear` | Uninstall plugins and skills from the system |
 | `list` | Show manifest items with install status (`✓` ok, `⚠` broken on disk, `✗` missing) |
+| `detect` | Show loaded config files for the current directory |
 | `fetch-catalog` | Fetch latest catalog from GitHub into `~/.army/catalog.json` |
-| `doctor` | Run health checks — missing items, orphans, disk drift (skill dirs + plugin installPaths). **Project-level manifests skip orphan warnings** |
+| `doctor` | Run health checks — missing items, orphans, disk drift. **Project-level manifests skip orphan warnings** |
+| `version` | Print the army version |
 
 ### Global Flags
 
@@ -60,26 +63,23 @@ army sync                # Install everything from your manifest
 
 ## Architecture
 
-Ports & Adapters (hexagonal):
-
 ```
-army/internal/
-├── core/              # Pure domain logic (no I/O)
-│   ├── types/         # Shared data structures
-│   ├── catalog/       # Catalog loading, merging, embedded JSON
-│   ├── manifest/      # Manifest CRUD with atomic writes, walk-up resolution
-│   ├── detector/      # Tech stack detection from project files
-│   ├── orchestrator/  # Action planning and execution coordination
-│   ├── diff/          # Manifest vs installed comparison
-│   └── doctor/        # Health checks
-├── port/              # User-facing
-│   ├── cli/           # Cobra commands
-│   └── tui/           # Bubble Tea setup wizard
-└── adapter/           # External system integration
-    ├── runner/         # Command execution (real + dry-run)
-    ├── plugin/         # claude plugin install/remove
-    ├── skill/          # npx skills add + direct filesystem removal
-    └── system/         # Reads installed_plugins.json, .skill-lock.json
+army/
+├── cmd/army/main.go       # Entry point → cli.NewRootCmd()
+├── cli/                   # CLI commands (Cobra) — app's entry surface
+└── internal/
+    ├── core/              # Pure domain logic (no I/O)
+    │   ├── types/         # Shared data structures
+    │   ├── catalog/       # Catalog loading, merging, embedded JSON
+    │   ├── manifest/      # Manifest CRUD with atomic writes, walk-up resolution
+    │   ├── detector/      # Tech stack detection from project files
+    │   ├── orchestrator/  # Action planning and execution coordination
+    │   ├── diff/          # Manifest vs installed comparison
+    │   └── doctor/        # Health checks
+    ├── installer/         # Plugin + skill install/remove operations
+    ├── runner/            # Command execution (real + dry-run)
+    ├── state/             # Reads installed_plugins.json, .skill-lock.json
+    └── tui/               # Bubble Tea setup wizard
 ```
 
 ## Testing
