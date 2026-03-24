@@ -149,7 +149,7 @@
       "tags": ["react", "frontend", "javascript"]
     },
     {
-      "name": "shadcn-ui",
+      "name": "shadcn",
       "source": "shadcn/ui",
       "description": "Accessible, customizable React UI components built on Radix UI and Tailwind CSS. Use when building polished interfaces with shadcn/ui.",
       "tags": ["react", "ui", "components", "frontend"]
@@ -194,7 +194,7 @@
     "react": {
       "detect": ["package.json:react", "*.tsx", "*.jsx"],
       "plugins": ["frontend-design"],
-      "skills": ["react-expert", "shadcn-ui", "javascript-pro"]
+      "skills": ["react-expert", "shadcn", "javascript-pro"]
     },
     "python": {
       "detect": ["requirements.txt", "pyproject.toml", "setup.py", "*.py"],
@@ -224,7 +224,7 @@
     "nextjs": {
       "detect": ["package.json:next", "next.config.*"],
       "plugins": ["frontend-design"],
-      "skills": ["nextjs-developer", "react-expert", "shadcn-ui", "javascript-pro"]
+      "skills": ["nextjs-developer", "react-expert", "shadcn", "javascript-pro"]
     },
     "nestjs": {
       "detect": ["package.json:@nestjs/core"],
