@@ -1,12 +1,46 @@
+# OS & Editor
 .DS_Store
 *.swp
 *.swo
 *~
+.vscode/
+.idea/
 
-# Python
-__pycache__/
-*.pyc
-.ruff_cache/
-.superpowers/
+# Go
+army/army
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# Node.js
+node_modules/
+.env
+.env.*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# React / Vite
+dist/
+*.local
+
+# NestJS
+.nest/
+
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Project-specific
 .build/
+.bin/
 .army/
+.superpowers/

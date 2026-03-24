@@ -206,7 +206,7 @@ func (o *Orchestrator) Execute(actions []types.Action) Result {
 
 	// Execute plugin actions sequentially to avoid races on installed_plugins.json
 	for _, a := range pluginActions {
-		if err := o.executeAction(a); err != nil {
+		if err := o.ExecuteAction(a); err != nil {
 			result.Failed++
 			result.Errors = append(result.Errors, err)
 		} else {
@@ -216,7 +216,7 @@ func (o *Orchestrator) Execute(actions []types.Action) Result {
 
 	// Execute skill actions sequentially
 	for _, a := range skillActions {
-		if err := o.executeAction(a); err != nil {
+		if err := o.ExecuteAction(a); err != nil {
 			result.Failed++
 			result.Errors = append(result.Errors, err)
 		} else {
@@ -254,7 +254,8 @@ func (o *Orchestrator) InstallItems(plugins []types.ManifestPlugin, skills []typ
 	return o.Execute(actions)
 }
 
-func (o *Orchestrator) executeAction(a types.Action) error {
+// ExecuteAction runs a single action. Exported for use by JSON streaming in sync.
+func (o *Orchestrator) ExecuteAction(a types.Action) error {
 	switch {
 	case a.ItemType == "plugin" && a.Type == "install":
 		fmt.Fprintf(o.out, "Installing plugin %s...\n", a.Name)

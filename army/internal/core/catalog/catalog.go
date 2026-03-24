@@ -47,6 +47,11 @@ func NewFromBytes(data []byte) (*Service, error) {
 	return &Service{catalog: cat}, nil
 }
 
+// GetCatalog returns the full catalog struct.
+func (s *Service) GetCatalog() *types.Catalog {
+	return &s.catalog
+}
+
 // FindPlugin returns the catalog plugin with the given name (case-insensitive).
 func (s *Service) FindPlugin(name string) (types.CatalogPlugin, bool) {
 	lower := strings.ToLower(name)

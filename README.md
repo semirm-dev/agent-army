@@ -26,6 +26,8 @@ army sync                # Install everything from your manifest
 | `detect` | Show loaded config files for the current directory |
 | `fetch-catalog` | Fetch latest catalog from GitHub into `~/.army/catalog.json` |
 | `doctor` | Run health checks — missing items, orphans, disk drift. **Project-level manifests skip orphan warnings** |
+| `catalog` | Show catalog summary (plugin/skill/profile counts) |
+| `serve` | Start the web management UI at `http://localhost:3141` |
 | `version` | Print the army version |
 
 ### Global Flags
@@ -34,6 +36,7 @@ army sync                # Install everything from your manifest
 |------|-------------|
 | `--dry-run` | Print commands without executing |
 | `--verbose` | Verbose output |
+| `--json` | Output structured JSON (for scripting and web UI) |
 
 ### Add Flags
 
@@ -54,6 +57,13 @@ army sync                # Install everything from your manifest
 | `--destination <user\|project>` | Override destination for all actions |
 | `--yes` / `-y` | Skip confirmation prompt |
 
+### Serve Flags
+
+| Flag | Description |
+|------|-------------|
+| `--port <int>` | Port to serve on (default: 3141) |
+| `--no-open` | Don't open browser automatically |
+
 ## How It Works
 
 1. **Catalog** — Bundled JSON with all known plugins, skills, and tech profiles. Updated via `army fetch-catalog`.
@@ -61,12 +71,31 @@ army sync                # Install everything from your manifest
 3. **Tech detection** — Scans project directory for markers (go.mod, package.json deps, tsconfig.json, etc.) and recommends relevant plugins/skills.
 4. **Sync** — Compares manifest against installed state, installs missing items, removes extras (user-level manifests only — project-level manifests skip orphan removal since they describe a subset of the system).
 
+## Web UI
+
+A browser-based management console that covers all CLI operations.
+
+```bash
+make web-install           # Install frontend + backend dependencies
+make web-build             # Build for production
+army serve                 # Start web UI at http://localhost:3141
+```
+
+**Pages:** Catalog browser, Manifest manager, Sync with live progress, Doctor dashboard.
+
+**Architecture:** React SPA (Vite + shadcn/ui + TanStack Query) → NestJS API (pure HTTP-to-CLI shell) → army CLI (`--json` output). Zero logic duplication — all domain logic stays in Go.
+
+**Dev mode:** Run three processes: `make build`, NestJS (`cd army/web/be && ARMY_BIN=../../.build/army PORT=3141 npm run start:dev`), Vite (`cd army/web/fe && VITE_API_URL=http://localhost:3141/api npm run dev`).
+
 ## Architecture
 
 ```
 army/
 ├── cmd/army/main.go       # Entry point → cli.NewRootCmd()
 ├── cli/                   # CLI commands (Cobra) — app's entry surface
+├── web/
+│   ├── be/                # NestJS backend (API shell, SSE sync streaming)
+│   └── fe/                # React frontend (Vite + shadcn/ui + Tailwind)
 └── internal/
     ├── core/              # Pure domain logic (no I/O)
     │   ├── types/         # Shared data structures
@@ -85,6 +114,8 @@ army/
 ## Testing
 
 ```bash
-make test                                              # All tests
+make test                                              # All Go tests
 cd army && go test ./internal/core/catalog/... -race    # Single package
+cd army/web/be && npm run build                         # Verify NestJS compiles
+cd army/web/fe && npm run build                         # Verify React compiles
 ```

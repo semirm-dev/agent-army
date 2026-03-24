@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -22,7 +23,9 @@ func newDoctorCmd() *cobra.Command {
 
 			cwd, _ := os.Getwd()
 			manifestPath, provenance := resolveManifestWithProvenance(cwd)
-			fmt.Printf("Manifest: %s %s(%s)%s\n", manifestPath, dim, provenance, reset)
+			if !globalFlags.JSON {
+				fmt.Printf("Manifest: %s %s(%s)%s\n", manifestPath, dim, provenance, reset)
+			}
 
 			installedPlugins, err := d.state.InstalledPlugins()
 			if err != nil {
@@ -46,6 +49,10 @@ func newDoctorCmd() *cobra.Command {
 					}
 				}
 				issues = filtered
+			}
+
+			if globalFlags.JSON {
+				return doctorJSON(issues)
 			}
 
 			if len(issues) == 0 {
@@ -79,4 +86,38 @@ func newDoctorCmd() *cobra.Command {
 			return nil
 		},
 	}
+}
+
+func doctorJSON(issues []types.DoctorIssue) error {
+	errors := 0
+	warnings := 0
+	for _, issue := range issues {
+		switch issue.Severity {
+		case "error":
+			errors++
+		case "warning":
+			warnings++
+		}
+	}
+
+	type summary struct {
+		Errors   int `json:"errors"`
+		Warnings int `json:"warnings"`
+	}
+
+	type doctorOutput struct {
+		Issues  []types.DoctorIssue `json:"issues"`
+		Summary summary             `json:"summary"`
+	}
+
+	out := doctorOutput{
+		Issues:  issues,
+		Summary: summary{Errors: errors, Warnings: warnings},
+	}
+
+	if out.Issues == nil {
+		out.Issues = []types.DoctorIssue{}
+	}
+
+	return json.NewEncoder(os.Stdout).Encode(out)
 }

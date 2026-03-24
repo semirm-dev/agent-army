@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -26,6 +27,9 @@ func newDetectCmd() *cobra.Command {
 		Use:   "detect",
 		Short: "Show loaded config files for the current directory",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if globalFlags.JSON {
+				return runDetectJSON()
+			}
 			return runDetect()
 		},
 	}
@@ -182,4 +186,77 @@ func visibleLen(s string) int {
 		n++
 	}
 	return n
+}
+
+func runDetectJSON() error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("getting working directory: %w", err)
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("getting home directory: %w", err)
+	}
+
+	// Catalog source
+	overlayPath := filepath.Join(home, ".army", "catalog.json")
+	catalogSource := "embedded"
+	if fileExists(overlayPath) {
+		catalogSource = "embedded + " + overlayPath
+	}
+
+	// Manifest
+	manifestPath, _ := resolveManifestWithProvenance(cwd)
+	manifestExists := fileExists(manifestPath)
+	manifestScope := "user"
+	if !manifest.IsDefault(manifestPath) {
+		manifestScope = "project"
+	}
+
+	// Load manifest for summary
+	m, err := manifest.Load(manifestPath)
+	if err != nil {
+		return fmt.Errorf("loading manifest: %w", err)
+	}
+
+	// Installed state files
+	pluginsDB := filepath.Join(home, ".claude", "plugins", "installed_plugins.json")
+	skillsDB := filepath.Join(home, ".agents", ".skill-lock.json")
+
+	type manifestSummary struct {
+		Plugins int `json:"plugins"`
+		Skills  int `json:"skills"`
+	}
+
+	type detectOutput struct {
+		Cwd             string          `json:"cwd"`
+		CatalogSource   string          `json:"catalog_source"`
+		ManifestPath    string          `json:"manifest_path"`
+		ManifestScope   string          `json:"manifest_scope"`
+		ManifestExists  bool            `json:"manifest_exists"`
+		PluginsDB       string          `json:"plugins_db"`
+		PluginsDBExists bool            `json:"plugins_db_exists"`
+		SkillsDB        string          `json:"skills_db"`
+		SkillsDBExists  bool            `json:"skills_db_exists"`
+		ManifestSummary manifestSummary `json:"manifest_summary"`
+	}
+
+	out := detectOutput{
+		Cwd:             cwd,
+		CatalogSource:   catalogSource,
+		ManifestPath:    manifestPath,
+		ManifestScope:   manifestScope,
+		ManifestExists:  manifestExists,
+		PluginsDB:       pluginsDB,
+		PluginsDBExists: fileExists(pluginsDB),
+		SkillsDB:        skillsDB,
+		SkillsDBExists:  fileExists(skillsDB),
+		ManifestSummary: manifestSummary{
+			Plugins: len(m.Plugins),
+			Skills:  len(m.Skills),
+		},
+	}
+
+	return json.NewEncoder(os.Stdout).Encode(out)
 }

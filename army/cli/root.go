@@ -8,6 +8,7 @@ import (
 type GlobalFlags struct {
 	DryRun  bool
 	Verbose bool
+	JSON    bool
 }
 
 var globalFlags GlobalFlags
@@ -22,6 +23,7 @@ func NewRootCmd() *cobra.Command {
 
 	cmd.PersistentFlags().BoolVar(&globalFlags.DryRun, "dry-run", false, "Print commands without executing")
 	cmd.PersistentFlags().BoolVar(&globalFlags.Verbose, "verbose", false, "Verbose output")
+	cmd.PersistentFlags().BoolVar(&globalFlags.JSON, "json", false, "Output in JSON format")
 
 	cmd.AddCommand(
 		newSetupCmd(),
@@ -30,9 +32,11 @@ func NewRootCmd() *cobra.Command {
 		newRemoveCmd(),
 		newClearCmd(),
 		newListCmd(),
+		newCatalogCmd(),
 		newFetchCatalogCmd(),
 		newDoctorCmd(),
 		newDetectCmd(),
+		newServeCmd(),
 		newVersionCmd(),
 	)
 

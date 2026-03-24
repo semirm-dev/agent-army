@@ -57,41 +57,41 @@ type Manifest struct {
 
 // InstalledPlugin represents a plugin found on the system.
 type InstalledPlugin struct {
-	Name        string
-	Marketplace string
-	Version     string
-	Scope       string
-	InstallPath string
+	Name        string `json:"name"`
+	Marketplace string `json:"marketplace"`
+	Version     string `json:"version"`
+	Scope       string `json:"scope"`
+	InstallPath string `json:"install_path"`
 }
 
 // InstalledSkill represents a skill found on the system.
 type InstalledSkill struct {
-	Name      string
-	Source    string
-	SourceURL string
+	Name      string `json:"name"`
+	Source    string `json:"source"`
+	SourceURL string `json:"source_url"`
 }
 
 // DiffResult represents the comparison between manifest and installed state.
 type DiffResult struct {
-	MissingPlugins []ManifestPlugin  // In manifest but not installed
-	ExtraPlugins   []InstalledPlugin // Installed but not in manifest
-	MissingSkills  []ManifestSkill   // In manifest but not installed
-	ExtraSkills    []InstalledSkill  // Installed but not in manifest
+	MissingPlugins []ManifestPlugin  `json:"missing_plugins"` // In manifest but not installed
+	ExtraPlugins   []InstalledPlugin `json:"extra_plugins"`   // Installed but not in manifest
+	MissingSkills  []ManifestSkill   `json:"missing_skills"`  // In manifest but not installed
+	ExtraSkills    []InstalledSkill  `json:"extra_skills"`    // Installed but not in manifest
 }
 
 // DoctorIssue represents a health check finding.
 type DoctorIssue struct {
-	Severity    string // "error", "warning", "info"
-	Category    string // "orphan", "drift", "missing", "broken"
-	Description string
-	Item        string // affected plugin/skill name
+	Severity    string `json:"severity"`    // "error", "warning", "info"
+	Category    string `json:"category"`    // "orphan", "drift", "missing", "broken"
+	Description string `json:"description"`
+	Item        string `json:"item"` // affected plugin/skill name
 }
 
 // Action represents an install or remove action for the orchestrator.
 type Action struct {
-	Type        string // "install" or "remove"
-	ItemType    string // "plugin" or "skill"
-	Name        string
-	Source      string // marketplace for plugins, source repo for skills
-	Destination string // "user" or "project"
+	Type        string `json:"type"`        // "install" or "remove"
+	ItemType    string `json:"item_type"`   // "plugin" or "skill"
+	Name        string `json:"name"`
+	Source      string `json:"source"`      // marketplace for plugins, source repo for skills
+	Destination string `json:"destination"` // "user" or "project"
 }

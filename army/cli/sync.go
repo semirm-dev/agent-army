@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -23,6 +24,10 @@ func newSyncCmd() *cobra.Command {
 				return fmt.Errorf("invalid --destination %q: must be \"user\" or \"project\"", destination)
 			}
 
+			if globalFlags.JSON && !yes {
+				return fmt.Errorf("--json requires --yes for non-interactive mode")
+			}
+
 			d, err := resolveDeps()
 			if err != nil {
 				return err
@@ -34,18 +39,22 @@ func newSyncCmd() *cobra.Command {
 			}
 
 			// Project-level manifests should not remove orphans — they only
-		// describe what this project needs, not the full system state.
-		if !manifest.IsDefault(d.manifestPath) {
-			filtered := actions[:0]
-			for _, a := range actions {
-				if a.Type != "remove" {
-					filtered = append(filtered, a)
+			// describe what this project needs, not the full system state.
+			if !manifest.IsDefault(d.manifestPath) {
+				filtered := actions[:0]
+				for _, a := range actions {
+					if a.Type != "remove" {
+						filtered = append(filtered, a)
+					}
 				}
+				actions = filtered
 			}
-			actions = filtered
-		}
 
-		if len(actions) == 0 {
+			if len(actions) == 0 {
+				if globalFlags.JSON {
+					emitNDJSON(map[string]interface{}{"event": "complete", "succeeded": 0, "failed": 0})
+					return nil
+				}
 				fmt.Println("Everything is in sync.")
 				return nil
 			}
@@ -53,6 +62,10 @@ func newSyncCmd() *cobra.Command {
 			// Apply destination override from flag
 			if destination != "" {
 				applyDestination(actions, destination)
+			}
+
+			if globalFlags.JSON {
+				return syncJSON(d, actions)
 			}
 
 			printPlan(actions, destination)
@@ -142,4 +155,63 @@ func promptDestination(scanner *bufio.Scanner, current string) string {
 		return ""
 	}
 	return val
+}
+
+func emitNDJSON(v interface{}) {
+	data, err := json.Marshal(v)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "json marshal error: %v\n", err)
+		return
+	}
+	fmt.Println(string(data))
+}
+
+func syncJSON(d *deps, actions []types.Action) error {
+	// Emit plan event
+	emitNDJSON(map[string]interface{}{
+		"event":   "plan",
+		"actions": actions,
+	})
+
+	succeeded := 0
+	failed := 0
+
+	for _, a := range actions {
+		// Emit action_start
+		emitNDJSON(map[string]interface{}{
+			"event":     "action_start",
+			"type":      a.Type,
+			"item_type": a.ItemType,
+			"name":      a.Name,
+		})
+
+		err := d.orchestrator.ExecuteAction(a)
+
+		event := map[string]interface{}{
+			"event":     "action_done",
+			"type":      a.Type,
+			"item_type": a.ItemType,
+			"name":      a.Name,
+			"success":   err == nil,
+		}
+		if err != nil {
+			event["error"] = err.Error()
+			failed++
+		} else {
+			succeeded++
+		}
+		emitNDJSON(event)
+	}
+
+	// Emit complete event
+	emitNDJSON(map[string]interface{}{
+		"event":     "complete",
+		"succeeded": succeeded,
+		"failed":    failed,
+	})
+
+	if failed > 0 {
+		return fmt.Errorf("%d action(s) failed", failed)
+	}
+	return nil
 }

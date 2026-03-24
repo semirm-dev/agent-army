@@ -1,12 +1,23 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/smahovkic/agent-army/army/internal/core/manifest"
 	"github.com/smahovkic/agent-army/army/internal/core/types"
 	"github.com/spf13/cobra"
 )
+
+type addResult struct {
+	Action           string `json:"action"`
+	ItemType         string `json:"item_type"`
+	Name             string `json:"name"`
+	AddedToManifest  bool   `json:"added_to_manifest"`
+	Installed        bool   `json:"installed"`
+	Error            string `json:"error"`
+}
 
 func newAddCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -35,6 +46,10 @@ func newAddPluginCmd() *cobra.Command {
 
 			cp, found := d.catalog.FindPlugin(name)
 			if !found {
+				if globalFlags.JSON {
+					r := addResult{Action: "add", ItemType: "plugin", Name: name, Error: fmt.Sprintf("plugin %q not found in catalog", name)}
+					return json.NewEncoder(os.Stdout).Encode(r)
+				}
 				return fmt.Errorf("plugin %q not found in catalog. Run 'army fetch-catalog' to refresh", name)
 			}
 
@@ -50,24 +65,45 @@ func newAddPluginCmd() *cobra.Command {
 				Destination: dest,
 			}
 
-			if !manifest.AddPlugin(d.manifest, mp) {
-				fmt.Printf("Plugin %q is already in the manifest.\n", name)
-				return nil
-			}
+			r := addResult{Action: "add", ItemType: "plugin", Name: cp.Name}
 
-			if err := manifest.Save(d.manifestPath, d.manifest); err != nil {
-				return fmt.Errorf("saving manifest: %w", err)
-			}
-			fmt.Printf("Added plugin %q to manifest.\n", name)
-
-			if !noInstall {
-				fmt.Printf("Installing %s...\n", name)
-				result := d.orchestrator.InstallItems([]types.ManifestPlugin{mp}, nil)
-				if result.Failed > 0 {
-					return fmt.Errorf("failed to install plugin %q", name)
+			added := manifest.AddPlugin(d.manifest, mp)
+			if added {
+				if err := manifest.Save(d.manifestPath, d.manifest); err != nil {
+					if globalFlags.JSON {
+						r.Error = fmt.Sprintf("saving manifest: %v", err)
+						return json.NewEncoder(os.Stdout).Encode(r)
+					}
+					return fmt.Errorf("saving manifest: %w", err)
+				}
+				r.AddedToManifest = true
+				if !globalFlags.JSON {
+					fmt.Printf("Added plugin %q to manifest.\n", name)
+				}
+			} else {
+				if !globalFlags.JSON {
+					fmt.Printf("Plugin %q is already in the manifest.\n", name)
 				}
 			}
 
+			if !noInstall && added {
+				if !globalFlags.JSON {
+					fmt.Printf("Installing %s...\n", name)
+				}
+				result := d.orchestrator.InstallItems([]types.ManifestPlugin{mp}, nil)
+				if result.Failed > 0 {
+					if globalFlags.JSON {
+						r.Error = fmt.Sprintf("failed to install plugin %q", name)
+						return json.NewEncoder(os.Stdout).Encode(r)
+					}
+					return fmt.Errorf("failed to install plugin %q", name)
+				}
+				r.Installed = true
+			}
+
+			if globalFlags.JSON {
+				return json.NewEncoder(os.Stdout).Encode(r)
+			}
 			return nil
 		},
 	}
@@ -94,6 +130,10 @@ func newAddSkillCmd() *cobra.Command {
 
 			cs, found := d.catalog.FindSkill(name)
 			if !found {
+				if globalFlags.JSON {
+					r := addResult{Action: "add", ItemType: "skill", Name: name, Error: fmt.Sprintf("skill %q not found in catalog", name)}
+					return json.NewEncoder(os.Stdout).Encode(r)
+				}
 				return fmt.Errorf("skill %q not found in catalog. Run 'army fetch-catalog' to refresh", name)
 			}
 
@@ -109,24 +149,45 @@ func newAddSkillCmd() *cobra.Command {
 				Destination: dest,
 			}
 
-			if !manifest.AddSkill(d.manifest, ms) {
-				fmt.Printf("Skill %q is already in the manifest.\n", name)
-				return nil
-			}
+			r := addResult{Action: "add", ItemType: "skill", Name: cs.Name}
 
-			if err := manifest.Save(d.manifestPath, d.manifest); err != nil {
-				return fmt.Errorf("saving manifest: %w", err)
-			}
-			fmt.Printf("Added skill %q to manifest.\n", name)
-
-			if !noInstall {
-				fmt.Printf("Installing %s...\n", name)
-				result := d.orchestrator.InstallItems(nil, []types.ManifestSkill{ms})
-				if result.Failed > 0 {
-					return fmt.Errorf("failed to install skill %q", name)
+			added := manifest.AddSkill(d.manifest, ms)
+			if added {
+				if err := manifest.Save(d.manifestPath, d.manifest); err != nil {
+					if globalFlags.JSON {
+						r.Error = fmt.Sprintf("saving manifest: %v", err)
+						return json.NewEncoder(os.Stdout).Encode(r)
+					}
+					return fmt.Errorf("saving manifest: %w", err)
+				}
+				r.AddedToManifest = true
+				if !globalFlags.JSON {
+					fmt.Printf("Added skill %q to manifest.\n", name)
+				}
+			} else {
+				if !globalFlags.JSON {
+					fmt.Printf("Skill %q is already in the manifest.\n", name)
 				}
 			}
 
+			if !noInstall && added {
+				if !globalFlags.JSON {
+					fmt.Printf("Installing %s...\n", name)
+				}
+				result := d.orchestrator.InstallItems(nil, []types.ManifestSkill{ms})
+				if result.Failed > 0 {
+					if globalFlags.JSON {
+						r.Error = fmt.Sprintf("failed to install skill %q", name)
+						return json.NewEncoder(os.Stdout).Encode(r)
+					}
+					return fmt.Errorf("failed to install skill %q", name)
+				}
+				r.Installed = true
+			}
+
+			if globalFlags.JSON {
+				return json.NewEncoder(os.Stdout).Encode(r)
+			}
 			return nil
 		},
 	}
