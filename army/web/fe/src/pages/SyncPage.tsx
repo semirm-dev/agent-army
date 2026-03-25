@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { SyncPanel } from '@/components/sync/SyncPanel';
 import { useSyncStream } from '@/hooks/use-sync-stream';
 
 export function SyncPage() {
   const [destination, setDestination] = useState<string | undefined>(undefined);
   const { events, isRunning, startSync } = useSyncStream();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const autostart = searchParams.get('autostart') === 'true';
+
+  useEffect(() => {
+    if (autostart && !isRunning) {
+      startSync(destination);
+      setSearchParams({}, { replace: true });
+    }
+  }, [autostart]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-4 max-w-3xl">

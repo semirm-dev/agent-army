@@ -22,4 +22,12 @@ export class ArmyCatalogController {
     this.cache = await this.army.exec(['catalog']);
     return this.cache;
   }
+
+  @Post('fetch')
+  async fetchCatalog() {
+    await this.army.exec(['fetch-catalog']);
+    this.cache = null;
+    this.cache = await this.army.exec(['catalog']);
+    return this.cache;
+  }
 }

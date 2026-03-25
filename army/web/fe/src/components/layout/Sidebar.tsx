@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Package, ClipboardList, RefreshCw, Stethoscope, Sun, Moon } from 'lucide-react';
+import { Package, ClipboardList, RefreshCw, Stethoscope, Sun, Moon, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/hooks/use-theme';
 
 const navItems = [
+  { path: '/setup', label: 'Setup', icon: Wand2 },
   { path: '/catalog', label: 'Catalog', icon: Package },
   { path: '/manifest', label: 'Manifest', icon: ClipboardList },
   { path: '/sync', label: 'Sync', icon: RefreshCw },
@@ -50,7 +51,7 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-border flex items-center justify-between">
-        <span className="font-mono text-[11px] text-muted-foreground/50">v0.3.0</span>
+        <span className="font-mono text-[11px] text-muted-foreground/50">v0.4.0</span>
         <button
           onClick={toggleTheme}
           className="size-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"

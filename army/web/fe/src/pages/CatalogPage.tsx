@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { CatalogSearch } from '@/components/catalog/CatalogSearch';
 import { CatalogList } from '@/components/catalog/CatalogList';
-import { getCatalog } from '@/api/catalog';
+import { getCatalog, fetchCatalog } from '@/api/catalog';
 import { getManifest } from '@/api/manifest';
 import { cn } from '@/lib/utils';
 
@@ -11,6 +12,15 @@ export function CatalogPage() {
   const [search, setSearch] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'plugins' | 'skills'>('plugins');
+
+  const queryClient = useQueryClient();
+
+  const fetchMutation = useMutation({
+    mutationFn: fetchCatalog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['catalog'] });
+    },
+  });
 
   const catalogQuery = useQuery({
     queryKey: ['catalog'],
@@ -76,12 +86,35 @@ export function CatalogPage() {
 
   return (
     <div className="space-y-4 max-w-5xl">
-      <div>
-        <h2 className="text-xl font-semibold">Catalog</h2>
-        <p className="text-sm text-muted-foreground">
-          Browse available plugins and skills
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">Catalog</h2>
+          <p className="text-sm text-muted-foreground">
+            Browse available plugins and skills
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fetchMutation.mutate()}
+          disabled={fetchMutation.isPending}
+        >
+          {fetchMutation.isPending ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="size-3.5" />
+          )}
+          {fetchMutation.isPending ? 'Fetching...' : 'Fetch Latest'}
+        </Button>
       </div>
+      {fetchMutation.isSuccess && (
+        <p className="text-xs text-green-500">Catalog updated</p>
+      )}
+      {fetchMutation.isError && (
+        <p className="text-xs text-red-500">
+          Fetch failed: {fetchMutation.error.message}
+        </p>
+      )}
 
       <CatalogSearch value={search} onChange={setSearch} />
 

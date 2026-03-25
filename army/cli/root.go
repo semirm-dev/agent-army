@@ -34,6 +34,7 @@ func NewRootCmd() *cobra.Command {
 		newListCmd(),
 		newCatalogCmd(),
 		newFetchCatalogCmd(),
+		newWriteManifestCmd(),
 		newDoctorCmd(),
 		newDetectCmd(),
 		newServeCmd(),

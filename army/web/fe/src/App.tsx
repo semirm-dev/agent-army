@@ -5,6 +5,7 @@ import { CatalogPage } from './pages/CatalogPage';
 import { ManifestPage } from './pages/ManifestPage';
 import { SyncPage } from './pages/SyncPage';
 import { DoctorPage } from './pages/DoctorPage';
+import { SetupPage } from './pages/SetupPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +23,7 @@ export default function App() {
         <Routes>
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/catalog" replace />} />
+            <Route path="/setup" element={<SetupPage />} />
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/manifest" element={<ManifestPage />} />
             <Route path="/sync" element={<SyncPage />} />

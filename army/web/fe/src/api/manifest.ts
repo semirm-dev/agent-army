@@ -1,5 +1,5 @@
 import { apiFetch } from './client';
-import type { ManifestResponse, AddRemoveResult } from '../lib/types';
+import type { ManifestResponse, AddRemoveResult, SaveManifestRequest, SaveManifestResponse } from '../lib/types';
 
 export function getManifest(scope?: string): Promise<ManifestResponse> {
   const params = scope ? `?scope=${scope}` : '';
@@ -31,5 +31,12 @@ export function removeSkill(name: string, project = false): Promise<AddRemoveRes
   const params = project ? '?project=true' : '';
   return apiFetch<AddRemoveResult>(`/manifest/skill/${encodeURIComponent(name)}${params}`, {
     method: 'DELETE',
+  });
+}
+
+export function saveManifest(req: SaveManifestRequest): Promise<SaveManifestResponse> {
+  return apiFetch<SaveManifestResponse>('/manifest/save', {
+    method: 'POST',
+    body: JSON.stringify(req),
   });
 }

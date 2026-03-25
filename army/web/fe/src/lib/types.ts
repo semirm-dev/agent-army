@@ -94,3 +94,13 @@ export interface AddRemoveResult {
   uninstalled?: boolean;
   error: string;
 }
+
+export interface SaveManifestRequest {
+  destination: 'user' | 'project';
+  plugins: Array<{ name: string; marketplace: string; tags: string[] }>;
+  skills: Array<{ name: string; source: string; tags: string[] }>;
+}
+
+export interface SaveManifestResponse {
+  path: string;
+}

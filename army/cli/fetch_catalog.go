@@ -63,6 +63,13 @@ func newFetchCatalogCmd() *cobra.Command {
 				return fmt.Errorf("writing catalog: %w", err)
 			}
 
+			if globalFlags.JSON {
+				return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{
+					"path":    path,
+					"updated": true,
+				})
+			}
+
 			fmt.Printf("Catalog saved: %s\n", path)
 			return nil
 		},

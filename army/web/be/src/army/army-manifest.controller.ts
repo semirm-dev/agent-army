@@ -41,4 +41,22 @@ export class ArmyManifestController {
     if (project === 'true') args.push('--project');
     return this.army.exec(args);
   }
+
+  @Post('save')
+  async saveManifest(
+    @Body() body: {
+      destination: 'user' | 'project';
+      plugins: Array<{ name: string; marketplace: string; tags: string[] }>;
+      skills: Array<{ name: string; source: string; tags: string[] }>;
+    },
+  ) {
+    const manifest = {
+      version: 1,
+      plugins: body.plugins,
+      skills: body.skills,
+    };
+    return this.army.exec(
+      ['write-manifest', '--destination', body.destination, '--input', JSON.stringify(manifest)],
+    );
+  }
 }
