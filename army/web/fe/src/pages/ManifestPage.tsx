@@ -1,17 +1,23 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ScopeToggle } from '@/components/manifest/ScopeToggle';
 import { ManifestList } from '@/components/manifest/ManifestList';
 import { getManifest } from '@/api/manifest';
 
 export function ManifestPage() {
   const [scope, setScope] = useState<'user' | 'project'>('user');
+  const queryClient = useQueryClient();
 
   const manifestQuery = useQuery({
     queryKey: ['manifest', scope],
     queryFn: () => getManifest(scope),
   });
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['manifest', scope] });
+  };
 
   return (
     <div className="space-y-4 max-w-3xl">
@@ -22,7 +28,22 @@ export function ManifestPage() {
             Manage your selected plugins and skills
           </p>
         </div>
-        <ScopeToggle scope={scope} onChange={setScope} />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={manifestQuery.isFetching}
+          >
+            {manifestQuery.isFetching ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="size-3.5" />
+            )}
+            {manifestQuery.isFetching ? 'Updating...' : 'Update'}
+          </Button>
+          <ScopeToggle scope={scope} onChange={setScope} />
+        </div>
       </div>
 
       {manifestQuery.data && (
