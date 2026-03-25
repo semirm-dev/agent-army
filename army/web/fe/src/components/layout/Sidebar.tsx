@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Package, ClipboardList, RefreshCw, Stethoscope, Sun, Moon, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,14 @@ const navItems = [
 export function Sidebar() {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const [version, setVersion] = useState<string>('');
+
+  useEffect(() => {
+    fetch('/api/health')
+      .then((r) => r.json())
+      .then((d) => setVersion(d.version || ''))
+      .catch(() => {});
+  }, []);
 
   return (
     <aside className="w-56 border-r border-border bg-card flex flex-col">
@@ -51,7 +60,7 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-border flex items-center justify-between">
-        <span className="font-mono text-[11px] text-muted-foreground/50">v0.4.0</span>
+        <span className="font-mono text-[11px] text-muted-foreground/50">{version ? `v${version}` : ''}</span>
         <button
           onClick={toggleTheme}
           className="size-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"

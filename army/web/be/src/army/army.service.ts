@@ -31,6 +31,16 @@ export class ArmyService {
     });
   }
 
+  async getVersion(): Promise<string> {
+    const { stdout } = await execFileAsync(this.bin, ['version'], {
+      cwd: this.cwd,
+      env: { ...process.env },
+    });
+    // output is "army v0.4.3\n" — extract the version
+    const match = stdout.trim().match(/v(.+)/);
+    return match ? match[1] : 'unknown';
+  }
+
   execWithInput<T = unknown>(args: string[], input: string): Promise<T> {
     return new Promise((resolve, reject) => {
       const child = spawn(this.bin, [...args, '--json'], {

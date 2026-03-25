@@ -25,17 +25,22 @@ export function SyncPage() {
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
-        <label className="text-sm text-muted-foreground">Destination:</label>
-        <select
-          className="bg-card border border-border rounded-md px-2.5 py-1.5 text-xs text-muted-foreground"
-          value={destination || ''}
-          onChange={(e) => setDestination(e.target.value || undefined)}
-        >
-          <option value="">Auto</option>
-          <option value="user">User</option>
-          <option value="project">Project</option>
-        </select>
+      <div className="space-y-1">
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-muted-foreground">Destination:</label>
+          <select
+            className="bg-card border border-border rounded-md px-2.5 py-1.5 text-xs text-muted-foreground"
+            value={destination || ''}
+            onChange={(e) => setDestination(e.target.value || undefined)}
+          >
+            <option value="">Auto</option>
+            <option value="user">User</option>
+            <option value="project">Project</option>
+          </select>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Auto detects a project manifest in the current directory tree and syncs to it, otherwise falls back to the global user manifest (~/.army/manifest.json). User always syncs to the global manifest. Project always syncs to the current directory's manifest.
+        </p>
       </div>
 
       <SyncPanel
