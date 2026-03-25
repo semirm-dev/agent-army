@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/smahovkic/agent-army/army/internal/installer"
@@ -47,17 +48,22 @@ func resolveDeps() (*deps, error) {
 		return nil, fmt.Errorf("loading manifest: %w", err)
 	}
 
+	var out io.Writer = os.Stdout
+	if globalFlags.JSON {
+		out = io.Discard
+	}
+
 	var r commandRunner
 	if globalFlags.DryRun {
 		r = runner.NewDry()
 	} else {
-		r = runner.NewReal(nil)
+		r = runner.NewReal(nil, out)
 	}
 
 	pi := installer.NewPlugin(r)
 	si := installer.NewSkill(r)
 	sr := state.New()
-	orch := orchestrator.New(pi, si, sr, os.Stdout)
+	orch := orchestrator.New(pi, si, sr, out)
 
 	return &deps{
 		catalog:      cat,

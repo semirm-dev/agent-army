@@ -13,21 +13,27 @@ import (
 // while capturing stdout for the return value.
 type RealRunner struct {
 	ctx context.Context
+	out io.Writer // live output destination (os.Stdout or io.Discard)
 }
 
 // NewReal creates a RealRunner. If ctx is nil, context.Background() is used.
-func NewReal(ctx context.Context) *RealRunner {
+// If out is nil, os.Stdout is used for live output streaming.
+func NewReal(ctx context.Context, out ...io.Writer) *RealRunner {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	return &RealRunner{ctx: ctx}
+	w := io.Writer(os.Stdout)
+	if len(out) > 0 && out[0] != nil {
+		w = out[0]
+	}
+	return &RealRunner{ctx: ctx, out: w}
 }
 
 func (r *RealRunner) Run(cmd string, args ...string) (string, error) {
 	c := exec.CommandContext(r.ctx, cmd, args...)
 
 	var stdoutBuf bytes.Buffer
-	c.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)
+	c.Stdout = io.MultiWriter(r.out, &stdoutBuf)
 	c.Stderr = os.Stderr
 	c.Stdin = nil // prevent interactive prompts from consuming input
 
