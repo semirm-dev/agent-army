@@ -20,7 +20,9 @@ func newFetchCatalogCmd() *cobra.Command {
 		Use:   "fetch-catalog",
 		Short: "Fetch latest catalog from GitHub",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Fetching latest catalog...")
+			if !globalFlags.JSON {
+				fmt.Println("Fetching latest catalog...")
+			}
 
 			resp, err := http.Get(catalogURL)
 			if err != nil {
