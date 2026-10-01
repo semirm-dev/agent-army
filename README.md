@@ -1,4 +1,5 @@
-# army
+# agentarmy
+> 100% AI implementation
 
 Interactive CLI for setting up and managing Claude Code plugins and skills. Maintains a personal manifest of desired plugins/skills, auto-detects your tech stack, and keeps everything in sync.
 
